@@ -551,7 +551,9 @@ function buildModel(input){
   const vs=new Set();
   const collect=n=>{if(n.t==="var")vs.add(n.name);else if(n.t==="not")collect(n.a);else if(n.t==="bin"){collect(n.a);collect(n.b)}};
   asts.forEach(collect);
-  const vars=[...vs].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
+  // by letter, then by numeric index: p, p₁, p₂, p₁₀
+  const vkey=v=>[v[0],fromSub(v.slice(1))];
+  const vars=[...vs].sort((a,b)=>{const [la,ia]=vkey(a),[lb,ib]=vkey(b);return la!==lb?la.localeCompare(lb):(ia===""?-1:+ia)-(ib===""?-1:+ib)});
   const cols=[],pieces=[],islots=[],groups=[];
   asts.forEach((ast,g)=>{
     const idx=new Map();
