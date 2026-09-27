@@ -103,6 +103,8 @@ h2{font-size:1.05rem;font-weight:700;margin:0}
 .preview.err .src{font-family:"PT Mono",ui-monospace,monospace;color:var(--text);white-space:pre-wrap}
 .preview mark{background:var(--err-bg);color:var(--err);border-bottom:2px solid var(--err);padding:0 .1em}
 .preview .stale{color:var(--accent)}
+.bigwarn{margin-top:.4rem;padding:.5rem .8rem;border-radius:6px;background:var(--src-bg);color:var(--text);display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .8rem}
+.btn.sm{min-height:32px;padding:.15rem .75rem;font-size:.9rem}
 .examples{display:flex;flex-wrap:wrap;gap:.4rem .5rem;align-items:center;font-size:.92rem}
 .examples > span{color:var(--muted)}
 .chip{
@@ -282,6 +284,8 @@ span.cell:hover{background:transparent}
 "use strict";
 
 /* ---------- texts ---------- */
+const SAFE_VARS=6,MAX_VARS=16;
+function rowList(rs){return rs.length>30?rs.slice(0,30).join(", ")+" … ("+rs.length+")":rs.join(", ")}
 function pluralRu(n,a,b,c){const m10=n%10,m100=n%100;if(m10===1&&m100!==11)return a;if(m10>=2&&m10<=4&&(m100<12||m100>14))return b;return c}
 const T={
 ru:{
@@ -301,6 +305,8 @@ ru:{
   rows:n=>n+" "+pluralRu(n,"строка","строки","строк"),
   cols_:n=>n+" "+pluralRu(n,"столбец","столбца","столбцов")+" справа",
   stale:"Формула изменена — нажмите Enter или «Построить таблицу».",
+  bigWarn:(k,n)=>"Переменных больше "+SAFE_VARS+": в таблице будет "+n.toLocaleString("ru")+" строк. Построение и проверка могут идти медленно, а на слабом компьютере или телефоне браузеру может не хватить памяти.",
+  bigGo:n=>"Всё равно построить ("+n.toLocaleString("ru")+" строк)",
   sets:(a,n)=>"Различных наборов: "+a+" из "+n,
   dups:n=>"Повторов: "+n,
   vals:(a,n)=>"Значений справа: "+a+" из "+n,
@@ -316,16 +322,16 @@ ru:{
   cellLabel:(r,h)=>"строка "+r+", "+h,
   clsShort:(t,n)=>t===n?"тавтология":t===0?"противоречие":"выполнима, истинна в "+t+" из "+n+" строк",
   noteCounter:"контрпример",
-  entailYes:rs=>rs.length?"Следование имеет место: во всех строках, где истинны все посылки ("+rs.join(", ")+"), заключение тоже истинно.":"Следование имеет место: строк, где все посылки истинны, нет, поэтому контрпримера быть не может.",
-  entailNo:rs=>"Следования нет. "+(rs.length===1?"Контрпример — строка ":"Контрпримеры — строки ")+rs.join(", ")+": посылки истинны, а заключение ложно.",
+  entailYes:rs=>rs.length?"Следование имеет место: во всех строках, где истинны все посылки ("+rowList(rs)+"), заключение тоже истинно.":"Следование имеет место: строк, где все посылки истинны, нет, поэтому контрпримера быть не может.",
+  entailNo:rs=>"Следования нет. "+(rs.length===1?"Контрпример — строка ":"Контрпримеры — строки ")+rowList(rs)+": посылки истинны, а заключение ложно.",
   validYes:"Заключение истинно во всех строках: оно общезначимо и следует из пустого множества посылок.",
-  validNo:rs=>"Следования нет: заключение не общезначимо. "+(rs.length===1?"Контрпример — строка ":"Контрпримеры — строки ")+rs.join(", ")+".",
+  validNo:rs=>"Следования нет: заключение не общезначимо. "+(rs.length===1?"Контрпример — строка ":"Контрпримеры — строки ")+rowList(rs)+".",
   relHead:"Отношения между формулами:", and:"и", notBack:"но не наоборот",
   rel:{equiv:"эквивалентность",contradict:"контрадикторность",contrary:"контрарность",subcontrary:"субконтрарность",sub:"подчинение",indep:"независимость"},
   relWhy:{equiv:"значения совпадают во всех строках",contradict:"значения противоположны во всех строках",
     contrary:"не бывают истинны одновременно, но бывают одновременно ложны",subcontrary:"не бывают ложны одновременно, но бывают одновременно истинны",
     indep:"встречаются все четыре сочетания значений"},
-  joint:rs=>"Все формулы одновременно истинны в "+(rs.length===1?"строке ":"строках ")+rs.join(", ")+".",
+  joint:rs=>"Все формулы одновременно истинны в "+(rs.length===1?"строке ":"строках ")+rowList(rs)+".",
   noJoint:"Нет строки, где все формулы истинны одновременно: множество формул несовместно.",
   err:{
     empty:()=>"Введите формулу.",
@@ -335,7 +341,7 @@ ru:{
     expectClose:()=>"Не хватает закрывающей скобки.",
     conclOne:()=>"После ⊨ должна стоять одна формула — заключение.",
     extra:c=>"Лишний символ «"+c+"»: возможно, пропущена связка или скобка.",
-    tooMany:k=>"В формуле "+k+" переменных — это "+Math.pow(2,k)+" строк. Возьмите не больше 6 переменных."
+    tooMany:k=>"В формуле "+k+" переменных — это "+Math.pow(2,k).toLocaleString("ru")+" строк. Больше "+MAX_VARS+" переменных браузер не выдержит."
   },
   helpIntro:"Связки можно вводить кнопками, клавиатурой или командами LaTeX. Сокращения превращаются в символы прямо при вводе: <code>-&gt;</code> станет <code>→</code>, <code>+</code> — <code>⊻</code>, <code>||</code> или <code>v</code> — <code>∨</code>, а <code>\\land</code> — <code>∧</code> после пробела.",
   helpHead:["Связка","","Клавиатура","LaTeX"],
@@ -361,6 +367,8 @@ en:{
   rows:n=>n+" row"+(n===1?"":"s"),
   cols_:n=>n+" right-hand column"+(n===1?"":"s"),
   stale:"The formula has changed. Press Enter or “Build table”.",
+  bigWarn:(k,n)=>"More than "+SAFE_VARS+" variables: the table will have "+n.toLocaleString("en")+" rows. Building and checking it may be slow, and on a weak computer or a phone the browser may run out of memory.",
+  bigGo:n=>"Build anyway ("+n.toLocaleString("en")+" rows)",
   sets:(a,n)=>"Distinct assignments: "+a+" of "+n,
   dups:n=>"Repeats: "+n,
   vals:(a,n)=>"Right-hand values: "+a+" of "+n,
@@ -376,16 +384,16 @@ en:{
   cellLabel:(r,h)=>"row "+r+", "+h,
   clsShort:(t,n)=>t===n?"tautology":t===0?"contradiction":"satisfiable, true in "+t+" of "+n+" rows",
   noteCounter:"counterexample",
-  entailYes:rs=>rs.length?"The entailment holds: in every row where all premises are true ("+rs.join(", ")+"), the conclusion is true as well.":"The entailment holds: no row makes all premises true, so there can be no counterexample.",
-  entailNo:rs=>"The entailment fails. "+(rs.length===1?"Counterexample: row ":"Counterexamples: rows ")+rs.join(", ")+", where the premises are true and the conclusion is false.",
+  entailYes:rs=>rs.length?"The entailment holds: in every row where all premises are true ("+rowList(rs)+"), the conclusion is true as well.":"The entailment holds: no row makes all premises true, so there can be no counterexample.",
+  entailNo:rs=>"The entailment fails. "+(rs.length===1?"Counterexample: row ":"Counterexamples: rows ")+rowList(rs)+", where the premises are true and the conclusion is false.",
   validYes:"The conclusion is true in every row: it is valid and follows from the empty set of premises.",
-  validNo:rs=>"The entailment fails: the conclusion is not valid. "+(rs.length===1?"Counterexample: row ":"Counterexamples: rows ")+rs.join(", ")+".",
+  validNo:rs=>"The entailment fails: the conclusion is not valid. "+(rs.length===1?"Counterexample: row ":"Counterexamples: rows ")+rowList(rs)+".",
   relHead:"Relations between the formulas:", and:"and", notBack:"but not the other way round",
   rel:{equiv:"equivalence",contradict:"contradictoriness",contrary:"contrariety",subcontrary:"subcontrariety",sub:"subalternation",indep:"independence"},
   relWhy:{equiv:"their values agree in every row",contradict:"their values are opposite in every row",
     contrary:"never true together, but sometimes false together",subcontrary:"never false together, but sometimes true together",
     indep:"all four combinations of values occur"},
-  joint:rs=>"All formulas are true together in row"+(rs.length===1?" ":"s ")+rs.join(", ")+".",
+  joint:rs=>"All formulas are true together in row"+(rs.length===1?" ":"s ")+rowList(rs)+".",
   noJoint:"No row makes all formulas true together: the set of formulas is inconsistent.",
   err:{
     empty:()=>"Enter a formula.",
@@ -395,7 +403,7 @@ en:{
     expectClose:()=>"A closing parenthesis is missing.",
     conclOne:()=>"Only one formula, the conclusion, may follow ⊨.",
     extra:c=>"Unexpected “"+c+"”: a connective or parenthesis may be missing.",
-    tooMany:k=>"The formula has "+k+" variables, which means "+Math.pow(2,k)+" rows. Use at most 6 variables."
+    tooMany:k=>"The formula has "+k+" variables, which means "+Math.pow(2,k).toLocaleString("en")+" rows. A browser cannot handle more than "+MAX_VARS+" variables."
   },
   helpIntro:"Type connectives with the buttons, the keyboard, or LaTeX commands. Shortcuts turn into symbols as you type: <code>-&gt;</code> becomes <code>→</code>, <code>+</code> becomes <code>⊻</code>, <code>||</code> or <code>v</code> becomes <code>∨</code>, and <code>\\land</code> becomes <code>∧</code> after a space.",
   helpHead:["Connective","","Keyboard","LaTeX"],
@@ -650,17 +658,24 @@ function onFormulaInput(){
 }
 inp.addEventListener("input",e=>{if(e.isComposing)return;onFormulaInput()});
 inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();build()}});
-$("build").addEventListener("click",build);
+$("build").addEventListener("click",()=>build());
+preview.addEventListener("click",e=>{if(e.target.id==="big-go")build(true)});
 
 function renderPreview(){
   const s=inp.value;
   try{
     const ast=parse(s);const m=buildModel(ast);
-    if(m.vars.length>6)throw new PErr("tooMany",0,0,m.vars.length);
+    if(m.vars.length>MAX_VARS)throw new PErr("tooMany",0,0,m.vars.length);
     const stale=!S.model||m.text!==S.model.text;
     preview.className="preview";
-    preview.innerHTML="<span class=\"f\">"+esc(m.text)+"</span> · "+L().vars(m.vars.length)+" · "+L().rows(m.n)+
+    let html="<span class=\"f\">"+esc(m.text)+"</span> · "+L().vars(m.vars.length)+" · "+L().rows(m.n)+
       (stale&&S.model?" · <span class=\"stale\">"+esc(L().stale)+"</span>":"");
+    if(m.vars.length>SAFE_VARS&&stale){
+      html+="<div class=\"bigwarn\">"+esc(L().bigWarn(m.vars.length,m.n));
+      if(S.askBig===m.text)html+=" <button type=\"button\" class=\"btn sm\" id=\"big-go\">"+esc(L().bigGo(m.n))+"</button>";
+      html+="</div>";
+    }
+    preview.innerHTML=html;
     return ast;
   }catch(e){
     if(!(e instanceof PErr))throw e;
@@ -675,10 +690,15 @@ function renderPreview(){
   }
 }
 
-function build(){
+function build(force){
   const ast=renderPreview();
   if(!ast){inp.focus();return}
-  setModel(buildModel(ast));
+  const m=buildModel(ast);
+  // big tables need an explicit second click
+  if(m.vars.length>SAFE_VARS&&force!==true){S.askBig=m.text;renderPreview();const b=$("big-go");if(b)b.focus();return}
+  S.askBig=null;
+  if(m.vars.length>SAFE_VARS){preview.textContent="…";setTimeout(()=>{setModel(m);save("formula",inp.value)},30);return}
+  setModel(m);
   save("formula",inp.value);
 }
 function setModel(m,restore){
@@ -763,6 +783,7 @@ function renderTable(){
     }
   }
   table.innerHTML=h+"</tbody>";
+  S.cells=[...table.tBodies[0].rows].map(tr=>{const o={};for(const td of tr.children)if(td.dataset.td)o[td.dataset.td]=td;return o});
   update();
 }
 function rowStart(r){
@@ -828,22 +849,22 @@ function update(){
     const isDup=!!(marks&&(row.dupOf!=null||row.dupHead));
     tr.classList.toggle("dup",isDup);
     m.vars.forEach((_,j)=>{
-      const td=tr.querySelector("[data-td=\"L"+j+"\"]");
+      const td=S.cells[r]["L"+j];
       td.firstChild.textContent=sym(row.vals[j]);
       td.classList.toggle("dup",isDup&&!S.auto);
     });
     if(S.layout==="inline"){
       m.pieces.forEach((p,i)=>{
-        const td=tr.querySelector("td.copy[data-td=\"P"+i+"\"]");
-        if(td)td.firstChild.textContent=p.c==="v"?sym(row.vals[p.vj]):sym(p.t==="⊤");
+        const td=S.cells[r]["P"+i];
+        if(td.classList.contains("copy"))td.firstChild.textContent=p.c==="v"?sym(row.vals[p.vj]):sym(p.t==="⊤");
       });
       // a value is crossed out once the connective above it has been computed
       const used=new Set();
       A.sl.forEach(x=>{if(store(x.s)[r][x.c]!=null)x.kids.forEach(id=>{if(id[0]==="P")used.add(id)})});
-      tr.querySelectorAll("td.fp").forEach(td=>td.classList.toggle("used",used.has(td.dataset.td)));
+      m.pieces.forEach((p,i)=>S.cells[r]["P"+i].classList.toggle("used",used.has("P"+i)));
     }
     A.sl.forEach(x=>{
-      const td=tr.querySelector("[data-td=\""+x.td+"\"]");
+      const td=S.cells[r][x.td];
       td.firstChild.textContent=sym(store(x.s)[r][x.c]);
       const st=marks?row.cells[x.td]:null;
       td.classList.toggle("ok",st==="ok");td.classList.toggle("err",st==="err");
@@ -867,8 +888,9 @@ function update(){
   h+="<span class=\"pill"+(A.filled===A.total?" ok":"")+"\">"+esc(lang.vals(A.filled,A.total))+"</span>";
   if(marks)h+="<span class=\"pill"+(A.errors?" err":" ok")+"\">"+esc(lang.errs(A.errors))+"</span>";
   if(marks&&!S.auto&&A.missing.length&&(A.allLeft||S.checked)&&m.vars.length){
-    const list=A.missing.map(key=>"("+key.split("").map(b=>sym(b==="1")).join(", ")+")");
-    h+="<div class=\"missing\">"+esc(lang.missing)+" <span class=\"mono\">("+esc(m.vars.join(", "))+")</span>: <span class=\"mono\">"+esc(list.join("  "))+"</span></div>";
+    const list=A.missing.slice(0,24).map(key=>"("+key.split("").map(b=>sym(b==="1")).join(", ")+")");
+    const more=A.missing.length>24?" … ("+A.missing.length+")":"";
+    h+="<div class=\"missing\">"+esc(lang.missing)+" <span class=\"mono\">("+esc(m.vars.join(", "))+")</span>: <span class=\"mono\">"+esc(list.join("  ")+more)+"</span></div>";
   }
   if(!marks)h+="<div class=\"muted-line\">"+esc(lang.hidden)+"</div>";
   if(marks&&A.done){
