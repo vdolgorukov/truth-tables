@@ -670,7 +670,7 @@ function renderPreview(){
     preview.className="preview";
     let html="<span class=\"f\">"+esc(m.text)+"</span> · "+L().vars(m.vars.length)+" · "+L().rows(m.n)+
       (stale&&S.model?" · <span class=\"stale\">"+esc(L().stale)+"</span>":"");
-    if(m.vars.length>SAFE_VARS&&stale){
+    if(m.vars.length>SAFE_VARS&&(stale||S.askBig===m.text)){
       html+="<div class=\"bigwarn\">"+esc(L().bigWarn(m.vars.length,m.n));
       if(S.askBig===m.text)html+=" <button type=\"button\" class=\"btn sm\" id=\"big-go\">"+esc(L().bigGo(m.n))+"</button>";
       html+="</div>";
