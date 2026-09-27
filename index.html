@@ -1,0 +1,1026 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Тренажёр таблиц истинности</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Mono&family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+:root{
+  --paper:#ffffff;
+  --text:#22252d;
+  --muted:#5f6576;
+  --rule:#dde0e8;
+  --rule-strong:#a3a9b8;
+  --accent:#34438b;
+  --on-accent:#ffffff;
+  --ok:#2c7a4b;
+  --err:#b53a2f;
+  --ok-bg:#e2f2e8;
+  --err-bg:#fbe4e1;
+  --src-bg:#fdf1c9;
+  --tint:#f3f5fa;
+  box-sizing:border-box;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#16181d; --text:#e4e6ec; --muted:#9aa0b1;
+    --rule:#2d313c; --rule-strong:#565c6e; --accent:#a4b3f2; --on-accent:#141826;
+    --ok:#66c48b; --err:#f08172; --ok-bg:#1c3326; --err-bg:#3e2320; --src-bg:#3a3321;
+    --tint:#1e2129; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#16181d; --text:#e4e6ec; --muted:#9aa0b1;
+  --rule:#2d313c; --rule-strong:#565c6e; --accent:#a4b3f2; --on-accent:#141826;
+  --ok:#66c48b; --err:#f08172; --ok-bg:#1c3326; --err-bg:#3e2320; --src-bg:#3a3321;
+  --tint:#1e2129; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+body{
+  margin:0;background:var(--paper);color:var(--text);
+  font-family:"PT Serif",Georgia,"Times New Roman",serif;
+  font-size:1.0625rem;line-height:1.6;-webkit-text-size-adjust:100%;
+}
+main{max-width:1120px;margin:0 auto;padding:2.25rem 1.5rem 3rem}
+@media (max-width:520px){main{padding:1.5rem 1rem 2.5rem}}
+h1{font-size:clamp(1.55rem,1.2rem + 1.4vw,2.1rem);line-height:1.2;font-weight:700;margin:0 0 .45rem;text-wrap:balance}
+h2{font-size:1.05rem;font-weight:700;margin:0}
+.lead{margin:0;color:var(--muted);max-width:66ch}
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
+.mono{font-family:"PT Mono",ui-monospace,Menlo,Consolas,monospace}
+
+.seg{display:inline-flex;flex-wrap:wrap;border:1.5px solid var(--rule-strong);border-radius:6px;overflow:hidden}
+.seg button{font:inherit;font-size:.9rem;min-width:44px;min-height:36px;padding:0 .75rem;border:0;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap}
+.seg button + button{border-left:1.5px solid var(--rule-strong)}
+.seg button:hover{color:var(--accent)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.seg button:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
+.lang{margin-top:.3rem;flex-shrink:0}
+.lang button{letter-spacing:.04em;font-size:.85rem;padding:0 .6rem}
+
+.btn{
+  font:inherit;font-size:.97rem;min-height:40px;padding:.4rem 1rem;border-radius:6px;cursor:pointer;
+  border:1.5px solid var(--accent);background:transparent;color:var(--accent);
+}
+.btn:hover{background:var(--tint)}
+.btn.primary{background:var(--accent);color:var(--on-accent)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.quiet{border-color:var(--rule-strong);color:var(--muted)}
+.btn:focus-visible,summary:focus-visible,.chip:focus-visible,.key:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* formula entry */
+.entry{margin:1.6rem 0 0;display:grid;gap:.7rem}
+.entry label{color:var(--muted);font-size:.9rem;letter-spacing:.04em;text-transform:uppercase}
+.frow{display:flex;gap:.6rem;flex-wrap:wrap}
+#f-input{
+  flex:1 1 18rem;min-width:0;font-family:"PT Mono",ui-monospace,Menlo,monospace;font-size:1.3rem;
+  padding:.45rem .7rem;border:1.5px solid var(--rule-strong);border-radius:6px;background:var(--paper);color:var(--text);
+}
+#f-input:focus-visible{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.keys{display:flex;flex-wrap:wrap;gap:.4rem}
+.key{
+  font-family:"PT Mono",ui-monospace,Menlo,monospace;font-size:1.08rem;min-width:44px;min-height:40px;padding:0 .55rem;
+  border:1.5px solid var(--rule-strong);border-radius:6px;background:var(--paper);color:var(--text);cursor:pointer;
+}
+.key:hover{border-color:var(--accent);color:var(--accent)}
+.key.var{font-style:italic;font-family:"PT Serif",Georgia,serif}
+.key.aux{font-family:"PT Serif",Georgia,serif;font-size:.9rem;color:var(--muted)}
+.keys .gap{width:.6rem}
+.preview{min-height:1.6em;font-size:.97rem;color:var(--muted)}
+.preview .f{font-family:"PT Mono",ui-monospace,monospace;color:var(--text)}
+.preview.err{color:var(--err)}
+.preview.err .src{font-family:"PT Mono",ui-monospace,monospace;color:var(--text);white-space:pre-wrap}
+.preview mark{background:var(--err-bg);color:var(--err);border-bottom:2px solid var(--err);padding:0 .1em}
+.preview .stale{color:var(--accent)}
+.examples{display:flex;flex-wrap:wrap;gap:.4rem .5rem;align-items:center;font-size:.92rem}
+.examples > span{color:var(--muted)}
+.chip{
+  font-family:"PT Mono",ui-monospace,monospace;font-size:.88rem;padding:.2rem .6rem;min-height:32px;
+  border:1px solid var(--rule);border-radius:999px;background:var(--tint);color:var(--text);cursor:pointer;
+}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+
+details{border-top:1px solid var(--rule);padding-top:.6rem}
+summary{cursor:pointer;color:var(--accent);width:max-content;max-width:100%}
+.help{margin-top:.6rem;display:grid;gap:.8rem;font-size:.95rem}
+.help p{margin:0;max-width:70ch}
+.help-wrap{overflow-x:auto}
+.help table{border-collapse:collapse;font-size:.92rem}
+.help th,.help td{padding:.3rem .8rem .3rem 0;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top}
+.help th{font-weight:400;color:var(--muted)}
+.help td.sym{font-size:1.15rem}
+.help code{font-family:"PT Mono",ui-monospace,monospace;font-size:.88rem;background:var(--tint);padding:.05rem .3rem;border-radius:4px;white-space:nowrap}
+
+/* settings */
+.settings{display:flex;flex-wrap:wrap;gap:1rem 1.6rem;margin:1.6rem 0 0;padding:1.1rem 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.opt{display:grid;gap:.35rem;align-content:start}
+.opt > span{color:var(--muted);font-size:.8rem;letter-spacing:.05em;text-transform:uppercase}
+.seg .mono{font-size:.88rem}
+
+/* work area */
+.work{margin-top:1.6rem;display:grid;gap:1rem}
+.status{display:flex;flex-wrap:wrap;gap:.45rem .6rem;align-items:center;font-size:.93rem}
+.pill{display:inline-flex;align-items:center;gap:.4rem;padding:.15rem .7rem;border-radius:999px;border:1px solid var(--rule);background:var(--tint);color:var(--muted);font-variant-numeric:tabular-nums}
+.pill.ok{color:var(--ok);border-color:currentColor;background:var(--ok-bg)}
+.pill.err{color:var(--err);border-color:currentColor;background:var(--err-bg)}
+.missing{flex-basis:100%;color:var(--err)}
+.missing .mono{color:var(--text)}
+.banner{flex-basis:100%;padding:.6rem .9rem;border-radius:6px;background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok)}
+.banner b{font-weight:700}
+.banner .neg{color:var(--err);font-weight:700}
+.banner ul{margin:.3rem 0 .4rem;padding-left:1.2rem}
+.muted-line{flex-basis:100%;color:var(--muted);font-style:italic}
+
+.tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:.25rem}
+table.tt{border-collapse:collapse;font-family:"PT Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:1.05rem}
+.tt th,.tt td{border:1px solid var(--rule);padding:0;text-align:center;position:relative}
+.tt thead th{padding:.45rem .75rem;font-weight:400;white-space:nowrap;background:var(--tint);border-bottom:2px solid var(--rule-strong)}
+.tt thead th.var{font-family:"PT Serif",Georgia,serif;font-style:italic;font-size:1.12rem}
+.tt thead th.main{font-weight:700;color:var(--accent)}
+.tt th.rn{font-family:"PT Serif",Georgia,serif;font-size:.85rem;color:var(--muted);padding:0 .55rem;font-weight:400;background:var(--tint)}
+.tt .lastL{border-right:4px double var(--rule-strong)}
+.tt .gsep,.tt.inline .fp.gsep{border-left:4px double var(--rule-strong)}
+.tt .gconcl,.tt.inline .fp.gconcl{border-left:4px double var(--accent)}
+.tt thead th.gconcl{padding-left:1.5rem}
+.tt thead th.gconcl::before{content:"⊨";position:absolute;left:.3rem;top:50%;transform:translateY(-50%);color:var(--accent);font-size:.95rem;line-height:1}
+.tt tr.counter th.rn{color:var(--err);font-weight:700}
+.tt tr.counter td.note{font-weight:700}
+.rel{margin:.3rem 0 .4rem;padding-left:1.2rem}
+.rel li{margin:.15rem 0}
+.tt th.note,.tt td.note{border:0;background:transparent;text-align:left;padding:0 .7rem;font-family:"PT Serif",Georgia,serif;font-size:.86rem;white-space:nowrap}
+.tt td.note{color:var(--err)}
+.tt td.note.info{color:var(--muted);font-style:italic}
+.cell{
+  display:block;width:100%;min-width:2.75rem;height:2.4rem;border:0;margin:0;padding:0 .5rem;
+  background:transparent;font:inherit;color:var(--text);cursor:pointer;
+}
+.cell:hover{background:var(--tint)}
+.cell:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+span.cell{display:grid;place-items:center;cursor:default;color:var(--muted)}
+span.cell:hover{background:transparent}
+.tt td.ok{background:var(--ok-bg)}
+.tt td.ok .cell{color:var(--ok)}
+.tt td.err{background:var(--err-bg)}
+.tt td.err .cell{color:var(--err);font-weight:700}
+.tt td.err::after{content:"";position:absolute;top:0;right:0;border:5px solid transparent;border-top-color:var(--err);border-right-color:var(--err);pointer-events:none}
+.tt td.dup{background:var(--err-bg)}
+.tt tr.dup th.rn{color:var(--err);font-weight:700}
+.tt.inline .fp{border-left:0;border-right:0}
+.tt.inline thead th.fp{padding:.45rem .08rem;font-size:1.1rem}
+.tt.inline thead th.fp.op{padding:.45rem .2rem}
+.tt.inline thead th.fp.v{font-family:"PT Serif",Georgia,serif;font-style:italic;font-size:1.15rem;padding:.45rem .15rem}
+.tt.inline .fp.slot{border-left:1px solid var(--rule-strong);border-right:1px solid var(--rule-strong)}
+.tt.inline thead th.fp.slot{padding:.45rem .5rem}
+.tt.inline .fp .cell{min-width:2.4rem;padding:0 .15rem}
+.tt.inline .lastP{border-right:1px solid var(--rule)}
+.tt.inline td.fp.blank{min-width:.5rem}
+.tt.inline td.fp.copy .cell{min-width:1.4rem;padding:0 .1rem;color:var(--muted)}
+.tt.inline td.used .cell{text-decoration:line-through;text-decoration-thickness:1.5px;opacity:.6}
+.tt .src{box-shadow:inset 0 0 0 2px #d9a300;background:var(--src-bg)}
+.tt thead th.src{background:var(--src-bg)}
+
+.actions{display:flex;flex-wrap:wrap;gap:.6rem}
+.hint{margin:0;color:var(--muted);font-size:.9rem;max-width:80ch}
+@media (prefers-reduced-motion:no-preference){
+  .tt td{transition:background-color .15s}
+}
+</style>
+
+</head>
+<body>
+<main>
+  <header class="top">
+    <div>
+      <h1 data-i18n="h1"></h1>
+      <p class="lead" data-i18n="lead"></p>
+    </div>
+    <div class="seg lang" role="group" aria-label="Language">
+      <button type="button" data-lang="ru">RU</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+  </header>
+
+  <section class="entry">
+    <label for="f-input" data-i18n="flabel"></label>
+    <div class="frow">
+      <input id="f-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      <button type="button" class="btn primary" id="build" data-i18n="build"></button>
+    </div>
+    <div class="keys" id="keys"></div>
+    <div class="preview" id="preview" aria-live="polite"></div>
+    <div class="examples" id="examples"></div>
+    <details id="help-details">
+      <summary data-i18n="help"></summary>
+      <div class="help" id="help"></div>
+    </details>
+  </section>
+
+  <section class="settings" aria-label="Settings">
+    <div class="opt"><span data-i18n="notation"></span>
+      <div class="seg" data-set="notation">
+        <button type="button" data-val="01" class="mono">0 / 1</button>
+        <button type="button" data-val="IL" class="mono">И / Л</button>
+        <button type="button" data-val="TF" class="mono">T / F</button>
+      </div>
+    </div>
+    <div class="opt"><span data-i18n="left"></span>
+      <div class="seg" data-set="auto">
+        <button type="button" data-val="0" data-i18n="manual"></button>
+        <button type="button" data-val="1" data-i18n="auto"></button>
+      </div>
+    </div>
+    <div class="opt"><span data-i18n="order"></span>
+      <div class="seg" data-set="order">
+        <button type="button" data-val="asc" class="mono" id="ord-asc"></button>
+        <button type="button" data-val="desc" class="mono" id="ord-desc"></button>
+      </div>
+    </div>
+    <div class="opt"><span data-i18n="layout"></span>
+      <div class="seg" data-set="layout">
+        <button type="button" data-val="cols" data-i18n="layoutCols"></button>
+        <button type="button" data-val="inline" data-i18n="layoutInline"></button>
+      </div>
+    </div>
+    <div class="opt"><span data-i18n="cols"></span>
+      <div class="seg" data-set="cols">
+        <button type="button" data-val="all" data-i18n="colsAll"></button>
+        <button type="button" data-val="main" data-i18n="colsMain"></button>
+      </div>
+    </div>
+    <div class="opt"><span data-i18n="check"></span>
+      <div class="seg" data-set="live">
+        <button type="button" data-val="1" data-i18n="live"></button>
+        <button type="button" data-val="0" data-i18n="onButton"></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="work">
+    <div class="status" id="status" aria-live="polite"></div>
+    <div class="tablewrap"><table class="tt" id="tt"></table></div>
+    <div class="actions">
+      <button type="button" class="btn primary" id="check" data-i18n="checkBtn"></button>
+      <button type="button" class="btn" id="solve" data-i18n="solve"></button>
+      <button type="button" class="btn quiet" id="clear" data-i18n="clear"></button>
+    </div>
+    <p class="hint" data-i18n="keyhint"></p>
+  </section>
+</main>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- texts ---------- */
+function pluralRu(n,a,b,c){const m10=n%10,m100=n%100;if(m10===1&&m100!==11)return a;if(m10>=2&&m10<=4&&(m100<12||m100>14))return b;return c}
+const T={
+ru:{
+  h1:"Таблицы истинности",
+  lead:"Введите формулу и постройте её таблицу истинности сами: слева — наборы значений переменных, справа — значения подформул. Сайт подсвечивает верные и неверные ячейки, повторённые и пропущенные строки.",
+  flabel:"Формула", build:"Построить таблицу", examples:"Примеры:", random:"Случайная формула",
+  help:"Как вводить формулы",
+  notation:"Обозначения", left:"Левая часть", manual:"заполняю сам", auto:"автоматически",
+  order:"Порядок строк", layout:"Вид таблицы", layoutCols:"подформулы в столбцах", layoutInline:"значения под связками",
+  cols:"Что вычислять", colsAll:"все подформулы", colsMain:"только формулу",
+  check:"Проверка", live:"сразу", onButton:"по кнопке",
+  checkBtn:"Проверить", solve:"Показать ответ", clear:"Очистить",
+  keyhint:"Ввод в ячейку: 1, T или И — истина; 0, F или Л — ложь; Backspace — стереть; стрелки — переход. Клик по ячейке перебирает значения. При фокусе на ячейке справа жёлтым отмечены ячейки, от которых зависит её значение. В записи «под связками» значения, уже использованные для вычисления, зачёркиваются.",
+  clearInput:"стереть",
+  vars:n=>n+" "+pluralRu(n,"переменная","переменные","переменных"),
+  rows:n=>n+" "+pluralRu(n,"строка","строки","строк"),
+  cols_:n=>n+" "+pluralRu(n,"столбец","столбца","столбцов")+" справа",
+  stale:"Формула изменена — нажмите Enter или «Построить таблицу».",
+  sets:(a,n)=>"Различных наборов: "+a+" из "+n,
+  dups:n=>"Повторов: "+n,
+  vals:(a,n)=>"Значений справа: "+a+" из "+n,
+  errs:n=>"Ошибок: "+n,
+  missing:"Пропущены наборы",
+  noteDup:i=>"повторяет строку "+i,
+  noteEmpty:"набор не заполнен",
+  hidden:"Подсветка появится после нажатия «Проверить».",
+  done:"Таблица построена верно.",
+  taut:"Формула — тавтология: она истинна во всех строках.",
+  contr:"Формула — противоречие: она ложна во всех строках.",
+  sat:(t,n)=>"Формула выполнима, но не тавтология: истинна в "+t+" "+pluralRu(t,"строке","строках","строках")+" из "+n+".",
+  cellLabel:(r,h)=>"строка "+r+", "+h,
+  clsShort:(t,n)=>t===n?"тавтология":t===0?"противоречие":"выполнима, истинна в "+t+" из "+n+" строк",
+  noteCounter:"контрпример",
+  entailYes:rs=>rs.length?"Следование имеет место: во всех строках, где истинны все посылки ("+rs.join(", ")+"), заключение тоже истинно.":"Следование имеет место: строк, где все посылки истинны, нет, поэтому контрпримера быть не может.",
+  entailNo:rs=>"Следования нет. "+(rs.length===1?"Контрпример — строка ":"Контрпримеры — строки ")+rs.join(", ")+": посылки истинны, а заключение ложно.",
+  validYes:"Заключение истинно во всех строках: оно общезначимо и следует из пустого множества посылок.",
+  validNo:rs=>"Следования нет: заключение не общезначимо. "+(rs.length===1?"Контрпример — строка ":"Контрпримеры — строки ")+rs.join(", ")+".",
+  relHead:"Отношения между формулами:", and:"и", notBack:"но не наоборот",
+  rel:{equiv:"эквивалентность",contradict:"контрадикторность",contrary:"контрарность",subcontrary:"субконтрарность",sub:"подчинение",indep:"независимость"},
+  relWhy:{equiv:"значения совпадают во всех строках",contradict:"значения противоположны во всех строках",
+    contrary:"не бывают истинны одновременно, но бывают одновременно ложны",subcontrary:"не бывают ложны одновременно, но бывают одновременно истинны",
+    indep:"встречаются все четыре сочетания значений"},
+  joint:rs=>"Все формулы одновременно истинны в "+(rs.length===1?"строке ":"строках ")+rs.join(", ")+".",
+  noJoint:"Нет строки, где все формулы истинны одновременно: множество формул несовместно.",
+  err:{
+    empty:()=>"Введите формулу.",
+    badChar:c=>"Непонятный символ «"+c+"».",
+    badCmd:c=>"Неизвестная команда \\"+c+".",
+    expectOperand:()=>"Здесь ожидается переменная, ¬ или открывающая скобка.",
+    expectClose:()=>"Не хватает закрывающей скобки.",
+    conclOne:()=>"После ⊨ должна стоять одна формула — заключение.",
+    extra:c=>"Лишний символ «"+c+"»: возможно, пропущена связка или скобка.",
+    tooMany:k=>"В формуле "+k+" переменных — это "+Math.pow(2,k)+" строк. Возьмите не больше 6 переменных."
+  },
+  helpIntro:"Связки можно вводить кнопками, клавиатурой или командами LaTeX. Сокращения превращаются в символы прямо при вводе: <code>-&gt;</code> станет <code>→</code>, <code>+</code> — <code>⊻</code>, <code>||</code> или <code>v</code> — <code>∨</code>, а <code>\\land</code> — <code>∧</code> после пробела.",
+  helpHead:["Связка","","Клавиатура","LaTeX"],
+  helpNames:["отрицание","конъюнкция","дизъюнкция","импликация","эквиваленция","исключающее «или»","штрих Шеффера","стрелка Пирса","истина, ложь"],
+  helpList:"Несколько формул пишутся через запятую: <code>p→q, ¬q→¬p</code>. Они получают общую левую часть, а справа — отдельный блок столбцов для каждой формулы; после заполнения сайт называет отношение между каждой парой формул. Логическое следование записывается через <code>⊨</code> (<code>|=</code>, <code>\\models</code>, <code>\\vDash</code>): <code>p, p→q ⊨ q</code>. Сайт проверит следование и укажет строки-контрпримеры.",
+  helpVars:"Переменные — буквы латинского или русского алфавита, можно с индексом: <code>p1</code>, <code>p_1</code> → p₁.",
+  helpPrec:"Приоритет связок: ¬ сильнее всех, затем ∧ (и |), затем ∨ (и ↓), затем →, слабее всех ↔ и ⊻. Импликация правоассоциативна: p→q→r читается как p→(q→r). В заголовках таблицы скобки расставлены полностью."
+},
+en:{
+  h1:"Truth Tables",
+  lead:"Enter a formula and build its truth table yourself: variable assignments on the left, values of subformulas on the right. Correct and wrong cells, repeated and missing rows are highlighted.",
+  flabel:"Formula", build:"Build table", examples:"Examples:", random:"Random formula",
+  help:"How to type formulas",
+  notation:"Notation", left:"Left side", manual:"I fill it in", auto:"automatic",
+  order:"Row order", layout:"Table layout", layoutCols:"subformula columns", layoutInline:"values under connectives",
+  cols:"What to compute", colsAll:"all subformulas", colsMain:"formula only",
+  check:"Checking", live:"instant", onButton:"on request",
+  checkBtn:"Check", solve:"Show answer", clear:"Clear",
+  keyhint:"In a cell: 1, T or И means true; 0, F or Л means false; Backspace clears; arrow keys move. Clicking a cell cycles its value. When a right-hand cell has focus, the cells it depends on are marked in yellow. In the “under connectives” layout, values already used in a computation are crossed out.",
+  clearInput:"clear",
+  vars:n=>n+" variable"+(n===1?"":"s"),
+  rows:n=>n+" row"+(n===1?"":"s"),
+  cols_:n=>n+" right-hand column"+(n===1?"":"s"),
+  stale:"The formula has changed. Press Enter or “Build table”.",
+  sets:(a,n)=>"Distinct assignments: "+a+" of "+n,
+  dups:n=>"Repeats: "+n,
+  vals:(a,n)=>"Right-hand values: "+a+" of "+n,
+  errs:n=>"Mistakes: "+n,
+  missing:"Missing assignments",
+  noteDup:i=>"repeats row "+i,
+  noteEmpty:"assignment not filled in",
+  hidden:"Highlighting appears after you press “Check”.",
+  done:"The table is correct.",
+  taut:"The formula is a tautology: it is true in every row.",
+  contr:"The formula is a contradiction: it is false in every row.",
+  sat:(t,n)=>"The formula is satisfiable but not a tautology: true in "+t+" of "+n+" rows.",
+  cellLabel:(r,h)=>"row "+r+", "+h,
+  clsShort:(t,n)=>t===n?"tautology":t===0?"contradiction":"satisfiable, true in "+t+" of "+n+" rows",
+  noteCounter:"counterexample",
+  entailYes:rs=>rs.length?"The entailment holds: in every row where all premises are true ("+rs.join(", ")+"), the conclusion is true as well.":"The entailment holds: no row makes all premises true, so there can be no counterexample.",
+  entailNo:rs=>"The entailment fails. "+(rs.length===1?"Counterexample: row ":"Counterexamples: rows ")+rs.join(", ")+", where the premises are true and the conclusion is false.",
+  validYes:"The conclusion is true in every row: it is valid and follows from the empty set of premises.",
+  validNo:rs=>"The entailment fails: the conclusion is not valid. "+(rs.length===1?"Counterexample: row ":"Counterexamples: rows ")+rs.join(", ")+".",
+  relHead:"Relations between the formulas:", and:"and", notBack:"but not the other way round",
+  rel:{equiv:"equivalence",contradict:"contradictoriness",contrary:"contrariety",subcontrary:"subcontrariety",sub:"subalternation",indep:"independence"},
+  relWhy:{equiv:"their values agree in every row",contradict:"their values are opposite in every row",
+    contrary:"never true together, but sometimes false together",subcontrary:"never false together, but sometimes true together",
+    indep:"all four combinations of values occur"},
+  joint:rs=>"All formulas are true together in row"+(rs.length===1?" ":"s ")+rs.join(", ")+".",
+  noJoint:"No row makes all formulas true together: the set of formulas is inconsistent.",
+  err:{
+    empty:()=>"Enter a formula.",
+    badChar:c=>"Unrecognised symbol “"+c+"”.",
+    badCmd:c=>"Unknown command \\"+c+".",
+    expectOperand:()=>"A variable, ¬ or an opening parenthesis is expected here.",
+    expectClose:()=>"A closing parenthesis is missing.",
+    conclOne:()=>"Only one formula, the conclusion, may follow ⊨.",
+    extra:c=>"Unexpected “"+c+"”: a connective or parenthesis may be missing.",
+    tooMany:k=>"The formula has "+k+" variables, which means "+Math.pow(2,k)+" rows. Use at most 6 variables."
+  },
+  helpIntro:"Type connectives with the buttons, the keyboard, or LaTeX commands. Shortcuts turn into symbols as you type: <code>-&gt;</code> becomes <code>→</code>, <code>+</code> becomes <code>⊻</code>, <code>||</code> or <code>v</code> becomes <code>∨</code>, and <code>\\land</code> becomes <code>∧</code> after a space.",
+  helpHead:["Connective","","Keyboard","LaTeX"],
+  helpNames:["negation","conjunction","disjunction","implication","biconditional","exclusive or","Sheffer stroke (nand)","Peirce arrow (nor)","true, false"],
+  helpList:"Separate several formulas with commas: <code>p→q, ¬q→¬p</code>. They share one left side, each formula gets its own block of columns, and once the table is complete the relation between every pair of formulas is named. Write entailment with <code>⊨</code> (<code>|=</code>, <code>\\models</code>, <code>\\vDash</code>): <code>p, p→q ⊨ q</code>. The site checks it and points out counterexample rows.",
+  helpVars:"Variables are single letters, optionally with an index: <code>p1</code>, <code>p_1</code> → p₁.",
+  helpPrec:"Precedence: ¬ binds tightest, then ∧ (and |), then ∨ (and ↓), then →, and ↔ and ⊻ bind loosest. Implication associates to the right: p→q→r means p→(q→r). Table headers are fully parenthesised."
+}};
+const HELP_ROWS=[
+  ["¬","~  !  -","\\neg  \\lnot"],
+  ["∧","&  ^  /\\","\\land  \\wedge"],
+  ["∨","v  ||  \\/","\\lor  \\vee"],
+  ["→","->  =>","\\to  \\rightarrow  \\implies  \\supset"],
+  ["↔","<->  <=>","\\leftrightarrow  \\iff  \\equiv"],
+  ["⊻","+","\\veebar  \\oplus  \\xor"],
+  ["|","|","\\mid  \\uparrow  \\nand"],
+  ["↓","","\\downarrow  \\nor"],
+  ["⊤  ⊥","1  0","\\top  \\bot"]
+];
+const KEYS=[
+  ["¬","~  \\neg"],["∧","&  \\land"],["∨","v  ||  \\lor"],["→","->  \\to"],["↔","<->  \\iff"],["⊻","+  \\veebar"],["|","|  \\mid"],["↓","\\downarrow"],
+  null,["(",""],[")",""],[",",""],["⊨","|=  \\models"],["⊤","\\top"],["⊥","\\bot"],null,["p",""],["q",""],["r",""],["s",""]
+];
+const EXAMPLES=["p→q","p, p→q ⊨ q","p→q, q ⊨ p","p∧q, ¬p∨¬q, p∨q","p→q, ¬q→¬p","(p→q)∧¬r","¬(p∧q)↔¬p∨¬q","(p→q)↔(¬q→¬p)","((p→q)→p)→p","(p∨q)∧(p→r)∧(q→r)→r","p⊻q↔¬(p↔q)","p|q↔¬(p∧q)","p∧¬p"];
+const SYM={"01":["0","1"],"IL":["Л","И"],"TF":["F","T"]};
+const TRUE_KEYS=["1","t","T","и","И","y","Y"];
+const FALSE_KEYS=["0","f","F","л","Л","n","N"];
+
+/* ---------- storage ---------- */
+function load(k,d){try{const v=localStorage.getItem("tt-"+k);return v==null?d:JSON.parse(v)}catch(e){return d}}
+function save(k,v){try{localStorage.setItem("tt-"+k,JSON.stringify(v))}catch(e){}}
+
+const S={
+  lang:load("lang","ru"), notation:load("notation","01"), auto:load("auto",false), order:load("order","asc"),
+  cols:load("cols","all"), layout:load("layout","cols"), live:load("live",true),
+  model:null, left:[], right:[], checked:false
+};
+
+/* ---------- lexer / parser ---------- */
+const LATEX={to:"→",rightarrow:"→",Rightarrow:"→",implies:"→",supset:"→",rarr:"→",
+  leftrightarrow:"↔",Leftrightarrow:"↔",iff:"↔",equiv:"↔",lrarr:"↔",
+  land:"∧",wedge:"∧",with:"∧",lor:"∨",vee:"∨",neg:"¬",lnot:"¬",sim:"¬",
+  models:"⊨",vDash:"⊨",entails:"⊨",oplus:"⊻",xor:"⊻",veebar:"⊻",uparrow:"|",nand:"|",mid:"|",downarrow:"↓",nor:"↓",top:"⊤",bot:"⊥",bottom:"⊥"};
+const ASCII=[["|=","⊨"],["⊨","⊨"],["<->","↔"],["<=>","↔"],["->","→"],["=>","→"],["/\\","∧"],["\\/","∨"],["\\&","∧"],["&&","∧"],["||","∨"],
+  ["&","∧"],["|","|"],["^","∧"],["~","¬"],["!","¬"],["-","¬"],["+","⊻"],
+  ["⇒","→"],["⊃","→"],["⇔","↔"],["≡","↔"],["·","∧"],["⊕","⊻"],["↑","|"],["∼","¬"],
+  ["¬","¬"],["∧","∧"],["∨","∨"],["→","→"],["↔","↔"],["⊻","⊻"],["↓","↓"],["⊤","⊤"],["⊥","⊥"]];
+const SUB="₀₁₂₃₄₅₆₇₈₉";
+const toSub=d=>d.replace(/\d/g,x=>SUB[+x]);
+const fromSub=s=>s.replace(/[₀-₉]/g,x=>String(SUB.indexOf(x)));
+
+function PErr(key,pos,len,arg){this.key=key;this.pos=pos;this.len=len||1;this.arg=arg}
+
+function tokenize(s){
+  const out=[];let i=0;
+  outer: while(i<s.length){
+    const ch=s[i];
+    if(/\s/.test(ch)){i++;continue}
+    if(ch==="("||ch===")"){out.push({k:ch,pos:i,len:1});i++;continue}
+    if(ch===","||ch===";"){out.push({k:",",pos:i,len:1});i++;continue}
+    for(const [a,v] of ASCII){
+      if(s.startsWith(a,i)){
+        if(v==="⊤"||v==="⊥")out.push({k:"const",v:v==="⊤",pos:i,len:a.length});
+        else if(v==="⊨")out.push({k:"⊨",pos:i,len:a.length});
+        else out.push({k:"op",v,pos:i,len:a.length});
+        i+=a.length;continue outer;
+      }
+    }
+    if(ch==="\\"){
+      const m=/^\\([A-Za-z]+)/.exec(s.slice(i));
+      if(!m)throw new PErr("badChar",i,1,ch);
+      const v=LATEX[m[1]];
+      if(!v)throw new PErr("badCmd",i,m[0].length,m[1]);
+      if(v==="⊤"||v==="⊥")out.push({k:"const",v:v==="⊤",pos:i,len:m[0].length});
+      else if(v==="⊨")out.push({k:"⊨",pos:i,len:m[0].length});
+      else out.push({k:"op",v,pos:i,len:m[0].length});
+      i+=m[0].length;continue;
+    }
+    const mv=/^([A-Za-zА-Яа-яЁё])(?:_?\{?(\d+)\}?|([₀-₉]+))?/.exec(s.slice(i));
+    if(mv){
+      const idx=mv[2]||(mv[3]?fromSub(mv[3]):"");
+      out.push({k:"var",name:mv[1]+toSub(idx),pos:i,len:mv[0].length});
+      i+=mv[0].length;continue;
+    }
+    if(ch==="0"||ch==="1"){out.push({k:"const",v:ch==="1",pos:i,len:1});i++;continue}
+    throw new PErr("badChar",i,1,ch);
+  }
+  return out;
+}
+
+function parse(s){
+  const toks=tokenize(s);
+  if(!toks.length)throw new PErr("empty",0,0);
+  let p=0;
+  const peek=()=>toks[p];
+  const isOp=(...v)=>p<toks.length&&toks[p].k==="op"&&v.includes(toks[p].v);
+  function iff(){let a=imp();while(isOp("↔","⊻")){const op=toks[p++].v;a={t:"bin",op,a,b:imp()}}return a}
+  function imp(){const a=disj();if(isOp("→")){p++;return {t:"bin",op:"→",a,b:imp()}}return a}
+  function disj(){let a=conj();while(isOp("∨","↓")){const op=toks[p++].v;a={t:"bin",op,a,b:conj()}}return a}
+  function conj(){let a=un();while(isOp("∧","|")){const op=toks[p++].v;a={t:"bin",op,a,b:un()}}return a}
+  function un(){if(isOp("¬")){p++;return {t:"not",a:un()}}return atom()}
+  function atom(){
+    const t=peek();
+    if(!t)throw new PErr("expectOperand",s.length,1);
+    if(t.k==="var"){p++;return {t:"var",name:t.name}}
+    if(t.k==="const"){p++;return {t:"const",v:t.v}}
+    if(t.k==="("){
+      p++;const e=iff();const c=peek();
+      if(!c)throw new PErr("expectClose",s.length,1);
+      if(c.k!==")")throw new PErr("extra",c.pos,c.len,s.substr(c.pos,c.len));
+      p++;return e;
+    }
+    throw new PErr("expectOperand",t.pos,t.len);
+  }
+  // premises, premises ⊨ conclusion, or ⊨ conclusion
+  const list=[];let entail=false;
+  const at=k=>p<toks.length&&toks[p].k===k;
+  if(!at("⊨")){list.push(iff());while(at(",")){p++;list.push(iff())}}
+  if(at("⊨")){
+    entail=true;p++;list.push(iff());
+    if(at(","))throw new PErr("conclOne",toks[p].pos,1);
+  }
+  list.entail=entail;
+  if(p<toks.length){const t=toks[p];throw new PErr("extra",t.pos,t.len,s.substr(t.pos,t.len))}
+  return list;
+}
+
+function show(n){
+  switch(n.t){
+    case "var":return n.name;
+    case "const":return n.v?"⊤":"⊥";
+    case "not":return "¬"+(n.a.t==="bin"?"("+show(n.a)+")":show(n.a));
+    default:{const w=x=>x.t==="bin"?"("+show(x)+")":show(x);return w(n.a)+n.op+w(n.b)}
+  }
+}
+const OPS={"∧":(a,b)=>a&&b,"∨":(a,b)=>a||b,"→":(a,b)=>!a||b,"↔":(a,b)=>a===b,"⊻":(a,b)=>a!==b,"|":(a,b)=>!(a&&b),"↓":(a,b)=>!(a||b)};
+function ev(n,env){
+  switch(n.t){
+    case "var":return env[n.name];
+    case "const":return n.v;
+    case "not":return !ev(n.a,env);
+    default:return OPS[n.op](ev(n.a,env),ev(n.b,env));
+  }
+}
+
+/* live replacement while typing */
+function liveNorm(str){
+  return str
+    .replace(/\\([A-Za-z]+)(?=[^A-Za-z])/g,(m,c)=>LATEX[c]||m)
+    .replace(/\|=/g,"⊨").replace(/<->|<=>/g,"↔").replace(/->|=>/g,"→")
+    .replace(/\/\\/g,"∧").replace(/\\\//g,"∨").replace(/\\&/g,"∧")
+    .replace(/&&?/g,"∧").replace(/\|\|/g,"∨").replace(/\^/g,"∧")
+    .replace(/[~!∼]/g,"¬").replace(/-(?=[^>])/g,"¬").replace(/\+/g,"⊻")
+    .replace(/([A-Za-zА-Яа-яЁё0-9₀-₉)⊤⊥])\s+v\s/g,"$1∨")
+    .replace(/⇒|⊃/g,"→").replace(/⇔|≡/g,"↔").replace(/⊕/g,"⊻").replace(/↑/g,"|")
+    .replace(/\s*([∧∨→↔⊻|↓])\s*/g,"$1").replace(/¬\s+/g,"¬").replace(/\(\s+/g,"(").replace(/\s+\)/g,")").replace(/\s*([,;])(?=\S)/g,"$1 ").replace(/\s*⊨\s*/g," ⊨ ").replace(/^ ⊨/,"⊨");
+}
+
+/* ---------- model ---------- */
+/* Several formulas (separated by commas) share one left side; each gets its own
+   group of subformula columns and its own written-out block. */
+function buildModel(input){
+  const asts=Array.isArray(input)?input:[input];
+  const vs=new Set();
+  const collect=n=>{if(n.t==="var")vs.add(n.name);else if(n.t==="not")collect(n.a);else if(n.t==="bin"){collect(n.a);collect(n.b)}};
+  asts.forEach(collect);
+  const vars=[...vs].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
+  const cols=[],pieces=[],islots=[],groups=[];
+  asts.forEach((ast,g)=>{
+    const idx=new Map();
+    (function w(n){
+      if(n.t==="not")w(n.a);else if(n.t==="bin"){w(n.a);w(n.b)}else return;
+      const k=show(n);if(!idx.has(k)){idx.set(k,cols.length);cols.push({node:n,key:k,g})}
+    })(ast);
+    if(!idx.size){idx.set(show(ast),cols.length);cols.push({node:ast,key:show(ast),g})}
+    for(const c of cols){
+      if(c.g!==g)continue;
+      const ch=c.node.t==="not"?[c.node.a]:c.node.t==="bin"?[c.node.a,c.node.b]:[];
+      c.kids=ch.map(x=>x.t==="var"?"L"+vars.indexOf(x.name):x.t==="const"?null:"R"+idx.get(show(x))).filter(Boolean);
+      if(c.node.t==="var")c.kids=["L"+vars.indexOf(c.node.name)];
+    }
+    // written-out formula: one piece per symbol, one slot per connective occurrence
+    const p0=pieces.length,s0=islots.length;
+    const kidIds=i=>pieces[i].c==="v"?["P"+i,"L"+pieces[i].vj]:["P"+i];
+    function lay(n,paren){
+      if(paren)pieces.push({t:"(",c:"par",g});
+      let at,kids=[];
+      if(n.t==="var"){at=pieces.length;pieces.push({t:n.name,c:"v",vj:vars.indexOf(n.name),g})}
+      else if(n.t==="const"){at=pieces.length;pieces.push({t:n.v?"⊤":"⊥",c:"k",g})}
+      else if(n.t==="not"){at=pieces.length;pieces.push({t:"¬",c:"op",g});kids=[lay(n.a,n.a.t==="bin")]}
+      else{const a=lay(n.a,n.a.t==="bin");at=pieces.length;pieces.push({t:n.op,c:"op",g});kids=[a,lay(n.b,n.b.t==="bin")]}
+      if(kids.length)islots.push({node:n,piece:at,kids:kids.flatMap(kidIds)});
+      if(paren)pieces.push({t:")",c:"par",g});
+      return at;
+    }
+    const rootAt=lay(ast,false);
+    if(islots.length===s0)islots.push({node:ast,piece:rootAt,kids:ast.t==="var"?["L"+vars.indexOf(ast.name)]:[]});
+    pieces[p0].first=true;
+    groups.push({ast,text:show(ast),main:idx.get(show(ast)),mainI:islots.length-1});
+  });
+  cols.forEach((c,i)=>{c.first=i===0||cols[i-1].g!==c.g});
+  const entail=!!input.entail,prem=groups.slice(0,entail?-1:groups.length).map(x=>x.text).join(", ");
+  const text=entail?(prem?prem+" ":"")+"⊨ "+groups[groups.length-1].text:prem;
+  return {asts,groups,text,entail,concl:entail?groups.length-1:-1,vars,cols,n:1<<vars.length,pieces,islots,
+    mains:new Set(groups.map(x=>x.main)),mainsI:new Set(groups.map(x=>x.mainI))};
+}
+const k=()=>S.model.vars.length;
+const visCols=()=>S.cols==="main"?S.model.groups.map(x=>x.main):S.model.cols.map((_,i)=>i);
+function lexVal(r,j){const bit=(r>>(k()-1-j))&1;return S.order==="asc"?bit===1:bit===0}
+function leftVal(r,j){return S.auto?lexVal(r,j):S.left[r][j]}
+const sym=v=>v==null?"":SYM[S.notation][v?1:0];
+
+/* ---------- DOM refs ---------- */
+const $=id=>document.getElementById(id);
+const inp=$("f-input"),preview=$("preview"),table=$("tt"),statusEl=$("status");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const L=()=>T[S.lang];
+
+/* ---------- formula input ---------- */
+function buildKeys(){
+  const box=$("keys");box.innerHTML="";
+  for(const k of KEYS){
+    if(!k){const g=document.createElement("span");g.className="gap";box.appendChild(g);continue}
+    const b=document.createElement("button");b.type="button";b.className="key"+(/^[pqrs]$/.test(k[0])?" var":"");
+    b.textContent=k[0];if(k[1])b.title=k[1];
+    b.addEventListener("click",()=>insertAtCaret(k[0]));
+    box.appendChild(b);
+  }
+  const bs=document.createElement("button");bs.type="button";bs.className="key";bs.textContent="⌫";bs.setAttribute("aria-label","Backspace");
+  bs.addEventListener("click",()=>{const s=inp.selectionStart,e=inp.selectionEnd,v=inp.value;
+    if(s!==e){inp.value=v.slice(0,s)+v.slice(e);setCaret(s)}else if(s>0){inp.value=v.slice(0,s-1)+v.slice(s);setCaret(s-1)}else inp.focus();onFormulaInput()});
+  box.appendChild(bs);
+  const cl=document.createElement("button");cl.type="button";cl.className="key aux";cl.id="key-clear";cl.textContent=L().clearInput;
+  cl.addEventListener("click",()=>{inp.value="";setCaret(0);onFormulaInput()});
+  box.appendChild(cl);
+}
+function setCaret(p){inp.focus();inp.setSelectionRange(p,p)}
+function insertAtCaret(t){
+  const s=inp.selectionStart??inp.value.length,e=inp.selectionEnd??s,v=inp.value;
+  const ins=t;
+  inp.value=v.slice(0,s)+ins+v.slice(e);
+  setCaret(s+ins.length);onFormulaInput();
+}
+function onFormulaInput(){
+  const v=inp.value,c=inp.selectionStart??v.length;
+  const a=liveNorm(v.slice(0,c)),b=liveNorm(v.slice(c));
+  if(a+b!==v){inp.value=a+b;inp.setSelectionRange(a.length,a.length)}
+  renderPreview();
+}
+inp.addEventListener("input",e=>{if(e.isComposing)return;onFormulaInput()});
+inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();build()}});
+$("build").addEventListener("click",build);
+
+function renderPreview(){
+  const s=inp.value;
+  try{
+    const ast=parse(s);const m=buildModel(ast);
+    if(m.vars.length>6)throw new PErr("tooMany",0,0,m.vars.length);
+    const stale=!S.model||m.text!==S.model.text;
+    preview.className="preview";
+    preview.innerHTML="<span class=\"f\">"+esc(m.text)+"</span> · "+L().vars(m.vars.length)+" · "+L().rows(m.n)+
+      (stale&&S.model?" · <span class=\"stale\">"+esc(L().stale)+"</span>":"");
+    return ast;
+  }catch(e){
+    if(!(e instanceof PErr))throw e;
+    preview.className="preview err";
+    let html=esc(L().err[e.key](e.arg));
+    if(e.key!=="empty"&&e.key!=="tooMany"){
+      const before=s.slice(0,e.pos),mid=s.slice(e.pos,e.pos+e.len)||" ",after=s.slice(e.pos+e.len);
+      html+=" <span class=\"src\">"+esc(before)+"<mark>"+esc(mid)+"</mark>"+esc(after)+"</span>";
+    }
+    preview.innerHTML=html;
+    return null;
+  }
+}
+
+function build(){
+  const ast=renderPreview();
+  if(!ast){inp.focus();return}
+  setModel(buildModel(ast));
+  save("formula",inp.value);
+}
+function setModel(m,restore){
+  S.model=m;S.checked=false;
+  emptyGrids();
+  const fits=(g,h,w)=>Array.isArray(g)&&g.length===h&&(h===0||(Array.isArray(g[0])&&g[0].length===w));
+  if(restore&&restore.text===m.text&&fits(restore.left,m.n,m.vars.length)&&fits(restore.right,m.n,m.cols.length)){
+    S.left=restore.left;S.right=restore.right;
+    if(fits(restore.rightI,m.n,m.islots.length))S.rightI=restore.rightI;
+  }
+  renderTable();renderPreview();
+}
+function saveProgress(){save("progress",{text:S.model.text,left:S.left,right:S.right,rightI:S.rightI})}
+
+/* ---------- examples ---------- */
+function buildExamples(){
+  const box=$("examples");box.innerHTML="";
+  const lab=document.createElement("span");lab.textContent=L().examples;box.appendChild(lab);
+  for(const ex of EXAMPLES){
+    const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=ex;
+    b.addEventListener("click",()=>{inp.value=ex;build()});box.appendChild(b);
+  }
+  const r=document.createElement("button");r.type="button";r.className="chip";r.style.fontFamily="inherit";r.textContent="⚄ "+L().random;
+  r.addEventListener("click",()=>{inp.value=randomFormula();build()});box.appendChild(r);
+}
+function randomFormula(){
+  const pick=a=>a[Math.floor(Math.random()*a.length)];
+  const ops=["∧","∨","→","↔","∧","∨","→"];
+  for(let tries=0;tries<200;tries++){
+    const vars=["p","q","r"].slice(0,2+Math.floor(Math.random()*2));
+    const gen=d=>{
+      if(d===0||(d<3&&Math.random()<.3))return Math.random()<.2?{t:"not",a:{t:"var",name:pick(vars)}}:{t:"var",name:pick(vars)};
+      if(Math.random()<.18)return {t:"not",a:gen(d-1)};
+      return {t:"bin",op:pick(ops),a:gen(d-1),b:gen(d-1)};
+    };
+    const ast=gen(3);if(ast.t!=="bin")continue;
+    const m=buildModel(ast);
+    if(m.vars.length===vars.length&&m.cols.length>=3&&m.cols.length<=6)return m.text;
+  }
+  return "(p→q)∧(q→r)→(p→r)";
+}
+
+/* ---------- table ---------- */
+/* A slot is one editable right-hand cell per row: a subformula column (s="R")
+   or a position under a connective inside the written-out formula (s="I"). */
+function slots(){
+  const m=S.model;
+  if(S.layout==="cols")return visCols().map(c=>({s:"R",c,td:"R"+c,node:m.cols[c].node,kids:m.cols[c].kids,label:m.cols[c].key,main:m.mains.has(c),sep:sepCls(m.cols[c].g,S.cols==="main"||m.cols[c].first)}));
+  const idx=S.cols==="main"?[...m.mainsI]:m.islots.map((_,i)=>i);
+  return idx.map(i=>({s:"I",c:i,td:"P"+m.islots[i].piece,node:m.islots[i].node,kids:m.islots[i].kids,label:show(m.islots[i].node),main:m.mainsI.has(i),piece:m.islots[i].piece}))
+    .sort((a,b)=>a.piece-b.piece);
+}
+function sepCls(g,first){if(!first)return "";const m=S.model;return (g>0?" gsep":"")+(g===m.concl?" gconcl":"")}
+const store=s=>s==="L"?S.left:s==="R"?S.right:S.rightI;
+function cellBtn(s,r,c,label){return "<button type=\"button\" class=\"cell\" data-s=\""+s+"\" data-r=\""+r+"\" data-c=\""+c+"\" aria-label=\""+esc(L().cellLabel(r+1,label))+"\"></button>"}
+function renderTable(){
+  const m=S.model,K=m.vars.length,sl=slots(),inline=S.layout==="inline";
+  table.classList.toggle("inline",inline);
+  let h="<thead><tr><th class=\"rn\" scope=\"col\">#</th>";
+  m.vars.forEach((v,j)=>{h+="<th scope=\"col\" class=\"var"+(j===K-1?" lastL":"")+"\" data-h=\"L"+j+"\">"+esc(v)+"</th>"});
+  if(inline){
+    const at=new Map(sl.map(x=>[x.piece,x]));
+    const mainPieces=new Set([...m.mainsI].map(i=>m.islots[i].piece));
+    m.pieces.forEach((p,i)=>{h+="<th scope=\"col\" class=\"fp "+p.c+sepCls(p.g,p.first)+(at.has(i)?" slot":"")+(mainPieces.has(i)?" main":"")+(i===m.pieces.length-1?" lastP":"")+"\" data-h=\"P"+i+"\">"+esc(p.t)+"</th>"});
+    h+="<th class=\"note\" aria-hidden=\"true\"></th></tr></thead><tbody>";
+    for(let r=0;r<m.n;r++){
+      h+=rowStart(r);
+      m.pieces.forEach((p,i)=>{
+        const x=at.get(i),cls="fp "+p.c+sepCls(p.g,p.first)+(i===m.pieces.length-1?" lastP":"");
+        const copy=!x&&(p.c==="v"||p.c==="k");
+        h+="<td class=\""+cls+(x?" slot":copy?" copy":" blank")+"\" data-td=\"P"+i+"\">"+(x?cellBtn("I",r,x.c,x.label):copy?"<span class=\"cell\"></span>":"")+"</td>";
+      });
+      h+="<td class=\"note\"></td></tr>";
+    }
+  }else{
+    sl.forEach(x=>{h+="<th scope=\"col\" class=\""+(x.main?"main":"")+x.sep+"\" data-h=\""+x.td+"\">"+esc(x.label)+"</th>"});
+    h+="<th class=\"note\" aria-hidden=\"true\"></th></tr></thead><tbody>";
+    for(let r=0;r<m.n;r++){
+      h+=rowStart(r);
+      sl.forEach(x=>{h+="<td"+(x.sep?" class=\""+x.sep.trim()+"\"":"")+" data-td=\""+x.td+"\">"+cellBtn("R",r,x.c,x.label)+"</td>"});
+      h+="<td class=\"note\"></td></tr>";
+    }
+  }
+  table.innerHTML=h+"</tbody>";
+  update();
+}
+function rowStart(r){
+  const m=S.model,K=m.vars.length;
+  let h="<tr data-r=\""+r+"\"><th class=\"rn\" scope=\"row\">"+(r+1)+"</th>";
+  for(let j=0;j<K;j++){
+    h+="<td class=\""+(j===K-1?"lastL":"")+"\" data-td=\"L"+j+"\">"+(S.auto?"<span class=\"cell\"></span>":cellBtn("L",r,j,m.vars[j]))+"</td>";
+  }
+  return h;
+}
+
+function analyze(){
+  const m=S.model,K=m.vars.length,sl=slots();
+  const rows=[],groups=new Map();
+  for(let r=0;r<m.n;r++){
+    const vals=m.vars.map((_,j)=>leftVal(r,j));
+    const complete=vals.every(v=>v!=null);
+    const key=complete?vals.map(v=>v?1:0).join(""):null;
+    const env={};m.vars.forEach((v,j)=>env[v]=vals[j]);
+    rows.push({vals,complete,key,env,dupOf:null,cells:{}});
+    if(complete){if(!groups.has(key))groups.set(key,[]);groups.get(key).push(r)}
+  }
+  let dupRows=0;
+  for(const g of groups.values()){if(g.length>1){for(let i=1;i<g.length;i++){rows[g[i]].dupOf=g[0];dupRows++}rows[g[0]].dupHead=true}}
+  const missing=[];
+  for(let x=0;x<m.n;x++){
+    const key=K?x.toString(2).padStart(K,"0"):"";
+    if(!groups.has(key))missing.push(key);
+  }
+  if(S.order==="desc")missing.reverse();
+  let filled=0,errors=0;const total=m.n*sl.length;
+  rows.forEach((row,r)=>{
+    sl.forEach(x=>{
+      const v=store(x.s)[r][x.c];row.cells[x.td]=null;
+      if(v==null)return;
+      filled++;
+      if(!row.complete)return;
+      const ok=ev(x.node,row.env)===v;
+      row.cells[x.td]=ok?"ok":"err";if(!ok)errors++;
+    });
+  });
+  const allLeft=rows.every(r=>r.complete);
+  const done=allLeft&&!missing.length&&filled===total&&errors===0;
+  const trues=m.groups.map(()=>0),vecs=m.groups.map(()=>"");
+  for(let x=0;x<m.n;x++){
+    const env={};m.vars.forEach((v,j)=>env[v]=((x>>(K-1-j))&1)===1);
+    m.groups.forEach((g,i)=>{const t=ev(g.ast,env);if(t)trues[i]++;vecs[i]+=t?1:0});
+  }
+  const jointRows=[];rows.forEach((row,r)=>{if(row.complete&&m.groups.every(g=>ev(g.ast,row.env)))jointRows.push(r+1)});
+  const premRows=[],counter=[];
+  if(m.entail)rows.forEach((row,r)=>{
+    if(!row.complete)return;
+    if(m.groups.every((g,i)=>i===m.concl||ev(g.ast,row.env))){premRows.push(r+1);if(!ev(m.groups[m.concl].ast,row.env))counter.push(r+1)}
+  });
+  return {rows,missing,dupRows,distinct:groups.size,filled,total,errors,allLeft,done,trues,vecs,jointRows,premRows,counter,sl};
+}
+
+function update(){
+  const m=S.model,A=analyze(),lang=L(),marks=S.live||S.checked;
+  const trs=table.tBodies[0].rows;
+  A.rows.forEach((row,r)=>{
+    const tr=trs[r];
+    const isDup=!!(marks&&(row.dupOf!=null||row.dupHead));
+    tr.classList.toggle("dup",isDup);
+    m.vars.forEach((_,j)=>{
+      const td=tr.querySelector("[data-td=\"L"+j+"\"]");
+      td.firstChild.textContent=sym(row.vals[j]);
+      td.classList.toggle("dup",isDup&&!S.auto);
+    });
+    if(S.layout==="inline"){
+      m.pieces.forEach((p,i)=>{
+        const td=tr.querySelector("td.copy[data-td=\"P"+i+"\"]");
+        if(td)td.firstChild.textContent=p.c==="v"?sym(row.vals[p.vj]):sym(p.t==="⊤");
+      });
+      // a value is crossed out once the connective above it has been computed
+      const used=new Set();
+      A.sl.forEach(x=>{if(store(x.s)[r][x.c]!=null)x.kids.forEach(id=>{if(id[0]==="P")used.add(id)})});
+      tr.querySelectorAll("td.fp").forEach(td=>td.classList.toggle("used",used.has(td.dataset.td)));
+    }
+    A.sl.forEach(x=>{
+      const td=tr.querySelector("[data-td=\""+x.td+"\"]");
+      td.firstChild.textContent=sym(store(x.s)[r][x.c]);
+      const st=marks?row.cells[x.td]:null;
+      td.classList.toggle("ok",st==="ok");td.classList.toggle("err",st==="err");
+    });
+    const note=tr.lastElementChild;
+    note.className="note";
+    const isCounter=marks&&A.done&&A.counter.includes(r+1);
+    tr.classList.toggle("counter",isCounter);
+    if(isCounter)note.textContent=lang.noteCounter;
+    else if(marks&&row.dupOf!=null)note.textContent=lang.noteDup(row.dupOf+1);
+    else if(S.checked&&!row.complete){note.textContent=lang.noteEmpty;note.className="note info"}
+    else note.textContent="";
+  });
+
+  let h="";
+  if(!S.auto){
+    const good=A.distinct===m.n;
+    h+="<span class=\"pill"+(good?" ok":"")+"\">"+esc(lang.sets(A.distinct,m.n))+"</span>";
+    if(marks&&A.dupRows)h+="<span class=\"pill err\">"+esc(lang.dups(A.dupRows))+"</span>";
+  }
+  h+="<span class=\"pill"+(A.filled===A.total?" ok":"")+"\">"+esc(lang.vals(A.filled,A.total))+"</span>";
+  if(marks)h+="<span class=\"pill"+(A.errors?" err":" ok")+"\">"+esc(lang.errs(A.errors))+"</span>";
+  if(marks&&!S.auto&&A.missing.length&&(A.allLeft||S.checked)&&m.vars.length){
+    const list=A.missing.map(key=>"("+key.split("").map(b=>sym(b==="1")).join(", ")+")");
+    h+="<div class=\"missing\">"+esc(lang.missing)+" <span class=\"mono\">("+esc(m.vars.join(", "))+")</span>: <span class=\"mono\">"+esc(list.join("  "))+"</span></div>";
+  }
+  if(!marks)h+="<div class=\"muted-line\">"+esc(lang.hidden)+"</div>";
+  if(marks&&A.done){
+    const cls=t=>t===m.n?lang.taut:t===0?lang.contr:lang.sat(t,m.n);
+    if(m.entail){
+      let b="<b>"+esc(lang.done)+"</b> ";
+      const noPrem=m.groups.length===1;
+      const t=noPrem?(A.counter.length?lang.validNo(A.counter):lang.validYes):(A.counter.length?lang.entailNo(A.counter):lang.entailYes(A.premRows));
+      b+=A.counter.length?"<span class=\"neg\">"+esc(t)+"</span>":esc(t);
+      h+="<div class=\"banner\">"+b+"</div>";
+    }
+    else if(m.groups.length===1)h+="<div class=\"banner\"><b>"+esc(lang.done)+"</b> "+esc(cls(A.trues[0]))+"</div>";
+    else{
+      let b="<b>"+esc(lang.done)+"</b><ul>";
+      m.groups.forEach((g,i)=>{b+="<li><span class=\"mono\">"+esc(g.text)+"</span>: "+esc(lang.clsShort(A.trues[i],m.n))+"</li>"});
+      b+="</ul>";
+      b+="<div>"+esc(lang.relHead)+"</div><ul class=\"rel\">";
+      for(let i=0;i<m.groups.length;i++)for(let j=i+1;j<m.groups.length;j++){
+        const A_=m.groups[i].text,B_=m.groups[j].text;
+        const f=x=>"<span class=\"mono\">"+esc(x)+"</span>";
+        b+="<li>"+f(A_)+" "+esc(lang.and)+" "+f(B_)+": "+relations(A.vecs[i],A.vecs[j]).map(r=>
+          "<b>"+esc(lang.rel[r.kind])+"</b> — "+(r.kind==="sub"?f(r.dir>0?A_:B_)+" ⊨ "+f(r.dir>0?B_:A_)+", "+esc(lang.notBack):esc(lang.relWhy[r.kind]))
+        ).join("; ")+"</li>";
+      }
+      b+="</ul>"+esc(A.jointRows.length?lang.joint(A.jointRows):lang.noJoint);
+      h+="<div class=\"banner\">"+b+"</div>";
+    }
+  }
+  statusEl.innerHTML=h;
+}
+
+/* Relations between two formulas, from which value pairs (TT, TF, FT, FF) occur.
+   Several can hold at once: ⊤ and ⊥ are contradictory and ⊥ ⊨ ⊤ (subordination). */
+function relations(a,b){
+  let tt=0,tf=0,ft=0,ff=0;
+  for(let i=0;i<a.length;i++){const x=a[i]==="1",y=b[i]==="1";if(x&&y)tt++;else if(x)tf++;else if(y)ft++;else ff++}
+  if(!tf&&!ft)return [{kind:"equiv"}];
+  const out=[];
+  if(!tt&&!ff)out.push({kind:"contradict"});
+  if(!tt&&ff)out.push({kind:"contrary"});
+  if(!ff&&tt)out.push({kind:"subcontrary"});
+  if(!tf&&ft)out.push({kind:"sub",dir:1});
+  if(!ft&&tf)out.push({kind:"sub",dir:-1});
+  if(tt&&tf&&ft&&ff)out.push({kind:"indep"});
+  return out;
+}
+
+/* ---------- cell interaction ---------- */
+function cellAt(s,r,c){return table.querySelector("button[data-s=\""+s+"\"][data-r=\""+r+"\"][data-c=\""+c+"\"]")}
+function navCols(){const a=S.auto?[]:S.model.vars.map((_,j)=>({s:"L",c:j}));return a.concat(slots().map(x=>({s:x.s,c:x.c})))}
+function setVal(s,r,c,v){
+  store(s)[r][c]=v;
+  if(!S.live)S.checked=false;
+  update();saveProgress();
+}
+function focusAt(ci,r){const nc=navCols();if(ci<0||ci>=nc.length||r<0||r>=S.model.n)return;const b=cellAt(nc[ci].s,r,nc[ci].c);if(b)b.focus()}
+table.addEventListener("click",e=>{
+  const b=e.target.closest("button.cell");if(!b)return;
+  const s=b.dataset.s,r=+b.dataset.r,c=+b.dataset.c;
+  const cur=store(s)[r][c];
+  setVal(s,r,c,cur==null?true:cur?false:null);
+});
+table.addEventListener("keydown",e=>{
+  const b=e.target.closest("button.cell");if(!b)return;
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  const s=b.dataset.s,r=+b.dataset.r,c=+b.dataset.c;
+  const nc=navCols(),ci=nc.findIndex(x=>x.s===s&&x.c===c);
+  let v;
+  if(TRUE_KEYS.includes(e.key))v=true;else if(FALSE_KEYS.includes(e.key))v=false;
+  if(v!==undefined){
+    e.preventDefault();setVal(s,r,c,v);
+    if(r<S.model.n-1)focusAt(ci,r+1);else if(ci<nc.length-1)focusAt(ci+1,0);
+    return;
+  }
+  switch(e.key){
+    case "Backspace":case "Delete":e.preventDefault();setVal(s,r,c,null);return;
+    case "ArrowDown":e.preventDefault();focusAt(ci,r+1);return;
+    case "ArrowUp":e.preventDefault();focusAt(ci,r-1);return;
+    case "ArrowLeft":e.preventDefault();focusAt(ci-1,r);return;
+    case "ArrowRight":e.preventDefault();focusAt(ci+1,r);return;
+  }
+});
+function clearSrc(){table.querySelectorAll(".src").forEach(x=>x.classList.remove("src"))}
+table.addEventListener("focusin",e=>{
+  clearSrc();
+  const b=e.target.closest("button.cell");if(!b||b.dataset.s==="L")return;
+  const m=S.model,c=+b.dataset.c;
+  const kids=b.dataset.s==="R"?m.cols[c].kids:m.islots[c].kids;
+  const tr=table.tBodies[0].rows[+b.dataset.r];
+  for(const id of kids){
+    const td=tr.querySelector("[data-td=\""+id+"\"]");if(td)td.classList.add("src");
+    const th=table.querySelector("[data-h=\""+id+"\"]");if(th)th.classList.add("src");
+  }
+});
+table.addEventListener("focusout",e=>{if(!table.contains(e.relatedTarget))clearSrc()});
+
+function emptyGrids(){
+  const m=S.model,grid=w=>Array.from({length:m.n},()=>Array(w).fill(null));
+  S.left=grid(m.vars.length);S.right=grid(m.cols.length);S.rightI=grid(m.islots.length);
+}
+$("check").addEventListener("click",()=>{S.checked=true;update()});
+$("clear").addEventListener("click",()=>{S.checked=false;emptyGrids();update();saveProgress()});
+$("solve").addEventListener("click",()=>{
+  const m=S.model;
+  for(let r=0;r<m.n;r++){
+    const env={};
+    m.vars.forEach((v,j)=>{S.left[r][j]=lexVal(r,j);env[v]=S.left[r][j]});
+    m.cols.forEach((c,i)=>{S.right[r][i]=ev(c.node,env)});
+    m.islots.forEach((x,i)=>{S.rightI[r][i]=ev(x.node,env)});
+  }
+  S.checked=true;update();saveProgress();
+});
+
+/* ---------- settings ---------- */
+function syncSegs(){
+  const val={notation:S.notation,auto:S.auto?"1":"0",order:S.order,layout:S.layout,cols:S.cols,live:S.live?"1":"0"};
+  document.querySelectorAll(".seg[data-set]").forEach(g=>{
+    g.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.val===val[g.dataset.set])));
+  });
+  document.querySelectorAll("[data-lang]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.lang===S.lang)));
+  const [f,t]=SYM[S.notation];
+  $("ord-asc").textContent=f+f+f+" → "+t+t+t;
+  $("ord-desc").textContent=t+t+t+" → "+f+f+f;
+}
+document.querySelectorAll(".seg[data-set]").forEach(g=>{
+  g.addEventListener("click",e=>{
+    const b=e.target.closest("button");if(!b)return;
+    const key=g.dataset.set,v=b.dataset.val;
+    if(key==="notation")S.notation=v;
+    if(key==="auto")S.auto=v==="1";
+    if(key==="order")S.order=v;
+    if(key==="cols")S.cols=v;
+    if(key==="layout")S.layout=v;
+    if(key==="live"){S.live=v==="1";S.checked=false}
+    save(key,S[key]);syncSegs();
+    if(key==="auto"||key==="cols"||key==="layout")renderTable();else update();
+  });
+});
+document.querySelectorAll("[data-lang]").forEach(b=>b.addEventListener("click",()=>{S.lang=b.dataset.lang;save("lang",S.lang);applyLang()}));
+
+function applyLang(){
+  const lang=L();
+  document.documentElement.lang=S.lang;
+  document.title=S.lang==="ru"?"Тренажёр таблиц истинности":"Truth Table Trainer";
+  document.querySelectorAll("[data-i18n]").forEach(el=>{el.textContent=lang[el.dataset.i18n]});
+  let h="<p>"+lang.helpIntro+"</p><div class=\"help-wrap\"><table><thead><tr>"+lang.helpHead.map(x=>"<th>"+esc(x)+"</th>").join("")+"</tr></thead><tbody>";
+  HELP_ROWS.forEach((row,i)=>{
+    const codes=s=>s?s.split(/\s{2,}/).map(x=>"<code>"+esc(x)+"</code>").join(" "):"";
+    h+="<tr><td>"+esc(lang.helpNames[i])+"</td><td class=\"sym\">"+esc(row[0])+"</td><td>"+codes(row[1])+"</td><td>"+codes(row[2])+"</td></tr>";
+  });
+  h+="</tbody></table></div><p>"+lang.helpList+"</p><p>"+lang.helpVars+"</p><p>"+lang.helpPrec+"</p>";
+  $("help").innerHTML=h;
+  buildKeys();buildExamples();syncSegs();
+  if(S.model)renderTable();
+  renderPreview();
+}
+
+/* ---------- start ---------- */
+inp.value=liveNorm(load("formula","(p→q)∧¬r"));
+applyLang();
+let ast=renderPreview();
+if(!ast){inp.value="(p→q)∧¬r";ast=renderPreview()}
+setModel(buildModel(ast),load("progress",null));
+})();
+</script>
+</body>
+</html>
