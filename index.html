@@ -22,6 +22,7 @@
   --err-bg:#fbe4e1;
   --src-bg:#fdf1c9;
   --tint:#f3f5fa;
+  --key-bg:#dfe5f0; --key-bg-hover:#cfd8ea; --key-border:#aab5cc;
   box-sizing:border-box;
 }
 @media (prefers-color-scheme:dark){
@@ -29,14 +30,14 @@
     --paper:#16181d; --text:#e4e6ec; --muted:#9aa0b1;
     --rule:#2d313c; --rule-strong:#565c6e; --accent:#a4b3f2; --on-accent:#141826;
     --ok:#66c48b; --err:#f08172; --ok-bg:#1c3326; --err-bg:#3e2320; --src-bg:#3a3321;
-    --tint:#1e2129; color-scheme:dark;
+    --tint:#1e2129; --key-bg:#2b3244; --key-bg-hover:#353e55; --key-border:#4b5670; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --paper:#16181d; --text:#e4e6ec; --muted:#9aa0b1;
   --rule:#2d313c; --rule-strong:#565c6e; --accent:#a4b3f2; --on-accent:#141826;
   --ok:#66c48b; --err:#f08172; --ok-bg:#1c3326; --err-bg:#3e2320; --src-bg:#3a3321;
-  --tint:#1e2129; color-scheme:dark;
+  --tint:#1e2129; --key-bg:#2b3244; --key-bg-hover:#353e55; --key-border:#4b5670; color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:inherit}
 body{
@@ -44,7 +45,14 @@ body{
   font-family:"PT Serif",Georgia,"Times New Roman",serif;
   font-size:1.0625rem;line-height:1.6;-webkit-text-size-adjust:100%;
 }
-main{max-width:1120px;margin:0 auto;padding:2.25rem 1.5rem 3rem}
+main{max-width:1120px;margin:0 auto;padding:2.25rem 1.5rem 4.5rem}
+.report{
+  position:fixed;right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:5;
+  font-size:.82rem;line-height:1.2;padding:.4rem .8rem;border-radius:999px;text-decoration:none;
+  background:var(--key-bg);border:1px solid var(--key-border);color:var(--muted);box-shadow:0 1px 4px rgba(20,30,60,.15);
+}
+.report:hover{color:var(--accent);border-color:var(--accent)}
+.report:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media (max-width:520px){main{padding:1.5rem 1rem 2.5rem}}
 h1{font-size:clamp(1.55rem,1.2rem + 1.4vw,2.1rem);line-height:1.2;font-weight:700;margin:0 0 .45rem;text-wrap:balance}
 h2{font-size:1.05rem;font-weight:700;margin:0}
@@ -83,9 +91,9 @@ h2{font-size:1.05rem;font-weight:700;margin:0}
 .keys{display:flex;flex-wrap:wrap;gap:.4rem}
 .key{
   font-family:"PT Mono",ui-monospace,Menlo,monospace;font-size:1.08rem;min-width:44px;min-height:40px;padding:0 .55rem;
-  border:1.5px solid var(--rule-strong);border-radius:6px;background:var(--paper);color:var(--text);cursor:pointer;
+  border:1.5px solid var(--key-border);border-radius:6px;background:var(--key-bg);color:var(--text);cursor:pointer;
 }
-.key:hover{border-color:var(--accent);color:var(--accent)}
+.key:hover{background:var(--key-bg-hover);border-color:var(--accent);color:var(--accent)}
 .key.var{font-style:italic;font-family:"PT Serif",Georgia,serif}
 .key.aux{font-family:"PT Serif",Georgia,serif;font-size:.9rem;color:var(--muted)}
 .keys .gap{width:.6rem}
@@ -219,7 +227,7 @@ span.cell:hover{background:transparent}
   <section class="settings" aria-label="Settings">
     <div class="opt"><span data-i18n="notation"></span>
       <div class="seg" data-set="notation">
-        <button type="button" data-val="01" class="mono">0 / 1</button>
+        <button type="button" data-val="01" class="mono">1 / 0</button>
         <button type="button" data-val="IL" class="mono">И / Л</button>
         <button type="button" data-val="TF" class="mono">T / F</button>
       </div>
@@ -267,6 +275,7 @@ span.cell:hover{background:transparent}
     <p class="hint" data-i18n="keyhint"></p>
   </section>
 </main>
+<a class="report" id="report" href="mailto:vdolgorukov+truthtable@gmail.com" title="vdolgorukov+truthtable@gmail.com" data-i18n="report"></a>
 
 <script>
 (function(){
@@ -276,7 +285,8 @@ span.cell:hover{background:transparent}
 function pluralRu(n,a,b,c){const m10=n%10,m100=n%100;if(m10===1&&m100!==11)return a;if(m10>=2&&m10<=4&&(m100<12||m100>14))return b;return c}
 const T={
 ru:{
-  h1:"Таблицы истинности",
+  h1:"Таблицы истинности", report:"Сообщить об ошибке",
+  reportSubject:"Тренажёр таблиц истинности: ошибка", reportBody:f=>"Формула: "+f+"\nАдрес страницы: "+location.href+"\n\nЧто произошло:\n",
   lead:"Введите формулу и постройте её таблицу истинности сами: слева — наборы значений переменных, справа — значения подформул. Сайт подсвечивает верные и неверные ячейки, повторённые и пропущенные строки.",
   flabel:"Формула", build:"Построить таблицу", examples:"Примеры:", random:"Случайная формула",
   help:"Как вводить формулы",
@@ -285,7 +295,7 @@ ru:{
   cols:"Что вычислять", colsAll:"все подформулы", colsMain:"только формулу",
   check:"Проверка", live:"сразу", onButton:"по кнопке",
   checkBtn:"Проверить", solve:"Показать ответ", clear:"Очистить",
-  keyhint:"Ввод в ячейку: 1, T или И — истина; 0, F или Л — ложь; Backspace — стереть; стрелки — переход. Клик по ячейке перебирает значения. При фокусе на ячейке справа жёлтым отмечены ячейки, от которых зависит её значение. В записи «под связками» значения, уже использованные для вычисления, зачёркиваются.",
+  keyhint:"Ввод в ячейку: 1, И или T — истина; 0, Л или F — ложь; Backspace — стереть; стрелки — переход. Клик по ячейке перебирает значения. При фокусе на ячейке справа жёлтым отмечены ячейки, от которых зависит её значение. В записи «под связками» значения, уже использованные для вычисления, зачёркиваются.",
   clearInput:"стереть",
   vars:n=>n+" "+pluralRu(n,"переменная","переменные","переменных"),
   rows:n=>n+" "+pluralRu(n,"строка","строки","строк"),
@@ -335,7 +345,8 @@ ru:{
   helpPrec:"Приоритет связок: ¬ сильнее всех, затем ∧ (и |), затем ∨ (и ↓), затем →, слабее всех ↔ и ⊻. Импликация правоассоциативна: p→q→r читается как p→(q→r). В заголовках таблицы скобки расставлены полностью."
 },
 en:{
-  h1:"Truth Tables",
+  h1:"Truth Tables", report:"Report a bug",
+  reportSubject:"Truth table trainer: bug report", reportBody:f=>"Formula: "+f+"\nPage: "+location.href+"\n\nWhat happened:\n",
   lead:"Enter a formula and build its truth table yourself: variable assignments on the left, values of subformulas on the right. Correct and wrong cells, repeated and missing rows are highlighted.",
   flabel:"Formula", build:"Build table", examples:"Examples:", random:"Random formula",
   help:"How to type formulas",
@@ -344,7 +355,7 @@ en:{
   cols:"What to compute", colsAll:"all subformulas", colsMain:"formula only",
   check:"Checking", live:"instant", onButton:"on request",
   checkBtn:"Check", solve:"Show answer", clear:"Clear",
-  keyhint:"In a cell: 1, T or И means true; 0, F or Л means false; Backspace clears; arrow keys move. Clicking a cell cycles its value. When a right-hand cell has focus, the cells it depends on are marked in yellow. In the “under connectives” layout, values already used in a computation are crossed out.",
+  keyhint:"In a cell: 1 or T means true; 0 or F means false; Backspace clears; arrow keys move. Clicking a cell cycles its value. When a right-hand cell has focus, the cells it depends on are marked in yellow. In the “under connectives” layout, values already used in a computation are crossed out.",
   clearInput:"clear",
   vars:n=>n+" variable"+(n===1?"":"s"),
   rows:n=>n+" row"+(n===1?"":"s"),
@@ -405,8 +416,9 @@ const HELP_ROWS=[
   ["⊤  ⊥","1  0","\\top  \\bot"]
 ];
 const KEYS=[
-  ["¬","~  \\neg"],["∧","&  \\land"],["∨","v  ||  \\lor"],["→","->  \\to"],["↔","<->  \\iff"],["⊻","+  \\veebar"],["|","|  \\mid"],["↓","\\downarrow"],
-  null,["(",""],[")",""],[",",""],["⊨","|=  \\models"],["⊤","\\top"],["⊥","\\bot"],null,["p",""],["q",""],["r",""],["s",""]
+  ["p",""],["q",""],["r",""],["s",""],["⊤","1  \\top"],["⊥","0  \\bot"],null,
+  ["¬","~  \\neg"],["∧","&  \\land"],["∨","v  ||  \\lor"],["→","->  \\to"],["↔","<->  \\iff"],["⊻","+  \\veebar"],["|","|  \\mid"],["↓","\\downarrow"],null,
+  ["(",""],[")",""],[",",""],["⊨","|=  \\models"]
 ];
 const EXAMPLES=["p→q","p, p→q ⊨ q","p→q, q ⊨ p","p∧q, ¬p∨¬q, p∨q","p→q, ¬q→¬p","(p→q)∧¬r","¬(p∧q)↔¬p∨¬q","(p→q)↔(¬q→¬p)","((p→q)→p)→p","(p∨q)∧(p→r)∧(q→r)→r","p⊻q↔¬(p↔q)","p|q↔¬(p∧q)","p∧¬p"];
 const SYM={"01":["0","1"],"IL":["Л","И"],"TF":["F","T"]};
@@ -957,6 +969,11 @@ function emptyGrids(){
   const m=S.model,grid=w=>Array.from({length:m.n},()=>Array(w).fill(null));
   S.left=grid(m.vars.length);S.right=grid(m.cols.length);S.rightI=grid(m.islots.length);
 }
+function reportHref(){
+  const lang=L(),f=inp.value||(S.model?S.model.text:"");
+  return "mailto:vdolgorukov+truthtable@gmail.com?subject="+encodeURIComponent(lang.reportSubject)+"&body="+encodeURIComponent(lang.reportBody(f));
+}
+["pointerdown","focus","click"].forEach(ev=>$("report").addEventListener(ev,()=>{$("report").href=reportHref()}));
 $("check").addEventListener("click",()=>{S.checked=true;update()});
 $("clear").addEventListener("click",()=>{S.checked=false;emptyGrids();update();saveProgress()});
 $("solve").addEventListener("click",()=>{
@@ -1009,6 +1026,8 @@ function applyLang(){
   });
   h+="</tbody></table></div><p>"+lang.helpList+"</p><p>"+lang.helpVars+"</p><p>"+lang.helpPrec+"</p>";
   $("help").innerHTML=h;
+  if(S.lang==="en"&&S.notation==="IL"){S.notation="01";save("notation",S.notation)}
+  document.querySelector("[data-set=notation] [data-val=IL]").hidden=S.lang==="en";
   buildKeys();buildExamples();syncSegs();
   if(S.model)renderTable();
   renderPreview();
