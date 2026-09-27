@@ -142,10 +142,8 @@ table.tt{border-collapse:collapse;font-family:"PT Mono",ui-monospace,Menlo,monos
 .tt thead th.main{font-weight:700;color:var(--accent)}
 .tt th.rn{font-family:"PT Serif",Georgia,serif;font-size:.85rem;color:var(--muted);padding:0 .55rem;font-weight:400;background:var(--tint)}
 .tt .lastL{border-right:4px double var(--rule-strong)}
-.tt .gsep,.tt.inline .fp.gsep{border-left:4px double var(--rule-strong)}
-.tt .gconcl,.tt.inline .fp.gconcl{border-left:4px double var(--accent)}
-.tt thead th.gconcl{padding-left:1.5rem}
-.tt thead th.gconcl::before{content:"⊨";position:absolute;left:.3rem;top:50%;transform:translateY(-50%);color:var(--accent);font-size:.95rem;line-height:1}
+.tt .gsep,.tt.inline td.fp.gsep,.tt.inline th.fp.gsep{border-left:4px double var(--rule-strong)}
+.tt .gconcl,.tt.inline td.fp.gconcl,.tt.inline th.fp.gconcl{border-left:3px solid var(--accent)}
 .tt tr.counter th.rn{color:var(--err);font-weight:700}
 .tt tr.counter td.note{font-weight:700}
 .rel{margin:.3rem 0 .4rem;padding-left:1.2rem}
