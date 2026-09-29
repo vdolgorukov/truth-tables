@@ -354,7 +354,7 @@ ru:{
   helpHead:["Связка","","Клавиатура","LaTeX"],
   helpNames:["отрицание","конъюнкция","дизъюнкция","импликация","эквиваленция","исключающее «или»","штрих Шеффера","стрелка Пирса","истина, ложь"],
   helpList:"Несколько формул пишутся через запятую: <code>p→q, ¬q→¬p</code>. Они получают общую левую часть, а справа — отдельный блок столбцов для каждой формулы; после заполнения сайт называет отношение между каждой парой формул. Логическое следование записывается через <code>⊨</code> (<code>|=</code>, <code>\\models</code>, <code>\\vDash</code>): <code>p, p→q ⊨ q</code>. Сайт проверит следование и укажет строки-контрпримеры.",
-  helpVars:"Переменные — буквы латинского или русского алфавита, можно с индексом: <code>p1</code>, <code>p_1</code> → p₁.",
+  helpVars:"Переменные — буквы латинского или русского алфавита, можно с индексом: <code>p1</code>, <code>p_1</code> → p₁. Строчная <code>v</code> всегда означает дизъюнкцию ∨, поэтому переменной быть не может.",
   helpPrec:"Приоритет связок: ¬ сильнее всех, затем ∧ (и |), затем ∨ (и ↓), затем →, слабее всех ↔ и ⊻. Импликация правоассоциативна: p→q→r читается как p→(q→r). В заголовках таблицы скобки расставлены полностью."
 },
 en:{
@@ -416,7 +416,7 @@ en:{
   helpHead:["Connective","","Keyboard","LaTeX"],
   helpNames:["negation","conjunction","disjunction","implication","biconditional","exclusive or","Sheffer stroke (nand)","Peirce arrow (nor)","true, false"],
   helpList:"Separate several formulas with commas: <code>p→q, ¬q→¬p</code>. They share one left side, each formula gets its own block of columns, and once the table is complete the relation between every pair of formulas is named. Write entailment with <code>⊨</code> (<code>|=</code>, <code>\\models</code>, <code>\\vDash</code>): <code>p, p→q ⊨ q</code>. The site checks it and points out counterexample rows.",
-  helpVars:"Variables are single letters, optionally with an index: <code>p1</code>, <code>p_1</code> → p₁.",
+  helpVars:"Variables are single letters, optionally with an index: <code>p1</code>, <code>p_1</code> → p₁. A lowercase <code>v</code> always means disjunction ∨, so it cannot be a variable.",
   helpPrec:"Precedence: ¬ binds tightest, then ∧ (and |), then ∨ (and ↓), then →, and ↔ and ⊻ bind loosest. Implication associates to the right: p→q→r means p→(q→r). Table headers are fully parenthesised."
 }};
 const HELP_ROWS=[
@@ -490,6 +490,7 @@ function tokenize(s){
       else out.push({k:"op",v,pos:i,len:m[0].length});
       i+=m[0].length;continue;
     }
+    if(ch==="v"){out.push({k:"op",v:"∨",pos:i,len:1});i++;continue}
     const mv=/^([A-Za-zА-Яа-яЁё])(?:_?\{?(\d+)\}?|([₀-₉]+))?/.exec(s.slice(i));
     if(mv){
       const idx=mv[2]||(mv[3]?fromSub(mv[3]):"");
@@ -565,7 +566,7 @@ function liveNorm(str){
     .replace(/\/\\/g,"∧").replace(/\\\//g,"∨").replace(/\\&/g,"∧")
     .replace(/&&?/g,"∧").replace(/\|\|/g,"∨").replace(/\^/g,"∧")
     .replace(/[~!∼]/g,"¬").replace(/-(?=[^>])/g,"¬").replace(/\+/g,"⊻")
-    .replace(/([A-Za-zА-Яа-яЁё0-9₀-₉)⊤⊥])\s+v\s/g,"$1∨")
+    .replace(/(\\[A-Za-z]*)|v/g,(m,cmd)=>cmd?m:"∨")
     .replace(/⇒|⊃/g,"→").replace(/⇔|≡/g,"↔").replace(/⊕/g,"⊻").replace(/↑/g,"|")
     .replace(/\s*([∧∨→↔⊻|↓])\s*/g,"$1").replace(/¬\s+/g,"¬").replace(/\(\s+/g,"(").replace(/\s+\)/g,")").replace(/\s*([,;])(?=\S)/g,"$1 ").replace(/\s*⊨\s*/g," ⊨ ").replace(/^ ⊨/,"⊨");
 }
