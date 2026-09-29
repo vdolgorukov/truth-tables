@@ -104,7 +104,7 @@ h2{font-size:1.05rem;font-weight:700;margin:0}
 .preview.err .src{font-family:"PT Mono",ui-monospace,monospace;color:var(--text);white-space:pre-wrap}
 .preview mark{background:var(--err-bg);color:var(--err);border-bottom:2px solid var(--err);padding:0 .1em}
 .preview .stale{color:var(--accent)}
-.bigwarn{margin-top:.4rem;padding:.5rem .8rem;border-radius:6px;background:var(--src-bg);color:var(--text);display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .8rem}
+.bigwarn{padding:.5rem .8rem;border-radius:6px;background:var(--src-bg);color:var(--text);display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .8rem}
 .btn.sm{min-height:32px;padding:.15rem .75rem;font-size:.9rem}
 .examples{display:flex;flex-wrap:wrap;gap:.4rem .5rem;align-items:center;font-size:.92rem;margin-top:.6rem}
 .examples > span{color:var(--muted)}
@@ -675,14 +675,14 @@ function renderPreview(){
     if(m.vars.length>MAX_VARS)throw new PErr("tooMany",0,0,m.vars.length);
     const stale=!S.model||m.text!==S.model.text;
     preview.className="preview";
-    let html="<span class=\"f\">"+esc(m.text)+"</span> · "+L().vars(m.vars.length)+" · "+L().rows(m.n)+
-      (stale&&S.model?" · <span class=\"stale\">"+esc(L().stale)+"</span>":"");
+    // a formula that parses shows nothing here; only errors and the large-table warning
+    let html="";
     if(m.vars.length>SAFE_VARS&&(stale||S.askBig===m.text)){
       html+="<div class=\"bigwarn\">"+esc(L().bigWarn(m.vars.length,m.n));
       if(S.askBig===m.text)html+=" <button type=\"button\" class=\"btn sm\" id=\"big-go\">"+esc(L().bigGo(m.n))+"</button>";
       html+="</div>";
     }
-    preview.innerHTML=html;
+    preview.innerHTML=html;preview.hidden=!html;
     return ast;
   }catch(e){
     if(!(e instanceof PErr))throw e;
@@ -692,7 +692,7 @@ function renderPreview(){
       const before=s.slice(0,e.pos),mid=s.slice(e.pos,e.pos+e.len)||" ",after=s.slice(e.pos+e.len);
       html+=" <span class=\"src\">"+esc(before)+"<mark>"+esc(mid)+"</mark>"+esc(after)+"</span>";
     }
-    preview.innerHTML=html;
+    preview.innerHTML=html;preview.hidden=false;
     return null;
   }
 }
@@ -704,7 +704,7 @@ function build(force){
   // big tables need an explicit second click
   if(m.vars.length>SAFE_VARS&&force!==true){S.askBig=m.text;renderPreview();const b=$("big-go");if(b)b.focus();return}
   S.askBig=null;
-  if(m.vars.length>SAFE_VARS){preview.textContent="…";setTimeout(()=>{setModel(m);save("formula",inp.value)},30);return}
+  if(m.vars.length>SAFE_VARS){preview.textContent="…";preview.hidden=false;setTimeout(()=>{setModel(m);save("formula",inp.value)},30);return}
   setModel(m);
   save("formula",inp.value);
 }
