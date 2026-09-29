@@ -264,12 +264,6 @@ span.cell:hover{background:transparent}
         <button type="button" data-val="main" data-i18n="colsMain"></button>
       </div>
     </div>
-    <div class="opt"><span data-i18n="check"></span>
-      <div class="seg" data-set="live">
-        <button type="button" data-val="1" data-i18n="live"></button>
-        <button type="button" data-val="0" data-i18n="onButton"></button>
-      </div>
-    </div>
   </section>
   </details>
 
@@ -304,7 +298,6 @@ ru:{
   notation:"Обозначения", left:"Левая часть", manual:"заполняю сам", auto:"автоматически",
   order:"Порядок строк", layout:"Вид таблицы", layoutCols:"подформулы в столбцах", layoutInline:"значения под связками",
   cols:"Что вычислять", colsAll:"все подформулы", colsMain:"только формулу",
-  check:"Проверка", live:"сразу", onButton:"по кнопке",
   checkBtn:"Проверить", solve:"Показать ответ", clear:"Очистить",
   keyhint:"Ввод в ячейку: 1, И или T — истина; 0, Л или F — ложь; Backspace — стереть; стрелки — переход. Клик по ячейке перебирает значения. При фокусе на ячейке справа жёлтым отмечены ячейки, от которых зависит её значение. В записи «под связками» значения, уже использованные для вычисления, зачёркиваются.",
   clearInput:"стереть",
@@ -366,7 +359,6 @@ en:{
   notation:"Notation", left:"Left side", manual:"I fill it in", auto:"automatic",
   order:"Row order", layout:"Table layout", layoutCols:"subformula columns", layoutInline:"values under connectives",
   cols:"What to compute", colsAll:"all subformulas", colsMain:"formula only",
-  check:"Checking", live:"instant", onButton:"on request",
   checkBtn:"Check", solve:"Show answer", clear:"Clear",
   keyhint:"In a cell: 1 or T means true; 0 or F means false; Backspace clears; arrow keys move. Clicking a cell cycles its value. When a right-hand cell has focus, the cells it depends on are marked in yellow. In the “under connectives” layout, values already used in a computation are crossed out.",
   clearInput:"clear",
@@ -446,7 +438,7 @@ function save(k,v){try{localStorage.setItem("tt-"+k,JSON.stringify(v))}catch(e){
 
 const S={
   lang:load("lang","ru"), notation:load("notation","01"), auto:load("auto",false), order:load("order","asc"),
-  cols:load("cols","all"), layout:load("layout","cols"), live:load("live",true),
+  cols:load("cols","all"), layout:load("layout","cols"),
   model:null, left:[], right:[], checked:false
 };
 
@@ -853,7 +845,7 @@ function analyze(){
 }
 
 function update(){
-  const m=S.model,A=analyze(),lang=L(),marks=S.live||S.checked;
+  const m=S.model,A=analyze(),lang=L(),marks=S.checked;
   const trs=table.tBodies[0].rows;
   A.rows.forEach((row,r)=>{
     const tr=trs[r];
@@ -954,7 +946,7 @@ function cellAt(s,r,c){return table.querySelector("button[data-s=\""+s+"\"][data
 function navCols(){const a=S.auto?[]:S.model.vars.map((_,j)=>({s:"L",c:j}));return a.concat(slots().map(x=>({s:x.s,c:x.c})))}
 function setVal(s,r,c,v){
   store(s)[r][c]=v;
-  if(!S.live)S.checked=false;
+  S.checked=false;
   update();saveProgress();
 }
 function focusAt(ci,r){const nc=navCols();if(ci<0||ci>=nc.length||r<0||r>=S.model.n)return;const b=cellAt(nc[ci].s,r,nc[ci].c);if(b)b.focus()}
@@ -1022,7 +1014,7 @@ $("solve").addEventListener("click",()=>{
 
 /* ---------- settings ---------- */
 function syncSegs(){
-  const val={notation:S.notation,auto:S.auto?"1":"0",order:S.order,layout:S.layout,cols:S.cols,live:S.live?"1":"0"};
+  const val={notation:S.notation,auto:S.auto?"1":"0",order:S.order,layout:S.layout,cols:S.cols};
   document.querySelectorAll(".seg[data-set]").forEach(g=>{
     g.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.val===val[g.dataset.set])));
   });
@@ -1040,7 +1032,6 @@ document.querySelectorAll(".seg[data-set]").forEach(g=>{
     if(key==="order")S.order=v;
     if(key==="cols")S.cols=v;
     if(key==="layout")S.layout=v;
-    if(key==="live"){S.live=v==="1";S.checked=false}
     save(key,S[key]);syncSegs();
     if(key==="auto"||key==="cols"||key==="layout")renderTable();else update();
   });
