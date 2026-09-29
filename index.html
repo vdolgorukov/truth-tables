@@ -6,7 +6,7 @@
 <title>Тренажёр таблиц истинности</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Mono&family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&family=PT+Mono&family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap">
 <style>
 :root{
   --paper:#ffffff;
@@ -96,6 +96,8 @@ h2{font-size:1.05rem;font-weight:700;margin:0}
 .key:hover{background:var(--key-bg-hover);border-color:var(--accent);color:var(--accent)}
 .key.aux{font-family:"PT Serif",Georgia,serif;font-size:.9rem;color:var(--muted)}
 .keys .gap{width:.6rem}
+/* connective and constant glyphs come from one math font, so all keys match in size and weight */
+.key.sym{font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace;font-size:1.2rem;line-height:1}
 .preview{min-height:1.6em;font-size:.97rem;color:var(--muted)}
 .preview .f{font-family:"PT Mono",ui-monospace,monospace;color:var(--text)}
 .preview.err{color:var(--err)}
@@ -104,7 +106,7 @@ h2{font-size:1.05rem;font-weight:700;margin:0}
 .preview .stale{color:var(--accent)}
 .bigwarn{margin-top:.4rem;padding:.5rem .8rem;border-radius:6px;background:var(--src-bg);color:var(--text);display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .8rem}
 .btn.sm{min-height:32px;padding:.15rem .75rem;font-size:.9rem}
-.examples{display:flex;flex-wrap:wrap;gap:.4rem .5rem;align-items:center;font-size:.92rem}
+.examples{display:flex;flex-wrap:wrap;gap:.4rem .5rem;align-items:center;font-size:.92rem;margin-top:.6rem}
 .examples > span{color:var(--muted)}
 .chip{
   font-family:"PT Mono",ui-monospace,monospace;font-size:.88rem;padding:.2rem .6rem;min-height:32px;
@@ -124,7 +126,8 @@ summary{cursor:pointer;color:var(--accent);width:max-content;max-width:100%}
 .help code{font-family:"PT Mono",ui-monospace,monospace;font-size:.88rem;background:var(--tint);padding:.05rem .3rem;border-radius:4px;white-space:nowrap}
 
 /* settings */
-.settings{display:flex;flex-wrap:wrap;gap:1rem 1.6rem;margin:1.6rem 0 0;padding:1.1rem 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.setbox{margin-top:.7rem;border-bottom:1px solid var(--rule);padding-bottom:.6rem}
+.settings{display:flex;flex-wrap:wrap;gap:1rem 1.6rem;margin:.9rem 0 .4rem}
 .opt{display:grid;gap:.35rem;align-content:start}
 .opt > span{color:var(--muted);font-size:.8rem;letter-spacing:.05em;text-transform:uppercase}
 .seg .mono{font-size:.88rem}
@@ -217,13 +220,18 @@ span.cell:hover{background:transparent}
     </div>
     <div class="keys" id="keys"></div>
     <div class="preview" id="preview" aria-live="polite"></div>
-    <div class="examples" id="examples"></div>
+    <details id="ex-details" data-remember="ex">
+      <summary data-i18n="examplesTitle"></summary>
+      <div class="examples" id="examples"></div>
+    </details>
     <details id="help-details">
       <summary data-i18n="help"></summary>
       <div class="help" id="help"></div>
     </details>
   </section>
 
+  <details class="setbox" id="settings-details" data-remember="settings">
+  <summary data-i18n="settingsTitle"></summary>
   <section class="settings" aria-label="Settings">
     <div class="opt"><span data-i18n="notation"></span>
       <div class="seg" data-set="notation">
@@ -263,6 +271,7 @@ span.cell:hover{background:transparent}
       </div>
     </div>
   </section>
+  </details>
 
   <section class="work">
     <div class="status" id="status" aria-live="polite"></div>
@@ -290,7 +299,7 @@ ru:{
   h1:"Таблицы истинности", report:"Сообщить об ошибке",
   reportSubject:"Тренажёр таблиц истинности: ошибка", reportBody:f=>"Формула: "+f+"\nАдрес страницы: "+location.href+"\n\nЧто произошло:\n",
   lead:"Введите формулу и постройте её таблицу истинности сами: слева — наборы значений переменных, справа — значения подформул. Сайт подсвечивает верные и неверные ячейки, повторённые и пропущенные строки.",
-  flabel:"Формула", build:"Построить таблицу", examples:"Примеры:", random:"Случайная формула",
+  flabel:"Формула", build:"Построить таблицу", examplesTitle:"Примеры", settingsTitle:"Настройки", random:"Случайная формула",
   help:"Как вводить формулы",
   notation:"Обозначения", left:"Левая часть", manual:"заполняю сам", auto:"автоматически",
   order:"Порядок строк", layout:"Вид таблицы", layoutCols:"подформулы в столбцах", layoutInline:"значения под связками",
@@ -352,7 +361,7 @@ en:{
   h1:"Truth Tables", report:"Report a bug",
   reportSubject:"Truth table trainer: bug report", reportBody:f=>"Formula: "+f+"\nPage: "+location.href+"\n\nWhat happened:\n",
   lead:"Enter a formula and build its truth table yourself: variable assignments on the left, values of subformulas on the right. Correct and wrong cells, repeated and missing rows are highlighted.",
-  flabel:"Formula", build:"Build table", examples:"Examples:", random:"Random formula",
+  flabel:"Formula", build:"Build table", examplesTitle:"Examples", settingsTitle:"Settings", random:"Random formula",
   help:"How to type formulas",
   notation:"Notation", left:"Left side", manual:"I fill it in", auto:"automatic",
   order:"Row order", layout:"Table layout", layoutCols:"subformula columns", layoutInline:"values under connectives",
@@ -628,7 +637,7 @@ function buildKeys(){
   const box=$("keys");box.innerHTML="";
   for(const k of KEYS){
     if(!k){const g=document.createElement("span");g.className="gap";box.appendChild(g);continue}
-    const b=document.createElement("button");b.type="button";b.className="key"+(/^[pqrs]$/.test(k[0])?" var":"");
+    const b=document.createElement("button");b.type="button";b.className="key"+(/^[pqrs]$/.test(k[0])?" var":/^[¬∧∨→↔⊻|↓⊤⊥⊨]$/.test(k[0])?" sym":"");
     b.textContent=k[0];if(k[1])b.title=k[1];
     b.addEventListener("click",()=>insertAtCaret(k[0]));
     box.appendChild(b);
@@ -714,7 +723,6 @@ function saveProgress(){save("progress",{text:S.model.text,left:S.left,right:S.r
 /* ---------- examples ---------- */
 function buildExamples(){
   const box=$("examples");box.innerHTML="";
-  const lab=document.createElement("span");lab.textContent=L().examples;box.appendChild(lab);
   for(const ex of EXAMPLES){
     const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=ex;
     b.addEventListener("click",()=>{inp.value=ex;build()});box.appendChild(b);
@@ -1052,6 +1060,11 @@ function applyLang(){
   if(S.model)renderTable();
   renderPreview();
 }
+
+document.querySelectorAll("details[data-remember]").forEach(d=>{
+  if(load("open-"+d.dataset.remember,false))d.open=true;
+  d.addEventListener("toggle",()=>save("open-"+d.dataset.remember,d.open));
+});
 
 /* ---------- start ---------- */
 inp.value=liveNorm(load("formula","(p→q)∧¬r"));
