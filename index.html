@@ -658,6 +658,7 @@ function insertAtCaret(t){
   setCaret(s+ins.length);onFormulaInput();
 }
 function onFormulaInput(){
+  S.showErr=false;
   const v=inp.value,c=inp.selectionStart??v.length;
   const a=liveNorm(v.slice(0,c)),b=liveNorm(v.slice(c));
   if(a+b!==v){inp.value=a+b;inp.setSelectionRange(a.length,a.length)}
@@ -686,6 +687,8 @@ function renderPreview(){
     return ast;
   }catch(e){
     if(!(e instanceof PErr))throw e;
+    // parse errors are shown only after "Build table", not while typing
+    if(!S.showErr){preview.innerHTML="";preview.hidden=true;return null}
     preview.className="preview err";
     let html=esc(L().err[e.key](e.arg));
     if(e.key!=="empty"&&e.key!=="tooMany"){
@@ -698,6 +701,7 @@ function renderPreview(){
 }
 
 function build(force){
+  S.showErr=true;
   const ast=renderPreview();
   if(!ast){inp.focus();return}
   const m=buildModel(ast);
