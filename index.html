@@ -187,7 +187,9 @@ span.cell:hover{background:transparent}
 .tt.inline .lastP{border-right:1px solid var(--rule)}
 .tt.inline td.fp.blank{min-width:.5rem}
 .tt.inline td.fp.copy .cell{min-width:1.4rem;padding:0 .1rem;color:var(--muted)}
-.tt.inline td.used .cell{text-decoration:line-through;text-decoration-thickness:1.5px;opacity:.6}
+/* values already used for a computation are struck out with a vertical stroke */
+.tt.inline td.used .cell{position:relative;opacity:.6}
+.tt.inline td.used .cell:not(:empty)::after{content:"";position:absolute;left:50%;top:18%;bottom:18%;width:1.5px;margin-left:-.75px;background:currentColor;pointer-events:none}
 .tt .src{box-shadow:inset 0 0 0 2px #d9a300;background:var(--src-bg)}
 .tt thead th.src{background:var(--src-bg)}
 
