@@ -148,6 +148,7 @@ summary{cursor:pointer;color:var(--accent);width:max-content;max-width:100%}
 .pill.err{color:var(--err);border-color:currentColor;background:var(--err-bg)}
 .missing{flex-basis:100%;color:var(--err)}
 .missing .mono{color:var(--text)}
+.result{display:flex}
 .banner{flex-basis:100%;padding:.6rem .9rem;border-radius:6px;background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok)}
 .banner b{font-weight:700}
 .banner .neg{color:var(--err);font-weight:700}
@@ -290,6 +291,7 @@ span.cell:hover{background:transparent}
   <section class="work">
     <div class="status" id="status" aria-live="polite"></div>
     <div class="tablewrap"><table class="tt" id="tt"></table></div>
+    <div class="result" id="result" aria-live="polite" hidden></div>
     <div class="actions">
       <button type="button" class="btn primary" id="check" data-i18n="checkBtn"></button>
       <button type="button" class="btn" id="solve" data-i18n="solve"></button>
@@ -642,7 +644,7 @@ function paint(el,v){el.textContent=sym(v);el.classList.toggle("v1",v===true);el
 
 /* ---------- DOM refs ---------- */
 const $=id=>document.getElementById(id);
-const inp=$("f-input"),preview=$("preview"),table=$("tt"),statusEl=$("status");
+const inp=$("f-input"),preview=$("preview"),table=$("tt"),statusEl=$("status"),resultEl=$("result");
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const L=()=>T[S.lang];
 
@@ -917,6 +919,8 @@ function update(){
     h+="<div class=\"missing\">"+esc(lang.missing)+" <span class=\"mono\">("+esc(m.vars.join(", "))+")</span>: <span class=\"mono\">"+esc(list.join("  ")+more)+"</span></div>";
   }
   if(!marks)h+="<div class=\"muted-line\">"+esc(lang.hidden)+"</div>";
+  // counters stay above the table; the verdict goes under it
+  const counters=h;h="";
   if(marks&&A.done){
     const cls=t=>t===m.n?lang.taut:t===0?lang.contr:lang.sat(t,m.n);
     if(m.entail){
@@ -943,7 +947,8 @@ function update(){
       h+="<div class=\"banner\">"+b+"</div>";
     }
   }
-  statusEl.innerHTML=h;
+  statusEl.innerHTML=counters;
+  resultEl.innerHTML=h;resultEl.hidden=!h;
 }
 
 /* Relations between two formulas, from which value pairs (TT, TF, FT, FF) occur.
