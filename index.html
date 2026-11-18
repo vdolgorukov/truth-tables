@@ -227,6 +227,12 @@ span.cell:hover{background:transparent}
 .tt thead th.src{outline:2px dashed var(--accent);outline-offset:-3px}
 
 .actions{display:flex;flex-wrap:wrap;gap:.6rem}
+.export{display:grid;gap:.6rem;margin-top:.6rem}
+#exp-fmt{justify-self:start}
+#exp-out{width:100%;min-height:11rem;resize:vertical;font-family:"PT Mono",ui-monospace,Menlo,monospace;font-size:.85rem;line-height:1.45;padding:.5rem .65rem;border:1.5px solid var(--rule-strong);border-radius:6px;background:var(--tint);color:var(--text);white-space:pre;overflow:auto}
+#exp-out:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.exp-btns{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .8rem}
+.exp-msg{color:var(--ok);font-size:.9rem}
 .hint{margin:0;color:var(--muted);font-size:.9rem;max-width:80ch}
 @media (prefers-reduced-motion:no-preference){
   .tt td{transition:background-color .15s}
@@ -318,6 +324,25 @@ span.cell:hover{background:transparent}
       <button type="button" class="btn" id="solve" data-i18n="solve"></button>
       <button type="button" class="btn quiet" id="clear" data-i18n="clear"></button>
     </div>
+    <details id="export-details" data-remember="export">
+      <summary data-i18n="exportTitle"></summary>
+      <div class="export">
+        <div class="seg" id="exp-fmt" role="group">
+          <button type="button" data-fmt="latex">LaTeX</button>
+          <button type="button" data-fmt="html">HTML</button>
+          <button type="button" data-fmt="md">Markdown</button>
+          <button type="button" data-fmt="csv">CSV</button>
+          <button type="button" data-fmt="txt" data-i18n="fmtText"></button>
+        </div>
+        <textarea id="exp-out" readonly spellcheck="false" aria-label="Export"></textarea>
+        <div class="exp-btns">
+          <button type="button" class="btn sm primary" id="exp-copy" data-i18n="exportCopy"></button>
+          <button type="button" class="btn sm" id="exp-dl" data-i18n="exportDownload"></button>
+          <span class="exp-msg" id="exp-msg" aria-live="polite"></span>
+        </div>
+        <p class="hint" data-i18n="exportNote"></p>
+      </div>
+    </details>
     <p class="hint" data-i18n="keyhint"></p>
   </section>
 </main>
@@ -367,6 +392,8 @@ ru:{
   noteCounter:"контрпример",
   entailYes:rs=>rs.length?"Следование имеет место: во всех строках, где истинны все посылки ("+rowList(rs)+"), заключение тоже истинно.":"Следование имеет место: строк, где все посылки истинны, нет, поэтому контрпримера быть не может.",
   entailNo:rs=>"Следования нет. "+(rs.length===1?"Контрпример — строка ":"Контрпримеры — строки ")+rowList(rs)+": посылки истинны, а заключение ложно.",
+  exportTitle:"Экспорт таблицы", fmtText:"Текст", exportCopy:"Копировать", exportDownload:"Скачать файл", exportCopied:"Скопировано.", exportSelected:"Не удалось скопировать автоматически: текст выделен, нажмите ⌘C или Ctrl+C.",
+  exportNote:"Экспортируется таблица в текущем виде: значения из ячеек, выбранные обозначения и вид таблицы. Чтобы получить полностью заполненную таблицу, нажмите «Показать ответ». Для LaTeX нужен пакет amssymb (для ⊻ — \\veebar).",
   qEntail:"Следует ли заключение из посылок?", qValid:"Общезначимо ли заключение, то есть следует ли оно из пустого множества посылок?",
   ansYes:"Да, следует", ansNo:"Нет, не следует",
   qRelHead:"Определите отношения между формулами. Отметьте все подходящие варианты — их может быть несколько.",
@@ -434,6 +461,8 @@ en:{
   noteCounter:"counterexample",
   entailYes:rs=>rs.length?"The entailment holds: in every row where all premises are true ("+rowList(rs)+"), the conclusion is true as well.":"The entailment holds: no row makes all premises true, so there can be no counterexample.",
   entailNo:rs=>"The entailment fails. "+(rs.length===1?"Counterexample: row ":"Counterexamples: rows ")+rowList(rs)+", where the premises are true and the conclusion is false.",
+  exportTitle:"Export table", fmtText:"Text", exportCopy:"Copy", exportDownload:"Download file", exportCopied:"Copied.", exportSelected:"Could not copy automatically: the text is selected, press ⌘C or Ctrl+C.",
+  exportNote:"The table is exported as shown: the values in the cells, the chosen notation and layout. For a fully filled table press “Show answer” first. LaTeX output needs the amssymb package (\\veebar for ⊻).",
   qEntail:"Does the conclusion follow from the premises?", qValid:"Is the conclusion valid, i.e. does it follow from the empty set of premises?",
   ansYes:"Yes, it follows", ansNo:"No, it does not",
   qRelHead:"Name the relations between the formulas. Tick every option that applies; more than one may be correct.",
@@ -956,6 +985,7 @@ function update(){
   if(marks&&A.done)h=verdictHtml(A);
   statusEl.innerHTML=counters;
   resultEl.innerHTML=h;resultEl.hidden=!h;
+  if(typeof renderExport==="function")renderExport();
 }
 
 /* ---------- verdict and quiz ----------
@@ -1096,6 +1126,85 @@ table.addEventListener("focusin",e=>{
   }
 });
 table.addEventListener("focusout",e=>{if(!table.contains(e.relatedTarget))clearSrc()});
+
+/* ---------- export ----------
+   The table as currently shown: header cells, value rows, and a separator kind
+   before each column ("lr" left|right, "g" between formulas, "c" before the conclusion,
+   "in" between pieces of one written-out formula). */
+function exportGrid(){
+  const m=S.model,K=m.vars.length,sl=slots(),inline=S.layout==="inline";
+  const head=[...m.vars],sep=m.vars.map(()=>""),rows=[];
+  const sepFor=(g,first,i)=>i===0?"lr":first?(g===m.concl?"c":"g"):"";
+  let cols=[];
+  if(inline){
+    const at=new Map(sl.map(x=>[x.piece,x]));
+    m.pieces.forEach((p,i)=>{head.push(p.t);sep.push(sepFor(p.g,p.first,i)||"in");cols.push({p,i,x:at.get(i)})});
+  }else sl.forEach((x,i)=>{head.push(x.label);sep.push(sepFor(m.cols[x.c].g,S.cols==="main"||m.cols[x.c].first,i));cols.push({x})});
+  for(let r=0;r<m.n;r++){
+    const row=m.vars.map((_,j)=>sym(leftVal(r,j)));
+    cols.forEach(c=>{
+      if(c.x)row.push(sym(store(c.x.s)[r][c.x.c]));
+      else if(c.p.c==="v")row.push(sym(leftVal(r,c.p.vj)));
+      else if(c.p.c==="k")row.push(sym(c.p.t==="⊤"));
+      else row.push("");
+    });
+    rows.push(row);
+  }
+  return {head,sep,rows,K};
+}
+const TEX={"¬":"\\neg ","∧":"\\land ","∨":"\\lor ","→":"\\to ","↔":"\\leftrightarrow ","⊻":"\\veebar ","|":"\\mid ","↓":"\\downarrow ","⊤":"\\top ","⊥":"\\bot "};
+const texMath=t=>"$"+t.replace(/[₀-₉]+/g,d=>"_{"+fromSub(d)+"}").replace(/[¬∧∨→↔⊻|↓⊤⊥]/g,c=>TEX[c]).replace(/ +$/,"").replace(/ ([)}])/g,"$1")+"$";
+const texText=t=>t.replace(/[\\&%$#_{}~^]/g,c=>"\\"+c);
+function exportText(fmt){
+  const G=exportGrid(),{head,sep,rows}=G,n=head.length;
+  if(fmt==="latex"){
+    let spec="";
+    sep.forEach(k=>{spec+=k==="lr"||k==="c"?"||":k==="g"?"|":k==="in"?"@{}":"";spec+="c"});
+    const line=cells=>cells.join(" & ")+" \\\\";
+    return ["% "+S.model.text,"\\begin{tabular}{"+spec+"}",line(head.map(texMath)),"\\hline",...rows.map(r=>line(r.map(v=>v?texText(v):""))),"\\end{tabular}"].join("\n");
+  }
+  if(fmt==="html"){
+    const bl=k=>k==="lr"||k==="c"?"border-left:3px double #555;":k==="g"?"border-left:2px solid #555;":k==="in"?"border-left:0;":"";
+    const cell=(tag,v,i)=>"<"+tag+" style=\"border:1px solid #999;padding:2px 8px;text-align:center;"+bl(sep[i])+(sep[i+1]==="in"?"border-right:0;":"")+"\">"+esc(v)+"</"+tag+">";
+    return ["<table style=\"border-collapse:collapse;font-family:monospace\">","<caption>"+esc(S.model.text)+"</caption>",
+      "<thead><tr>"+head.map((v,i)=>cell("th",v,i)).join("")+"</tr></thead>","<tbody>",
+      ...rows.map(r=>"<tr>"+r.map((v,i)=>cell("td",v,i)).join("")+"</tr>"),"</tbody>","</table>"].join("\n");
+  }
+  if(fmt==="md"){
+    const md=v=>v.replace(/\|/g,"\\|")||" ";
+    return ["| "+head.map(md).join(" | ")+" |","|"+head.map(()=>":-:").join("|")+"|",...rows.map(r=>"| "+r.map(md).join(" | ")+" |")].join("\n");
+  }
+  if(fmt==="csv"){
+    const q=v=>/[",;\n]/.test(v)?"\""+v.replace(/"/g,"\"\"")+"\"":v;
+    return [head,...rows].map(r=>r.map(q).join(",")).join("\n");
+  }
+  // plain text: padded columns, "|" between blocks
+  const w=head.map((h,i)=>Math.max([...h].length,...rows.map(r=>[...r[i]].length)));
+  const pad=(v,i)=>{const d=w[i]-[...v].length,l=Math.floor(d/2);return " ".repeat(l)+v+" ".repeat(d-l)};
+  const join=r=>r.map((v,i)=>(i===0?"":sep[i]==="lr"||sep[i]==="c"?" ‖ ":sep[i]==="g"?" | ":" ")+pad(v,i)).join("");
+  const top=join(head);
+  return [top,"-".repeat([...top].length),...rows.map(join)].join("\n");
+}
+const EXT={latex:"tex",html:"html",md:"md",csv:"csv",txt:"txt"},MIME={latex:"text/x-tex",html:"text/html",md:"text/markdown",csv:"text/csv",txt:"text/plain"};
+S.expFmt=load("expFmt","latex");
+function renderExport(){
+  if(!S.model||!$("export-details").open)return;
+  $("exp-out").value=exportText(S.expFmt);
+  document.querySelectorAll("#exp-fmt [data-fmt]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.fmt===S.expFmt)));
+}
+$("exp-fmt").addEventListener("click",e=>{const b=e.target.closest("[data-fmt]");if(!b)return;S.expFmt=b.dataset.fmt;save("expFmt",S.expFmt);$("exp-msg").textContent="";renderExport()});
+$("export-details").addEventListener("toggle",renderExport);
+$("exp-copy").addEventListener("click",()=>{
+  const t=$("exp-out"),msg=$("exp-msg");
+  const fallback=()=>{t.focus();t.select();msg.textContent=L().exportSelected};
+  try{navigator.clipboard.writeText(t.value).then(()=>{msg.textContent=L().exportCopied},fallback)}catch(e){fallback()}
+});
+$("exp-dl").addEventListener("click",()=>{
+  const text=exportText(S.expFmt);
+  const blob=new Blob([(S.expFmt==="csv"?"\ufeff":"")+text],{type:MIME[S.expFmt]+";charset=utf-8"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="truth-table."+EXT[S.expFmt];
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+});
 
 function emptyGrids(){
   const m=S.model,grid=w=>Array.from({length:m.n},()=>Array(w).fill(null));
