@@ -200,8 +200,11 @@ span.cell:hover{background:transparent}
 .tt.inline td.fp.blank{min-width:.5rem}
 .tt.inline td.fp.copy .cell{min-width:1.4rem;padding:0 .1rem;color:var(--muted)}
 /* values already used for a computation are struck out with a vertical stroke */
-.tt.inline td.used .cell{position:relative;opacity:.6}
-.tt.inline td.used .cell:not(:empty)::after{content:"";position:absolute;left:50%;top:18%;bottom:18%;width:1.5px;margin-left:-.75px;background:currentColor;pointer-events:none}
+/* the crossed-out digit fades; the stroke itself stays clearly visible */
+.tt.inline td.used .cell{position:relative;color:color-mix(in srgb,var(--text) 40%,transparent)}
+.tt.inline td.used .cell.v1{color:color-mix(in srgb,var(--tv) 40%,transparent)}
+.tt.inline td.used .cell.v0{color:color-mix(in srgb,var(--fv) 40%,transparent)}
+.tt.inline td.used .cell:not(:empty)::after{content:"";position:absolute;left:50%;top:18%;bottom:18%;width:1.5px;margin-left:-.75px;background:color-mix(in srgb,var(--muted) 55%,transparent);pointer-events:none}
 .tt .src{outline:2px dashed var(--accent);outline-offset:-3px}
 .tt thead th.src{outline:2px dashed var(--accent);outline-offset:-3px}
 
