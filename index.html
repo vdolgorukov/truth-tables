@@ -911,7 +911,6 @@ function update(){
     h+="<span class=\"pill"+(good?" ok":"")+"\">"+esc(lang.sets(A.distinct,m.n))+"</span>";
     if(marks&&A.dupRows)h+="<span class=\"pill err\">"+esc(lang.dups(A.dupRows))+"</span>";
   }
-  h+="<span class=\"pill"+(A.filled===A.total?" ok":"")+"\">"+esc(lang.vals(A.filled,A.total))+"</span>";
   if(marks)h+="<span class=\"pill"+(A.errors?" err":" ok")+"\">"+esc(lang.errs(A.errors))+"</span>";
   if(marks&&!S.auto&&A.missing.length&&(A.allLeft||S.checked)&&m.vars.length){
     const list=A.missing.slice(0,24).map(key=>"("+key.split("").map(b=>sym(b==="1")).join(", ")+")");
