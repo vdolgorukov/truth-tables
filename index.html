@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>try{var t=JSON.parse(localStorage.getItem("tt-theme"));if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 <title>Тренажёр таблиц истинности</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -71,7 +72,9 @@ h2{font-size:1.05rem;font-weight:700;margin:0}
 .seg button:hover{color:var(--accent)}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
 .seg button:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
-.lang{margin-top:.3rem;flex-shrink:0}
+.topctl{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:.5rem;margin-top:.3rem;flex-shrink:0}
+.theme button{font-size:.85rem;padding:0 .7rem}
+@media (max-width:640px){.top{flex-direction:column}.topctl{justify-content:flex-start}}
 .lang button{letter-spacing:.04em;font-size:.85rem;padding:0 .6rem}
 
 .btn{
@@ -216,9 +219,16 @@ span.cell:hover{background:transparent}
       <h1 data-i18n="h1"></h1>
       <p class="lead" data-i18n="lead"></p>
     </div>
-    <div class="seg lang" role="group" aria-label="Language">
-      <button type="button" data-lang="ru">RU</button>
-      <button type="button" data-lang="en">EN</button>
+    <div class="topctl">
+      <div class="seg theme" role="group" id="theme">
+        <button type="button" data-theme-set="auto" data-i18n="themeAuto"></button>
+        <button type="button" data-theme-set="light" data-i18n="themeLight"></button>
+        <button type="button" data-theme-set="dark" data-i18n="themeDark"></button>
+      </div>
+      <div class="seg lang" role="group" aria-label="Language">
+        <button type="button" data-lang="ru">RU</button>
+        <button type="button" data-lang="en">EN</button>
+      </div>
     </div>
   </header>
 
@@ -300,7 +310,7 @@ function rowList(rs){return rs.length>30?rs.slice(0,30).join(", ")+" … ("+rs.l
 function pluralRu(n,a,b,c){const m10=n%10,m100=n%100;if(m10===1&&m100!==11)return a;if(m10>=2&&m10<=4&&(m100<12||m100>14))return b;return c}
 const T={
 ru:{
-  h1:"Таблицы истинности", report:"Сообщить об ошибке",
+  h1:"Таблицы истинности", themeAuto:"Авто", themeLight:"Светлая", themeDark:"Тёмная", themeLabel:"Тема оформления", report:"Сообщить об ошибке",
   reportSubject:"Тренажёр таблиц истинности: ошибка", reportBody:f=>"Формула: "+f+"\nАдрес страницы: "+location.href+"\n\nЧто произошло:\n",
   lead:"Введите формулу и постройте её таблицу истинности сами: слева — наборы значений переменных, справа — значения подформул. Сайт подсвечивает верные и неверные ячейки, повторённые и пропущенные строки.",
   flabel:"Формула", build:"Построить таблицу", examplesTitle:"Примеры", settingsTitle:"Настройки", random:"Случайная формула",
@@ -361,7 +371,7 @@ ru:{
   helpPrec:"Приоритет связок: ¬ сильнее всех, затем ∧ (и |), затем ∨ (и ↓), затем →, слабее всех ↔ и ⊻. Импликация правоассоциативна: p→q→r читается как p→(q→r). В заголовках таблицы скобки расставлены полностью."
 },
 en:{
-  h1:"Truth Tables", report:"Report a bug",
+  h1:"Truth Tables", themeAuto:"Auto", themeLight:"Light", themeDark:"Dark", themeLabel:"Colour theme", report:"Report a bug",
   reportSubject:"Truth table trainer: bug report", reportBody:f=>"Formula: "+f+"\nPage: "+location.href+"\n\nWhat happened:\n",
   lead:"Enter a formula and build its truth table yourself: variable assignments on the left, values of subformulas on the right. Correct and wrong cells, repeated and missing rows are highlighted.",
   flabel:"Formula", build:"Build table", examplesTitle:"Examples", settingsTitle:"Settings", random:"Random formula",
@@ -1054,6 +1064,7 @@ function applyLang(){
   document.documentElement.lang=S.lang;
   document.title=S.lang==="ru"?"Тренажёр таблиц истинности":"Truth Table Trainer";
   document.querySelectorAll("[data-i18n]").forEach(el=>{el.textContent=lang[el.dataset.i18n]});
+  $("theme").setAttribute("aria-label",lang.themeLabel);
   let h="<p>"+lang.helpIntro+"</p><div class=\"help-wrap\"><table><thead><tr>"+lang.helpHead.map(x=>"<th>"+esc(x)+"</th>").join("")+"</tr></thead><tbody>";
   HELP_ROWS.forEach((row,i)=>{
     const codes=s=>s?s.split(/\s{2,}/).map(x=>"<code>"+esc(x)+"</code>").join(" "):"";
@@ -1072,6 +1083,16 @@ document.querySelectorAll("details[data-remember]").forEach(d=>{
   if(load("open-"+d.dataset.remember,false))d.open=true;
   d.addEventListener("toggle",()=>save("open-"+d.dataset.remember,d.open));
 });
+
+/* ---------- theme: auto (system) / light / dark ---------- */
+function applyTheme(t){
+  if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);
+  else document.documentElement.removeAttribute("data-theme");
+  document.querySelectorAll("[data-theme-set]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.themeSet===(t||"auto"))));
+  save("theme",t||"auto");
+}
+document.querySelectorAll("[data-theme-set]").forEach(b=>b.addEventListener("click",()=>applyTheme(b.dataset.themeSet)));
+applyTheme(load("theme","auto"));
 
 /* ---------- start ---------- */
 inp.value=liveNorm(load("formula","(p→q)∧¬r"));
