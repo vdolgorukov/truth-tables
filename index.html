@@ -6,7 +6,9 @@
 <title>Тренажёр таблиц истинности</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&family=PT+Mono&family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap">
+<!-- math font only for connective glyphs; letters stay in PT Mono -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&text=%C2%AC%E2%88%A7%E2%88%A8%E2%86%92%E2%86%94%E2%8A%BB%E2%86%93%E2%8A%A4%E2%8A%A5%E2%8A%A8&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Mono&family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap">
 <style>
 :root{
   --paper:#ffffff;
@@ -17,9 +19,12 @@
   --accent:#34438b;
   --on-accent:#ffffff;
   --ok:#2c7a4b;
-  --err:#b53a2f;
+  --err:#9c4a00;
   --ok-bg:#e2f2e8;
-  --err-bg:#fbe4e1;
+  --err-bg:#ffe1a8;
+  --tv:#1b7a3d;
+  --fv:#c23a2c;
+  --good-bg:#e3e9f6;
   --src-bg:#fdf1c9;
   --tint:#f3f5fa;
   --key-bg:#dfe5f0; --key-bg-hover:#cfd8ea; --key-border:#aab5cc;
@@ -29,14 +34,14 @@
   :root:not([data-theme="light"]){
     --paper:#16181d; --text:#e4e6ec; --muted:#9aa0b1;
     --rule:#2d313c; --rule-strong:#565c6e; --accent:#a4b3f2; --on-accent:#141826;
-    --ok:#66c48b; --err:#f08172; --ok-bg:#1c3326; --err-bg:#3e2320; --src-bg:#3a3321;
+    --ok:#66c48b; --err:#ffb35c; --ok-bg:#1c3326; --err-bg:#4a3313; --src-bg:#3a3321; --tv:#6fd394; --fv:#ff8a7a; --good-bg:#232f48;
     --tint:#1e2129; --key-bg:#2b3244; --key-bg-hover:#353e55; --key-border:#4b5670; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --paper:#16181d; --text:#e4e6ec; --muted:#9aa0b1;
   --rule:#2d313c; --rule-strong:#565c6e; --accent:#a4b3f2; --on-accent:#141826;
-  --ok:#66c48b; --err:#f08172; --ok-bg:#1c3326; --err-bg:#3e2320; --src-bg:#3a3321;
+  --ok:#66c48b; --err:#ffb35c; --ok-bg:#1c3326; --err-bg:#4a3313; --src-bg:#3a3321; --tv:#6fd394; --fv:#ff8a7a; --good-bg:#232f48;
   --tint:#1e2129; --key-bg:#2b3244; --key-bg-hover:#353e55; --key-border:#4b5670; color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:inherit}
@@ -58,7 +63,7 @@ h1{font-size:clamp(1.55rem,1.2rem + 1.4vw,2.1rem);line-height:1.2;font-weight:70
 h2{font-size:1.05rem;font-weight:700;margin:0}
 .lead{margin:0;color:var(--muted);max-width:66ch}
 .top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
-.mono{font-family:"PT Mono",ui-monospace,Menlo,Consolas,monospace}
+.mono{font-family:"Noto Sans Math","PT Mono",ui-monospace,Menlo,Consolas,monospace}
 
 .seg{display:inline-flex;flex-wrap:wrap;border:1.5px solid var(--rule-strong);border-radius:6px;overflow:hidden}
 .seg button{font:inherit;font-size:.9rem;min-width:44px;min-height:36px;padding:0 .75rem;border:0;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap}
@@ -84,13 +89,13 @@ h2{font-size:1.05rem;font-weight:700;margin:0}
 .entry label{color:var(--muted);font-size:.9rem;letter-spacing:.04em;text-transform:uppercase}
 .frow{display:flex;gap:.6rem;flex-wrap:wrap}
 #f-input{
-  flex:1 1 18rem;min-width:0;font-family:"PT Mono",ui-monospace,Menlo,monospace;font-size:1.3rem;
+  flex:1 1 18rem;min-width:0;font-family:"Noto Sans Math","PT Mono",ui-monospace,Menlo,monospace;font-size:1.3rem;
   padding:.45rem .7rem;border:1.5px solid var(--rule-strong);border-radius:6px;background:var(--paper);color:var(--text);
 }
 #f-input:focus-visible{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
 .keys{display:flex;flex-wrap:wrap;gap:.4rem}
 .key{
-  font-family:"PT Mono",ui-monospace,Menlo,monospace;font-size:1.08rem;min-width:44px;min-height:40px;padding:0 .55rem;
+  font-family:"Noto Sans Math","PT Mono",ui-monospace,Menlo,monospace;font-size:1.08rem;min-width:44px;min-height:40px;padding:0 .55rem;
   border:1.5px solid var(--key-border);border-radius:6px;background:var(--key-bg);color:var(--text);cursor:pointer;
 }
 .key:hover{background:var(--key-bg-hover);border-color:var(--accent);color:var(--accent)}
@@ -99,9 +104,9 @@ h2{font-size:1.05rem;font-weight:700;margin:0}
 /* connective and constant glyphs come from one math font, so all keys match in size and weight */
 .key.sym{font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace;font-size:1.2rem;line-height:1}
 .preview{min-height:1.6em;font-size:.97rem;color:var(--muted)}
-.preview .f{font-family:"PT Mono",ui-monospace,monospace;color:var(--text)}
+.preview .f{font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace;color:var(--text)}
 .preview.err{color:var(--err)}
-.preview.err .src{font-family:"PT Mono",ui-monospace,monospace;color:var(--text);white-space:pre-wrap}
+.preview.err .src{font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace;color:var(--text);white-space:pre-wrap}
 .preview mark{background:var(--err-bg);color:var(--err);border-bottom:2px solid var(--err);padding:0 .1em}
 .preview .stale{color:var(--accent)}
 .bigwarn{padding:.5rem .8rem;border-radius:6px;background:var(--src-bg);color:var(--text);display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .8rem}
@@ -109,7 +114,7 @@ h2{font-size:1.05rem;font-weight:700;margin:0}
 .examples{display:flex;flex-wrap:wrap;gap:.4rem .5rem;align-items:center;font-size:.92rem;margin-top:.6rem}
 .examples > span{color:var(--muted)}
 .chip{
-  font-family:"PT Mono",ui-monospace,monospace;font-size:.88rem;padding:.2rem .6rem;min-height:32px;
+  font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace;font-size:.88rem;padding:.2rem .6rem;min-height:32px;
   border:1px solid var(--rule);border-radius:999px;background:var(--tint);color:var(--text);cursor:pointer;
 }
 .chip:hover{border-color:var(--accent);color:var(--accent)}
@@ -123,7 +128,7 @@ summary{cursor:pointer;color:var(--accent);width:max-content;max-width:100%}
 .help th,.help td{padding:.3rem .8rem .3rem 0;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top}
 .help th{font-weight:400;color:var(--muted)}
 .help td.sym{font-size:1.15rem}
-.help code{font-family:"PT Mono",ui-monospace,monospace;font-size:.88rem;background:var(--tint);padding:.05rem .3rem;border-radius:4px;white-space:nowrap}
+.help code{font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace;font-size:.88rem;background:var(--tint);padding:.05rem .3rem;border-radius:4px;white-space:nowrap}
 
 /* settings */
 .setbox{margin-top:.7rem;border-bottom:1px solid var(--rule);padding-bottom:.6rem}
@@ -147,7 +152,7 @@ summary{cursor:pointer;color:var(--accent);width:max-content;max-width:100%}
 .muted-line{flex-basis:100%;color:var(--muted);font-style:italic}
 
 .tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:.25rem}
-table.tt{border-collapse:collapse;font-family:"PT Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:1.05rem}
+table.tt{border-collapse:collapse;font-family:"Noto Sans Math","PT Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums;font-size:1.05rem}
 .tt th,.tt td{border:1px solid var(--rule);padding:0;text-align:center;position:relative}
 .tt thead th{padding:.45rem .75rem;font-weight:400;white-space:nowrap;background:var(--tint);border-bottom:2px solid var(--rule-strong)}
 .tt thead th.main{font-weight:700;color:var(--accent)}
@@ -170,11 +175,14 @@ table.tt{border-collapse:collapse;font-family:"PT Mono",ui-monospace,Menlo,monos
 .cell:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 span.cell{display:grid;place-items:center;cursor:default;color:var(--muted)}
 span.cell:hover{background:transparent}
-.tt td.ok{background:var(--ok-bg)}
-.tt td.ok .cell{color:var(--ok)}
-.tt td.err{background:var(--err-bg)}
-.tt td.err .cell{color:var(--err);font-weight:700}
-.tt td.err::after{content:"";position:absolute;top:0;right:0;border:5px solid transparent;border-top-color:var(--err);border-right-color:var(--err);pointer-events:none}
+/* value colour (true / false) and check result (correct / wrong) use separate channels:
+   text colour for the value, background + outline + corner mark for the result */
+.cell.v1{color:var(--tv)}
+.cell.v0{color:var(--fv)}
+.tt td.ok{background:var(--good-bg)}
+.tt td.err{background:var(--err-bg);box-shadow:inset 0 0 0 2px var(--err)}
+.tt td.err .cell{font-weight:700}
+.tt td.err::after{content:"";position:absolute;top:0;right:0;border:6px solid transparent;border-top-color:var(--err);border-right-color:var(--err);pointer-events:none}
 .tt td.dup{background:var(--err-bg)}
 .tt tr.dup th.rn{color:var(--err);font-weight:700}
 .tt.inline .fp{border-left:0;border-right:0}
@@ -190,8 +198,8 @@ span.cell:hover{background:transparent}
 /* values already used for a computation are struck out with a vertical stroke */
 .tt.inline td.used .cell{position:relative;opacity:.6}
 .tt.inline td.used .cell:not(:empty)::after{content:"";position:absolute;left:50%;top:18%;bottom:18%;width:1.5px;margin-left:-.75px;background:currentColor;pointer-events:none}
-.tt .src{box-shadow:inset 0 0 0 2px #d9a300;background:var(--src-bg)}
-.tt thead th.src{background:var(--src-bg)}
+.tt .src{outline:2px dashed var(--accent);outline-offset:-3px}
+.tt thead th.src{outline:2px dashed var(--accent);outline-offset:-3px}
 
 .actions{display:flex;flex-wrap:wrap;gap:.6rem}
 .hint{margin:0;color:var(--muted);font-size:.9rem;max-width:80ch}
@@ -301,7 +309,7 @@ ru:{
   order:"Порядок строк", layout:"Вид таблицы", layoutCols:"подформулы в столбцах", layoutInline:"значения под связками",
   cols:"Что вычислять", colsAll:"все подформулы", colsMain:"только формулу",
   checkBtn:"Проверить", solve:"Показать ответ", clear:"Очистить",
-  keyhint:"Ввод в ячейку: 1, И или T — истина; 0, Л или F — ложь; Backspace — стереть; стрелки — переход. Клик по ячейке перебирает значения. При фокусе на ячейке справа жёлтым отмечены ячейки, от которых зависит её значение. В записи «под связками» значения, уже использованные для вычисления, зачёркиваются.",
+  keyhint:"Ввод в ячейку: 1, И или T — истина; 0, Л или F — ложь; Backspace — стереть; стрелки — переход. Клик по ячейке перебирает значения. При фокусе на ячейке справа пунктирной рамкой отмечены ячейки, от которых зависит её значение. Истина показана зелёным, ложь — красным; после проверки неверные ячейки выделяются оранжевой рамкой. В записи «под связками» значения, уже использованные для вычисления, зачёркиваются.",
   clearInput:"стереть",
   vars:n=>n+" "+pluralRu(n,"переменная","переменные","переменных"),
   rows:n=>n+" "+pluralRu(n,"строка","строки","строк"),
@@ -362,7 +370,7 @@ en:{
   order:"Row order", layout:"Table layout", layoutCols:"subformula columns", layoutInline:"values under connectives",
   cols:"What to compute", colsAll:"all subformulas", colsMain:"formula only",
   checkBtn:"Check", solve:"Show answer", clear:"Clear",
-  keyhint:"In a cell: 1 or T means true; 0 or F means false; Backspace clears; arrow keys move. Clicking a cell cycles its value. When a right-hand cell has focus, the cells it depends on are marked in yellow. In the “under connectives” layout, values already used in a computation are crossed out.",
+  keyhint:"In a cell: 1 or T means true; 0 or F means false; Backspace clears; arrow keys move. Clicking a cell cycles its value. When a right-hand cell has focus, the cells it depends on get a dashed outline. True is shown in green and false in red; after checking, wrong cells get an orange outline. In the “under connectives” layout, values already used in a computation are crossed out.",
   clearInput:"clear",
   vars:n=>n+" variable"+(n===1?"":"s"),
   rows:n=>n+" row"+(n===1?"":"s"),
@@ -620,6 +628,7 @@ const visCols=()=>S.cols==="main"?S.model.groups.map(x=>x.main):S.model.cols.map
 function lexVal(r,j){const bit=(r>>(k()-1-j))&1;return S.order==="asc"?bit===1:bit===0}
 function leftVal(r,j){return S.auto?lexVal(r,j):S.left[r][j]}
 const sym=v=>v==null?"":SYM[S.notation][v?1:0];
+function paint(el,v){el.textContent=sym(v);el.classList.toggle("v1",v===true);el.classList.toggle("v0",v===false)}
 
 /* ---------- DOM refs ---------- */
 const $=id=>document.getElementById(id);
@@ -855,13 +864,13 @@ function update(){
     tr.classList.toggle("dup",isDup);
     m.vars.forEach((_,j)=>{
       const td=S.cells[r]["L"+j];
-      td.firstChild.textContent=sym(row.vals[j]);
+      paint(td.firstChild,row.vals[j]);
       td.classList.toggle("dup",isDup&&!S.auto);
     });
     if(S.layout==="inline"){
       m.pieces.forEach((p,i)=>{
         const td=S.cells[r]["P"+i];
-        if(td.classList.contains("copy"))td.firstChild.textContent=p.c==="v"?sym(row.vals[p.vj]):sym(p.t==="⊤");
+        if(td.classList.contains("copy"))paint(td.firstChild,p.c==="v"?row.vals[p.vj]:p.t==="⊤");
       });
       // a value is crossed out once the connective above it has been computed
       const used=new Set();
@@ -870,7 +879,7 @@ function update(){
     }
     A.sl.forEach(x=>{
       const td=S.cells[r][x.td];
-      td.firstChild.textContent=sym(store(x.s)[r][x.c]);
+      paint(td.firstChild,store(x.s)[r][x.c]);
       const st=marks?row.cells[x.td]:null;
       td.classList.toggle("ok",st==="ok");td.classList.toggle("err",st==="err");
     });
