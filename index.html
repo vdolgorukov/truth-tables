@@ -189,6 +189,7 @@ summary{cursor:pointer;color:var(--accent);width:max-content;max-width:100%}
 .pair legend{padding:0 .3rem}
 .pair.ok{border-color:var(--ok)}
 .pair.bad{border-color:var(--err)}
+.pair.part{border-color:var(--accent);border-style:dashed}
 .opts{display:flex;flex-wrap:wrap;gap:.4rem}
 .qopt{display:inline-flex;align-items:center;gap:.4rem;padding:.25rem .7rem;min-height:34px;border:1.5px solid var(--key-border);border-radius:999px;background:var(--key-bg);cursor:pointer;font-size:.92rem}
 .qopt input{margin:0;accent-color:var(--accent)}
@@ -198,6 +199,7 @@ summary{cursor:pointer;color:var(--accent);width:max-content;max-width:100%}
 .qopt.missed{border-style:dashed;border-color:var(--ok)}
 .qres.ok{color:var(--ok)}
 .qres.bad{color:var(--err)}
+.qres.part{color:var(--accent)}
 .qscore{font-weight:700}
 .qbtns{margin-top:.6rem;display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .8rem}
 .qwarn{color:var(--err);font-size:.92rem}
@@ -542,6 +544,7 @@ ru:{
   qNeed:"Сначала отметьте хотя бы один вариант для каждой пары.", qNeedOne:"Сначала выберите ответ.",
   qCheck:"Проверить ответ", qRetry:"Изменить ответ", qRight:"Верно.", qWrong:"Неверно.", qAnswer:"Правильный ответ:",
   qScore:(r,n)=>"Верно определено пар: "+r+" из "+n+".",
+  qPartial:"Частично верно.", qMissing:"Отмечено верно, но не хватает:", qPartScore:k=>"Частично верно: "+k+".",
   validYes:"Заключение истинно во всех строках: оно общезначимо и следует из пустого множества посылок.",
   validNo:rs=>"Следования нет: заключение не общезначимо. "+(rs.length===1?"Контрпример — строка ":"Контрпримеры — строки ")+rowList(rs)+".",
   relHead:"Отношения между формулами:", and:"и", notBack:"но не наоборот",
@@ -660,6 +663,7 @@ en:{
   qNeed:"Tick at least one option for every pair first.", qNeedOne:"Choose an answer first.",
   qCheck:"Check answer", qRetry:"Change answer", qRight:"Correct.", qWrong:"Wrong.", qAnswer:"Correct answer:",
   qScore:(r,n)=>"Pairs answered correctly: "+r+" of "+n+".",
+  qPartial:"Partly correct.", qMissing:"What you ticked is right, but this is missing:", qPartScore:k=>"Partly correct: "+k+".",
   validYes:"The conclusion is true in every row: it is valid and follows from the empty set of premises.",
   validNo:rs=>"The entailment fails: the conclusion is not valid. "+(rs.length===1?"Counterexample: row ":"Counterexamples: rows ")+rowList(rs)+".",
   relHead:"Relations between the formulas:", and:"and", notBack:"but not the other way round",
@@ -1276,13 +1280,15 @@ function verdictHtml(A){
   b+="<ul>";
   m.groups.forEach((g,i)=>{b+="<li>"+f(g.text)+": "+esc(lang.clsShort(A.trues[i],m.n))+"</li>"});
   b+="</ul><div class=\"quiz\"><div class=\"q\">"+esc(lang.qRelHead)+"</div>";
-  let right=0,total=0;
+  let right=0,total=0,partial=0;
   for(let i=0;i<m.groups.length;i++)for(let j=i+1;j<m.groups.length;j++){
     const key=i+"-"+j,A_=m.groups[i].text,B_=m.groups[j].text;
     const rs=relations(A.vecs[i],A.vecs[j]),exp=new Set(rs.map(relKey)),got=Q.rel[key]||new Set();
     const ok=got.size===exp.size&&[...got].every(x=>exp.has(x));
-    total++;if(ok)right++;
-    b+="<fieldset class=\"pair"+(Q.checked?(ok?" ok":" bad"):"")+"\"><legend>"+f(A_)+" "+esc(lang.and)+" "+f(B_)+"</legend><div class=\"opts\">";
+    // only correct relations ticked, but not all of them
+    const part=!ok&&got.size>0&&[...got].every(x=>exp.has(x));
+    total++;if(ok)right++;if(part)partial++;
+    b+="<fieldset class=\"pair"+(Q.checked?(ok?" ok":part?" part":" bad"):"")+"\"><legend>"+f(A_)+" "+esc(lang.and)+" "+f(B_)+"</legend><div class=\"opts\">";
     REL_OPTS.forEach(o=>{
       const label=o==="sub1"?esc(lang.rel.sub)+": "+f(A_+" ⊨ "+B_):o==="sub-1"?esc(lang.rel.sub)+": "+f(B_+" ⊨ "+A_):esc(lang.rel[o]);
       b+="<label class=\""+optCls(got.has(o),exp.has(o))+"\"><input type=\"checkbox\" data-pair=\""+key+"\" value=\""+o+"\""+(got.has(o)?" checked":"")+(Q.checked?" disabled":"")+"> "+label+"</label>";
@@ -1290,11 +1296,15 @@ function verdictHtml(A){
     b+="</div>";
     if(Q.checked){
       const why=rs.map(r=>"<b>"+esc(lang.rel[r.kind])+"</b> — "+(r.kind==="sub"?f(r.dir>0?A_:B_)+" ⊨ "+f(r.dir>0?B_:A_)+", "+esc(lang.notBack):esc(lang.relWhy[r.kind]))).join("; ");
-      b+="<div class=\"qres "+(ok?"ok":"bad")+"\"><b>"+esc(ok?lang.qRight:lang.qWrong)+"</b> "+(ok?"":esc(lang.qAnswer)+" ")+why+"</div>";
+      const relName=o=>o==="sub1"?esc(lang.rel.sub)+" "+f(A_+" ⊨ "+B_):o==="sub-1"?esc(lang.rel.sub)+" "+f(B_+" ⊨ "+A_):esc(lang.rel[o]);
+      if(part){
+        const miss=[...exp].filter(x=>!got.has(x)).map(relName).join(", ");
+        b+="<div class=\"qres part\"><b>"+esc(lang.qPartial)+"</b> "+esc(lang.qMissing)+" "+miss+". "+esc(lang.qAnswer)+" "+why+"</div>";
+      }else b+="<div class=\"qres "+(ok?"ok":"bad")+"\"><b>"+esc(ok?lang.qRight:lang.qWrong)+"</b> "+(ok?"":esc(lang.qAnswer)+" ")+why+"</div>";
     }
     b+="</fieldset>";
   }
-  if(Q.checked)b+="<div class=\"qscore\">"+esc(lang.qScore(right,total))+"</div><div>"+esc(A.jointRows.length?lang.joint(A.jointRows):lang.noJoint)+"</div>";
+  if(Q.checked)b+="<div class=\"qscore\">"+esc(lang.qScore(right,total)+(partial?" "+lang.qPartScore(partial):""))+"</div><div>"+esc(A.jointRows.length?lang.joint(A.jointRows):lang.noJoint)+"</div>";
   return "<div class=\"banner\">"+b+btnRow(btn)+"</div></div>";
 }
 /* the same verdict with the answers shown at once (setting "show at once") */
