@@ -222,6 +222,10 @@ span.cell:hover{background:transparent}
 .tt tr.dup th.rn{color:var(--err);font-weight:700}
 .tt.inline .fp{border-left:0;border-right:0}
 .tt.inline thead th.fp{padding:.45rem .08rem;font-size:1.1rem}
+/* order-of-operations numbers above the connectives / column headers */
+.tt thead .ord{display:block;font-family:"PT Serif",Georgia,serif;font-size:.68rem;line-height:1.1;min-height:.75rem;color:var(--muted);font-weight:400}
+.tt thead th.main .ord{color:var(--accent);font-weight:700}
+.tt thead th:not(.rn):not(.note){vertical-align:bottom}
 .tt.inline thead th.fp.op{padding:.45rem .2rem}
 .tt.inline thead th.fp.v{padding:.45rem .15rem}
 .tt.inline .fp.slot{border-left:1px solid var(--rule-strong);border-right:1px solid var(--rule-strong)}
@@ -727,6 +731,10 @@ function buildModel(input){
     const rootAt=lay(ast,false);
     if(islots.length===s0)islots.push({node:ast,piece:rootAt,kids:ast.t==="var"?["L"+vars.indexOf(ast.name)]:[]});
     pieces[p0].first=true;
+    // order of operations: connectives numbered in the order they are computed (inner first)
+    let ord=0;
+    for(let i=s0;i<islots.length;i++){const x=islots[i];if(x.node.t==="not"||x.node.t==="bin"){x.ord=++ord;pieces[x.piece].ord=ord}}
+    ord=0;cols.forEach(c=>{if(c.g===g&&(c.node.t==="not"||c.node.t==="bin"))c.ord=++ord});
     groups.push({ast,text:show(ast),main:idx.get(show(ast)),mainI:islots.length-1});
   });
   cols.forEach((c,i)=>{c.first=i===0||cols[i-1].g!==c.g});
@@ -903,7 +911,7 @@ function renderTable(){
   if(inline){
     const at=new Map(sl.map(x=>[x.piece,x]));
     const mainPieces=new Set([...m.mainsI].map(i=>m.islots[i].piece));
-    m.pieces.forEach((p,i)=>{h+="<th scope=\"col\" class=\"fp "+p.c+sepCls(p.g,p.first)+(at.has(i)?" slot":"")+(mainPieces.has(i)?" main":"")+(i===m.pieces.length-1?" lastP":"")+"\" data-h=\"P"+i+"\">"+esc(p.t)+"</th>"});
+    m.pieces.forEach((p,i)=>{h+="<th scope=\"col\" class=\"fp "+p.c+sepCls(p.g,p.first)+(at.has(i)?" slot":"")+(mainPieces.has(i)?" main":"")+(i===m.pieces.length-1?" lastP":"")+"\" data-h=\"P"+i+"\"><span class=\"ord\">"+(p.ord||"")+"</span>"+esc(p.t)+"</th>"});
     h+="<th class=\"note\" aria-hidden=\"true\"></th></tr></thead><tbody>";
     for(let r=0;r<m.n;r++){
       h+=rowStart(r);
@@ -915,7 +923,7 @@ function renderTable(){
       h+="<td class=\"note\"></td></tr>";
     }
   }else{
-    sl.forEach(x=>{h+="<th scope=\"col\" class=\""+(x.main?"main":"")+x.sep+"\" data-h=\""+x.td+"\">"+esc(x.label)+"</th>"});
+    sl.forEach(x=>{h+="<th scope=\"col\" class=\""+(x.main?"main":"")+x.sep+"\" data-h=\""+x.td+"\"><span class=\"ord\">"+(m.cols[x.c].ord||"")+"</span>"+esc(x.label)+"</th>"});
     h+="<th class=\"note\" aria-hidden=\"true\"></th></tr></thead><tbody>";
     for(let r=0;r<m.n;r++){
       h+=rowStart(r);
@@ -1002,7 +1010,9 @@ function update(){
       // a value is crossed out once the connective above it has been computed and the
       // student has gone on to fill another cell (the last filled cell keeps its inputs visible)
       const used=new Set();
-      A.sl.forEach(x=>{if(store(x.s)[r][x.c]!=null&&S.lastFilled!==x.s+":"+r+":"+x.c)x.kids.forEach(id=>{if(id[0]==="P")used.add(id)})});
+      // a wrong cell keeps its inputs un-struck so the student can recompute it
+      A.sl.forEach(x=>{if(store(x.s)[r][x.c]!=null&&S.lastFilled!==x.s+":"+r+":"+x.c&&!(marks&&row.cells[x.td]==="err"))x.kids.forEach(id=>{if(id[0]==="P")used.add(id)})});
+      if(marks)A.sl.forEach(x=>{if(row.cells[x.td]==="err")used.delete(x.td)});
       m.pieces.forEach((p,i)=>S.cells[r]["P"+i].classList.toggle("used",used.has("P"+i)));
     }
     A.sl.forEach(x=>{
