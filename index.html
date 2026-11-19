@@ -1095,7 +1095,7 @@ function renderTable(){
   if(inline){
     const at=new Map(sl.map(x=>[x.piece,x]));
     const mainPieces=new Set([...m.mainsI].map(i=>m.islots[i].piece));
-    m.pieces.forEach((p,i)=>{h+="<th scope=\"col\" class=\"fp "+p.c+sepCls(p.g,p.first)+(at.has(i)?" slot":"")+(mainPieces.has(i)?" main":"")+(i===m.pieces.length-1?" lastP":"")+"\" data-h=\"P"+i+"\"><span class=\"ord\">"+(p.ord||"")+"</span>"+esc(p.t)+"</th>"});
+    m.pieces.forEach((p,i)=>{h+="<th scope=\"col\" class=\"fp "+p.c+sepCls(p.g,p.first)+(at.has(i)?" slot":"")+(mainPieces.has(i)?" main":"")+(i===m.pieces.length-1?" lastP":"")+"\" data-h=\"P"+i+"\"><span class=\"ord\">"+(S.cols==="main"?"":p.ord||"")+"</span>"+esc(p.t)+"</th>"});
     h+="<th class=\"note\" aria-hidden=\"true\"></th></tr></thead><tbody>";
     for(let r=0;r<m.n;r++){
       h+=rowStart(r);
@@ -1107,7 +1107,7 @@ function renderTable(){
       h+="<td class=\"note\"></td></tr>";
     }
   }else{
-    sl.forEach(x=>{h+="<th scope=\"col\" class=\""+(x.main?"main":"")+x.sep+"\" data-h=\""+x.td+"\"><span class=\"ord\">"+(m.cols[x.c].ord||"")+"</span>"+esc(x.label)+"</th>"});
+    sl.forEach(x=>{h+="<th scope=\"col\" class=\""+(x.main?"main":"")+x.sep+"\" data-h=\""+x.td+"\"><span class=\"ord\">"+(S.cols==="main"?"":m.cols[x.c].ord||"")+"</span>"+esc(x.label)+"</th>"});
     h+="<th class=\"note\" aria-hidden=\"true\"></th></tr></thead><tbody>";
     for(let r=0;r<m.n;r++){
       h+=rowStart(r);
