@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- math font only for connective glyphs; letters stay in PT Mono -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&text=%C2%AC%E2%88%A7%E2%88%A8%E2%86%92%E2%86%94%E2%8A%BB%E2%86%93%E2%8A%A4%E2%8A%A5%E2%8A%A8&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&text=%C2%AC%E2%88%A7%E2%88%A8%E2%86%92%E2%86%94%E2%8A%BB%E2%86%93%E2%8A%A4%E2%8A%A5%E2%8A%A8%E2%86%90%E2%86%9B&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Mono&family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap">
 <style>
 :root{
@@ -135,7 +135,15 @@ summary{cursor:pointer;color:var(--accent);width:max-content;max-width:100%}
 .help code{font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace;font-size:.88rem;background:var(--tint);padding:.05rem .3rem;border-radius:4px;white-space:nowrap}
 
 /* settings */
-.setbox{margin-top:.7rem;border-bottom:1px solid var(--rule);padding-bottom:.6rem}
+/* Examples / How to type / Settings: one row of toggles, panels open underneath */
+.drawers{display:flex;flex-wrap:wrap;gap:.2rem 1.5rem;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:.35rem 0}
+.drawer-btn{font:inherit;font-size:.88rem;color:var(--accent);background:none;border:0;padding:.2rem 0;cursor:pointer;min-height:30px}
+.drawer-btn::before{content:"▸";display:inline-block;width:1em}
+.drawer-btn[aria-expanded="true"]::before{content:"▾"}
+.drawer-btn[aria-expanded="true"]{font-weight:700}
+.drawer-btn:hover span{text-decoration:underline;text-underline-offset:2px}
+.drawer-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.panel{padding:.1rem 0 .75rem;border-bottom:1px solid var(--rule)}
 .settings{display:flex;flex-wrap:wrap;gap:1rem 1.6rem;margin:.9rem 0 .4rem}
 .opt{display:grid;gap:.35rem;align-content:start}
 .opt > span{color:var(--muted);font-size:.8rem;letter-spacing:.05em;text-transform:uppercase}
@@ -273,18 +281,14 @@ span.cell:hover{background:transparent}
     </div>
     <div class="keys" id="keys"></div>
     <div class="preview" id="preview" aria-live="polite"></div>
-    <details id="ex-details" data-remember="ex">
-      <summary data-i18n="examplesTitle"></summary>
-      <div class="examples" id="examples"></div>
-    </details>
-    <details id="help-details">
-      <summary data-i18n="help"></summary>
-      <div class="help" id="help"></div>
-    </details>
-  </section>
-
-  <details class="setbox" id="settings-details" data-remember="settings">
-  <summary data-i18n="settingsTitle"></summary>
+    <div class="drawers">
+      <button type="button" class="drawer-btn" data-panel="ex" aria-controls="panel-ex" aria-expanded="false"><span data-i18n="examplesTitle"></span></button>
+      <button type="button" class="drawer-btn" data-panel="help" aria-controls="panel-help" aria-expanded="false"><span data-i18n="help"></span></button>
+      <button type="button" class="drawer-btn" data-panel="settings" aria-controls="panel-settings" aria-expanded="false"><span data-i18n="settingsTitle"></span></button>
+    </div>
+    <div class="panel" id="panel-ex" hidden><div class="examples" id="examples"></div></div>
+    <div class="panel" id="panel-help" hidden><div class="help" id="help"></div></div>
+    <div class="panel" id="panel-settings" hidden>
   <section class="settings" aria-label="Settings">
     <div class="opt"><span data-i18n="notation"></span>
       <div class="seg" data-set="notation">
@@ -317,6 +321,12 @@ span.cell:hover{background:transparent}
         <button type="button" data-val="main" data-i18n="colsMain"></button>
       </div>
     </div>
+    <div class="opt"><span data-i18n="extraOps"></span>
+      <div class="seg" data-set="extraOps">
+        <button type="button" data-val="0" data-i18n="extraOff"></button>
+        <button type="button" data-val="1" data-i18n="extraOn"></button>
+      </div>
+    </div>
     <div class="opt"><span data-i18n="reveal"></span>
       <div class="seg" data-set="reveal">
         <button type="button" data-val="1" data-i18n="revealShow"></button>
@@ -324,7 +334,8 @@ span.cell:hover{background:transparent}
       </div>
     </div>
   </section>
-  </details>
+    </div>
+  </section>
 
   <section class="work">
     <div class="status" id="status" aria-live="polite"></div>
@@ -376,6 +387,7 @@ ru:{
   help:"Как вводить формулы",
   notation:"Обозначения", left:"Левая часть", manual:"заполняю сам", auto:"автоматически",
   order:"Порядок строк", layout:"Вид таблицы", layoutCols:"подформулы в столбцах", layoutInline:"значения под связками",
+  extraOps:"Обратная импликация ← и антиимпликация ↛", extraOff:"не использовать", extraOn:"использовать",
   reveal:"Следование и отношения", revealAsk:"спрашивать", revealShow:"показывать сразу",
   cols:"Что вычислять", colsAll:"все подформулы", colsMain:"только формулу",
   checkBtn:"Проверить", solve:"Показать ответ", clear:"Очистить",
@@ -433,10 +445,10 @@ ru:{
   },
   helpIntro:"Связки можно вводить кнопками, клавиатурой или командами LaTeX. Сокращения превращаются в символы прямо при вводе: <code>-&gt;</code> станет <code>→</code>, <code>+</code> — <code>⊻</code>, <code>||</code> или <code>v</code> — <code>∨</code>, а <code>\\land</code> — <code>∧</code> после пробела.",
   helpHead:["Связка","","Клавиатура","LaTeX"],
-  helpNames:["отрицание","конъюнкция","дизъюнкция","импликация","эквиваленция","исключающее «или»","штрих Шеффера","стрелка Пирса","истина, ложь"],
+  helpNames:["отрицание","конъюнкция","дизъюнкция","импликация","эквиваленция","исключающее «или»","штрих Шеффера","стрелка Пирса","истина, ложь","обратная импликация","антиимпликация"],
   helpList:"Несколько формул пишутся через запятую: <code>p→q, ¬q→¬p</code>. Они получают общую левую часть, а справа — отдельный блок столбцов для каждой формулы; после заполнения сайт называет отношение между каждой парой формул. Логическое следование записывается через <code>⊨</code> (<code>|=</code>, <code>\\models</code>, <code>\\vDash</code>): <code>p, p→q ⊨ q</code>. Сайт проверит следование и укажет строки-контрпримеры.",
   helpVars:"Переменные — буквы латинского или русского алфавита, можно с индексом: <code>p1</code>, <code>p_1</code> → p₁. Строчная <code>v</code> всегда означает дизъюнкцию ∨, поэтому переменной быть не может.",
-  helpPrec:"Приоритет связок: ¬ сильнее всех, затем ∧ (и |), затем ∨ (и ↓), затем →, слабее всех ↔ и ⊻. Импликация правоассоциативна: p→q→r читается как p→(q→r). В заголовках таблицы скобки расставлены полностью."
+  helpPrec:"Приоритет связок: ¬ сильнее всех, затем ∧ (и |), затем ∨ (и ↓), затем → (и ←, ↛), слабее всех ↔ и ⊻. Импликация правоассоциативна: p→q→r читается как p→(q→r). В заголовках таблицы скобки расставлены полностью."
 },
 en:{
   h1:"Truth Tables", themeAuto:"Auto", themeLight:"Light", themeDark:"Dark", themeLabel:"Colour theme", report:"Report a bug",
@@ -446,6 +458,7 @@ en:{
   help:"How to type formulas",
   notation:"Notation", left:"Left side", manual:"I fill it in", auto:"automatic",
   order:"Row order", layout:"Table layout", layoutCols:"subformula columns", layoutInline:"values under connectives",
+  extraOps:"Converse implication ← and non-implication ↛", extraOff:"off", extraOn:"on",
   reveal:"Entailment and relations", revealAsk:"ask", revealShow:"show at once",
   cols:"What to compute", colsAll:"all subformulas", colsMain:"formula only",
   checkBtn:"Check", solve:"Show answer", clear:"Clear",
@@ -503,10 +516,10 @@ en:{
   },
   helpIntro:"Type connectives with the buttons, the keyboard, or LaTeX commands. Shortcuts turn into symbols as you type: <code>-&gt;</code> becomes <code>→</code>, <code>+</code> becomes <code>⊻</code>, <code>||</code> or <code>v</code> becomes <code>∨</code>, and <code>\\land</code> becomes <code>∧</code> after a space.",
   helpHead:["Connective","","Keyboard","LaTeX"],
-  helpNames:["negation","conjunction","disjunction","implication","biconditional","exclusive or","Sheffer stroke (nand)","Peirce arrow (nor)","true, false"],
+  helpNames:["negation","conjunction","disjunction","implication","biconditional","exclusive or","Sheffer stroke (nand)","Peirce arrow (nor)","true, false","converse implication","non-implication (anti-implication)"],
   helpList:"Separate several formulas with commas: <code>p→q, ¬q→¬p</code>. They share one left side, each formula gets its own block of columns, and once the table is complete the relation between every pair of formulas is named. Write entailment with <code>⊨</code> (<code>|=</code>, <code>\\models</code>, <code>\\vDash</code>): <code>p, p→q ⊨ q</code>. The site checks it and points out counterexample rows.",
   helpVars:"Variables are single letters, optionally with an index: <code>p1</code>, <code>p_1</code> → p₁. A lowercase <code>v</code> always means disjunction ∨, so it cannot be a variable.",
-  helpPrec:"Precedence: ¬ binds tightest, then ∧ (and |), then ∨ (and ↓), then →, and ↔ and ⊻ bind loosest. Implication associates to the right: p→q→r means p→(q→r). Table headers are fully parenthesised."
+  helpPrec:"Precedence: ¬ binds tightest, then ∧ (and |), then ∨ (and ↓), then → (and ←, ↛), and ↔ and ⊻ bind loosest. Implication associates to the right: p→q→r means p→(q→r). Table headers are fully parenthesised."
 }};
 const HELP_ROWS=[
   ["¬","~  !  -","\\neg  \\lnot"],
@@ -517,11 +530,13 @@ const HELP_ROWS=[
   ["⊻","+","\\veebar  \\oplus  \\xor"],
   ["|","|","\\mid  \\uparrow  \\nand"],
   ["↓","","\\downarrow  \\nor"],
-  ["⊤  ⊥","1  0","\\top  \\bot"]
+  ["⊤  ⊥","1  0","\\top  \\bot"],
+  ["←","<-","\\leftarrow  \\gets  \\impliedby",true],
+  ["↛","-/>","\\nrightarrow  \\nrarr",true]
 ];
 const KEYS=[
-  ["p",""],["q",""],["r",""],["s",""],["⊤","1  \\top"],["⊥","0  \\bot"],null,
-  ["¬","~  \\neg"],["∧","&  \\land"],["∨","v  ||  \\lor"],["→","->  \\to"],["↔","<->  \\iff"],["⊻","+  \\veebar"],["|","|  \\mid"],["↓","\\downarrow"],null,
+  ["p",""],["q",""],["r",""],["s",""],["t",""],["⊤","1  \\top"],["⊥","0  \\bot"],null,
+  ["¬","~  \\neg"],["∧","&  \\land"],["∨","v  ||  \\lor"],["→","->  \\to"],["←","<-  \\leftarrow",true],["↛","-/>  \\nrightarrow",true],["↔","<->  \\iff"],["⊻","+  \\veebar"],["|","|  \\mid"],["↓","\\downarrow"],null,
   ["(",""],[")",""],[",",""],["⊨","|=  \\models"]
 ];
 const EXAMPLES=["p→q","p, p→q ⊨ q","p→q, q ⊨ p","p∧q, ¬p∨¬q, p∨q","p→q, ¬q→¬p","(p→q)∧¬r","¬(p∧q)↔¬p∨¬q","(p→q)↔(¬q→¬p)","((p→q)→p)→p","(p∨q)∧(p→r)∧(q→r)→r","p⊻q↔¬(p↔q)","p|q↔¬(p∧q)","p∧¬p"];
@@ -535,7 +550,7 @@ function save(k,v){try{localStorage.setItem("tt-"+k,JSON.stringify(v))}catch(e){
 
 const S={
   lang:load("lang","ru"), notation:load("notation","01"), auto:load("auto",false), order:load("order","asc"),
-  cols:load("cols","all"), layout:load("layout","cols"), reveal:load("reveal",false),
+  cols:load("cols","all"), layout:load("layout","cols"), reveal:load("reveal",false), extraOps:load("extraOps",false),
   model:null, left:[], right:[], checked:false, quiz:{entail:null,rel:{},checked:false}
 };
 
@@ -543,11 +558,11 @@ const S={
 const LATEX={to:"→",rightarrow:"→",Rightarrow:"→",implies:"→",supset:"→",rarr:"→",
   leftrightarrow:"↔",Leftrightarrow:"↔",iff:"↔",equiv:"↔",lrarr:"↔",
   land:"∧",wedge:"∧",with:"∧",lor:"∨",vee:"∨",neg:"¬",lnot:"¬",sim:"¬",
-  models:"⊨",vDash:"⊨",entails:"⊨",oplus:"⊻",xor:"⊻",veebar:"⊻",uparrow:"|",nand:"|",mid:"|",downarrow:"↓",nor:"↓",top:"⊤",bot:"⊥",bottom:"⊥"};
-const ASCII=[["|=","⊨"],["⊨","⊨"],["<->","↔"],["<=>","↔"],["->","→"],["=>","→"],["/\\","∧"],["\\/","∨"],["\\&","∧"],["&&","∧"],["||","∨"],
+  models:"⊨",vDash:"⊨",entails:"⊨",leftarrow:"←",gets:"←",impliedby:"←",larr:"←",nrightarrow:"↛",nrarr:"↛",oplus:"⊻",xor:"⊻",veebar:"⊻",uparrow:"|",nand:"|",mid:"|",downarrow:"↓",nor:"↓",top:"⊤",bot:"⊥",bottom:"⊥"};
+const ASCII=[["|=","⊨"],["⊨","⊨"],["<->","↔"],["<=>","↔"],["-/>","↛"],["<-","←"],["->","→"],["=>","→"],["/\\","∧"],["\\/","∨"],["\\&","∧"],["&&","∧"],["||","∨"],
   ["&","∧"],["|","|"],["^","∧"],["~","¬"],["!","¬"],["-","¬"],["+","⊻"],
   ["⇒","→"],["⊃","→"],["⇔","↔"],["≡","↔"],["·","∧"],["⊕","⊻"],["↑","|"],["∼","¬"],
-  ["¬","¬"],["∧","∧"],["∨","∨"],["→","→"],["↔","↔"],["⊻","⊻"],["↓","↓"],["⊤","⊤"],["⊥","⊥"]];
+  ["¬","¬"],["∧","∧"],["∨","∨"],["→","→"],["↔","↔"],["⊻","⊻"],["↓","↓"],["←","←"],["↛","↛"],["⊤","⊤"],["⊥","⊥"]];
 const SUB="₀₁₂₃₄₅₆₇₈₉";
 const toSub=d=>d.replace(/\d/g,x=>SUB[+x]);
 const fromSub=s=>s.replace(/[₀-₉]/g,x=>String(SUB.indexOf(x)));
@@ -599,7 +614,7 @@ function parse(s){
   const peek=()=>toks[p];
   const isOp=(...v)=>p<toks.length&&toks[p].k==="op"&&v.includes(toks[p].v);
   function iff(){let a=imp();while(isOp("↔","⊻")){const op=toks[p++].v;a={t:"bin",op,a,b:imp()}}return a}
-  function imp(){const a=disj();if(isOp("→")){p++;return {t:"bin",op:"→",a,b:imp()}}return a}
+  function imp(){const a=disj();if(isOp("→","←","↛")){const op=toks[p++].v;return {t:"bin",op,a,b:imp()}}return a}
   function disj(){let a=conj();while(isOp("∨","↓")){const op=toks[p++].v;a={t:"bin",op,a,b:conj()}}return a}
   function conj(){let a=un();while(isOp("∧","|")){const op=toks[p++].v;a={t:"bin",op,a,b:un()}}return a}
   function un(){if(isOp("¬")){p++;return {t:"not",a:un()}}return atom()}
@@ -637,7 +652,7 @@ function show(n){
     default:{const w=x=>x.t==="bin"?"("+show(x)+")":show(x);return w(n.a)+n.op+w(n.b)}
   }
 }
-const OPS={"∧":(a,b)=>a&&b,"∨":(a,b)=>a||b,"→":(a,b)=>!a||b,"↔":(a,b)=>a===b,"⊻":(a,b)=>a!==b,"|":(a,b)=>!(a&&b),"↓":(a,b)=>!(a||b)};
+const OPS={"∧":(a,b)=>a&&b,"∨":(a,b)=>a||b,"→":(a,b)=>!a||b,"↔":(a,b)=>a===b,"⊻":(a,b)=>a!==b,"|":(a,b)=>!(a&&b),"↓":(a,b)=>!(a||b),"←":(a,b)=>a||!b,"↛":(a,b)=>a&&!b};
 function ev(n,env){
   switch(n.t){
     case "var":return env[n.name];
@@ -654,10 +669,10 @@ function liveNorm(str){
     .replace(/\|=/g,"⊨").replace(/<->|<=>/g,"↔").replace(/->|=>/g,"→")
     .replace(/\/\\/g,"∧").replace(/\\\//g,"∨").replace(/\\&/g,"∧")
     .replace(/&&?/g,"∧").replace(/\|\|/g,"∨").replace(/\^/g,"∧")
-    .replace(/[~!∼]/g,"¬").replace(/-(?=[^>])/g,"¬").replace(/\+/g,"⊻")
+    .replace(/-\/>/g,"↛").replace(/<-(?=[^>])/g,"←").replace(/[~!∼]/g,"¬").replace(/-(?=[^>\/])/g,"¬").replace(/\+/g,"⊻")
     .replace(/(\\[A-Za-z]*)|v/g,(m,cmd)=>cmd?m:"∨")
     .replace(/⇒|⊃/g,"→").replace(/⇔|≡/g,"↔").replace(/⊕/g,"⊻").replace(/↑/g,"|")
-    .replace(/\s*([∧∨→↔⊻|↓])\s*/g,"$1").replace(/¬\s+/g,"¬").replace(/\(\s+/g,"(").replace(/\s+\)/g,")").replace(/\s*([,;])(?=\S)/g,"$1 ").replace(/\s*⊨\s*/g," ⊨ ").replace(/^ ⊨/,"⊨");
+    .replace(/\s*([∧∨→←↛↔⊻|↓])\s*/g,"$1").replace(/¬\s+/g,"¬").replace(/\(\s+/g,"(").replace(/\s+\)/g,")").replace(/\s*([,;])(?=\S)/g,"$1 ").replace(/\s*⊨\s*/g," ⊨ ").replace(/^ ⊨/,"⊨");
 }
 
 /* ---------- model ---------- */
@@ -728,7 +743,8 @@ function buildKeys(){
   const box=$("keys");box.innerHTML="";
   for(const k of KEYS){
     if(!k){const g=document.createElement("span");g.className="gap";box.appendChild(g);continue}
-    const b=document.createElement("button");b.type="button";b.className="key"+(/^[pqrs]$/.test(k[0])?" var":/^[¬∧∨→↔⊻|↓⊤⊥⊨]$/.test(k[0])?" sym":"");
+    if(k[2]&&!S.extraOps)continue;
+    const b=document.createElement("button");b.type="button";b.className="key"+(/^[pqrst]$/.test(k[0])?" var":/^[¬∧∨→←↛↔⊻|↓⊤⊥⊨]$/.test(k[0])?" sym":"");
     b.textContent=k[0];if(k[1])b.title=k[1];
     b.addEventListener("click",()=>insertAtCaret(k[0]));
     box.appendChild(b);
@@ -825,10 +841,21 @@ function buildExamples(){
   const r=document.createElement("button");r.type="button";r.className="chip";r.style.fontFamily="inherit";r.textContent="⚄ "+L().random;
   r.addEventListener("click",()=>{inp.value=randomFormula();build()});box.appendChild(r);
 }
+/* Random practice formula. Laws (tautologies) and contradictions come up much more often
+   than they would by chance: 35% laws, 25% contradictions, 40% any formula. Random search
+   first; if it finds nothing suitable, a well-known law (or its negation) is used. */
+const LAWS=["(p→q)↔(¬q→¬p)","¬(p∧q)↔¬p∨¬q","¬(p∨q)↔¬p∧¬q","((p→q)→p)→p","(p→q)∧(q→r)→(p→r)","p∧(p→q)→q","(p→q)∧¬q→¬p",
+  "(p∨q)∧¬p→q","¬¬p↔p","(p∧q→r)↔(p→(q→r))","p∧(q∨r)↔p∧q∨p∧r","p∨p∧q↔p","(p→q)↔¬p∨q","p→(q→p)","(p→(q→r))→((p→q)→(p→r))"];
+function formulaKind(ast){
+  const m=buildModel(ast),K=m.vars.length;let t=0;
+  for(let x=0;x<m.n;x++){const env={};m.vars.forEach((v,j)=>env[v]=((x>>(K-1-j))&1)===1);if(ev(ast,env))t++}
+  return t===m.n?"taut":t===0?"contr":"sat";
+}
 function randomFormula(){
   const pick=a=>a[Math.floor(Math.random()*a.length)];
   const ops=["∧","∨","→","↔","∧","∨","→"];
-  for(let tries=0;tries<200;tries++){
+  const x=Math.random(),want=x<.35?"taut":x<.6?"contr":"any";
+  for(let tries=0;tries<4000;tries++){
     const vars=["p","q","r"].slice(0,2+Math.floor(Math.random()*2));
     const gen=d=>{
       if(d===0||(d<3&&Math.random()<.3))return Math.random()<.2?{t:"not",a:{t:"var",name:pick(vars)}}:{t:"var",name:pick(vars)};
@@ -837,9 +864,11 @@ function randomFormula(){
     };
     const ast=gen(3);if(ast.t!=="bin")continue;
     const m=buildModel(ast);
-    if(m.vars.length===vars.length&&m.cols.length>=3&&m.cols.length<=6)return m.text;
+    if(m.vars.length!==vars.length||m.cols.length<3||m.cols.length>6)continue;
+    if(want==="any"||formulaKind(ast)===want)return m.text;
   }
-  return "(p→q)∧(q→r)→(p→r)";
+  const law=pick(LAWS);
+  return want==="contr"?"¬("+law+")":law;
 }
 
 /* ---------- table ---------- */
@@ -1194,8 +1223,8 @@ function exportGrid(){
   }
   return {head,sep,rows,K};
 }
-const TEX={"¬":"\\neg ","∧":"\\land ","∨":"\\lor ","→":"\\to ","↔":"\\leftrightarrow ","⊻":"\\veebar ","|":"\\mid ","↓":"\\downarrow ","⊤":"\\top ","⊥":"\\bot "};
-const texMath=t=>"$"+t.replace(/[₀-₉]+/g,d=>"_{"+fromSub(d)+"}").replace(/[¬∧∨→↔⊻|↓⊤⊥]/g,c=>TEX[c]).replace(/ +$/,"").replace(/ ([)}])/g,"$1")+"$";
+const TEX={"¬":"\\neg ","∧":"\\land ","∨":"\\lor ","→":"\\to ","↔":"\\leftrightarrow ","⊻":"\\veebar ","|":"\\mid ","↓":"\\downarrow ","←":"\\leftarrow ","↛":"\\nrightarrow ","⊤":"\\top ","⊥":"\\bot "};
+const texMath=t=>"$"+t.replace(/[₀-₉]+/g,d=>"_{"+fromSub(d)+"}").replace(/[¬∧∨→←↛↔⊻|↓⊤⊥]/g,c=>TEX[c]).replace(/ +$/,"").replace(/ ([)}])/g,"$1")+"$";
 const texText=t=>t.replace(/[\\&%$#_{}~^]/g,c=>"\\"+c);
 function exportText(fmt){
   const G=exportGrid(),{head,sep,rows}=G,n=head.length;
@@ -1273,7 +1302,7 @@ $("solve").addEventListener("click",()=>{
 
 /* ---------- settings ---------- */
 function syncSegs(){
-  const val={notation:S.notation,auto:S.auto?"1":"0",order:S.order,layout:S.layout,cols:S.cols,reveal:S.reveal?"1":"0"};
+  const val={notation:S.notation,auto:S.auto?"1":"0",order:S.order,layout:S.layout,cols:S.cols,reveal:S.reveal?"1":"0",extraOps:S.extraOps?"1":"0"};
   document.querySelectorAll(".seg[data-set]").forEach(g=>{
     g.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.val===val[g.dataset.set])));
   });
@@ -1292,6 +1321,7 @@ document.querySelectorAll(".seg[data-set]").forEach(g=>{
     if(key==="cols")S.cols=v;
     if(key==="layout")S.layout=v;
     if(key==="reveal")S.reveal=v==="1";
+    if(key==="extraOps"){S.extraOps=v==="1";save(key,S[key]);applyLang();return}
     save(key,S[key]);syncSegs();
     if(key==="auto"||key==="cols"||key==="layout")renderTable();else update();
   });
@@ -1306,6 +1336,7 @@ function applyLang(){
   $("theme").setAttribute("aria-label",lang.themeLabel);
   let h="<p>"+lang.helpIntro+"</p><div class=\"help-wrap\"><table><thead><tr>"+lang.helpHead.map(x=>"<th>"+esc(x)+"</th>").join("")+"</tr></thead><tbody>";
   HELP_ROWS.forEach((row,i)=>{
+    if(row[3]&&!S.extraOps)return;
     const codes=s=>s?s.split(/\s{2,}/).map(x=>"<code>"+esc(x)+"</code>").join(" "):"";
     h+="<tr><td>"+esc(lang.helpNames[i])+"</td><td class=\"sym\">"+esc(row[0])+"</td><td>"+codes(row[1])+"</td><td>"+codes(row[2])+"</td></tr>";
   });
@@ -1318,6 +1349,12 @@ function applyLang(){
   renderPreview();
 }
 
+document.querySelectorAll(".drawer-btn").forEach(b=>{
+  const k=b.dataset.panel,p=$("panel-"+k);
+  const set=open=>{b.setAttribute("aria-expanded",String(open));p.hidden=!open;save("open-"+k,open)};
+  set(!!load("open-"+k,false));
+  b.addEventListener("click",()=>set(p.hidden));
+});
 document.querySelectorAll("details[data-remember]").forEach(d=>{
   if(load("open-"+d.dataset.remember,false))d.open=true;
   d.addEventListener("toggle",()=>save("open-"+d.dataset.remember,d.open));
