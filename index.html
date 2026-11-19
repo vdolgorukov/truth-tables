@@ -47,6 +47,7 @@
   --tint:#1e2129; --key-bg:#2b3244; --key-bg-hover:#353e55; --key-border:#4b5670; color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none!important}
 body{
   margin:0;background:var(--paper);color:var(--text);
   font-family:"PT Serif",Georgia,"Times New Roman",serif;
@@ -369,6 +370,7 @@ span.cell:hover{background:transparent}
       <div class="seg" data-set="order">
         <button type="button" data-val="asc" class="mono" id="ord-asc"></button>
         <button type="button" data-val="desc" class="mono" id="ord-desc"></button>
+        <button type="button" data-val="rand" data-i18n="ordRand"></button>
       </div>
     </div>
     <div class="opt"><span data-i18n="layout"></span>
@@ -504,6 +506,7 @@ ru:{
   order:"Порядок строк", layout:"Вид таблицы", layoutCols:"подформулы в столбцах", layoutInline:"значения под связками",
   notCustom:"свои", custT:"истина", custF:"ложь",
   extraOps:"Обратная импликация ← и антиимпликация ↛", extraOff:"не использовать", extraOn:"использовать",
+  ordRand:"случайный",
   reveal:"Следование и отношения", revealAsk:"спрашивать", revealShow:"показывать сразу",
   cols:"Что вычислять", colsAll:"все подформулы", colsMain:"только формулу",
   checkBtn:"Проверить", solve:"Показать ответ", clear:"Очистить",
@@ -621,6 +624,7 @@ en:{
   order:"Row order", layout:"Table layout", layoutCols:"subformula columns", layoutInline:"values under connectives",
   notCustom:"custom", custT:"true", custF:"false",
   extraOps:"Converse implication ← and non-implication ↛", extraOff:"off", extraOn:"on",
+  ordRand:"random",
   reveal:"Entailment and relations", revealAsk:"ask", revealShow:"show at once",
   cols:"What to compute", colsAll:"all subformulas", colsMain:"formula only",
   checkBtn:"Check", solve:"Show answer", clear:"Clear",
@@ -906,7 +910,14 @@ function buildModel(input){
 }
 const k=()=>S.model.vars.length;
 const visCols=()=>S.cols==="main"?S.model.groups.map(x=>x.main):S.model.cols.map((_,i)=>i);
-function lexVal(r,j){const bit=(r>>(k()-1-j))&1;return S.order==="asc"?bit===1:bit===0}
+/* row r shows assignment number rowIdx(r); "rand" uses a shuffled order kept in S.perm */
+function shufflePerm(n){const a=[...Array(n).keys()];for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function rowIdx(r){
+  if(S.order!=="rand")return r;
+  if(!S.perm||S.perm.length!==S.model.n)S.perm=shufflePerm(S.model.n);
+  return S.perm[r];
+}
+function lexVal(r,j){const bit=(rowIdx(r)>>(k()-1-j))&1;return S.order==="desc"?bit===0:bit===1}
 function leftVal(r,j){return S.auto?lexVal(r,j):S.left[r][j]}
 const sym=v=>v==null?"":SYM[S.notation][v?1:0];
 function paint(el,v){el.textContent=sym(v);el.classList.toggle("v1",v===true);el.classList.toggle("v0",v===false)}
@@ -1009,6 +1020,7 @@ function taskUrl(text){
   return here+"?f="+encodeURIComponent(text);
 }
 function setModel(m,restore){
+  S.perm=null;
   try{if(/^https?:$/.test(location.protocol)&&/github\.io$|^localhost$|^127\.0\.0\.1$/.test(location.hostname))history.replaceState(null,"",taskUrl(m.text))}catch(e){}
   S.model=m;S.checked=false;S.quiz=newQuiz();S.lastFilled=null;
   emptyGrids();
@@ -1016,10 +1028,11 @@ function setModel(m,restore){
   if(restore&&restore.text===m.text&&fits(restore.left,m.n,m.vars.length)&&fits(restore.right,m.n,m.cols.length)){
     S.left=restore.left;S.right=restore.right;
     if(fits(restore.rightI,m.n,m.islots.length))S.rightI=restore.rightI;
+    if(Array.isArray(restore.perm)&&restore.perm.length===m.n)S.perm=restore.perm;
   }
   renderTable();renderPreview();
 }
-function saveProgress(){save("progress",{text:S.model.text,left:S.left,right:S.right,rightI:S.rightI})}
+function saveProgress(){save("progress",{text:S.model.text,left:S.left,right:S.right,rightI:S.rightI,perm:S.perm})}
 
 /* ---------- examples ---------- */
 function buildExamples(){
@@ -1841,7 +1854,7 @@ document.querySelectorAll(".seg[data-set]").forEach(g=>{
     const key=g.dataset.set,v=b.dataset.val;
     if(key==="notation"){S.notation=v;$("custom-sym").hidden=v!=="custom";buildSemantics()}
     if(key==="auto")S.auto=v==="1";
-    if(key==="order")S.order=v;
+    if(key==="order"){S.order=v;if(v==="rand"){S.perm=shufflePerm(S.model.n);saveProgress()}}
     if(key==="cols")S.cols=v;
     if(key==="layout")S.layout=v;
     if(key==="reveal")S.reveal=v==="1";
