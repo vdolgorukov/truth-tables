@@ -877,7 +877,10 @@ function buildModel(input){
     // order of operations: connectives numbered in the order they are computed (inner first)
     let ord=0;
     for(let i=s0;i<islots.length;i++){const x=islots[i];if(x.node.t==="not"||x.node.t==="bin"){x.ord=++ord;pieces[x.piece].ord=ord}}
+    // a single connective needs no number
+    if(ord===1)for(let i=s0;i<islots.length;i++){delete islots[i].ord;delete pieces[islots[i].piece].ord}
     ord=0;cols.forEach(c=>{if(c.g===g&&(c.node.t==="not"||c.node.t==="bin"))c.ord=++ord});
+    if(ord===1)cols.forEach(c=>{if(c.g===g)delete c.ord});
     groups.push({ast,text:show(ast),main:idx.get(show(ast)),mainI:islots.length-1});
   });
   cols.forEach((c,i)=>{c.first=i===0||cols[i-1].g!==c.g});
