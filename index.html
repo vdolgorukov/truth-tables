@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- math font only for connective glyphs; letters stay in PT Mono -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&text=%C2%AC%E2%88%A7%E2%88%A8%E2%86%92%E2%86%94%E2%8A%BB%E2%86%93%E2%8A%A4%E2%8A%A5%E2%8A%A8%E2%86%90%E2%86%9B&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&text=%C2%AC%E2%88%A7%E2%88%A8%E2%86%92%E2%86%94%E2%8A%BB%E2%86%93%E2%8A%A4%E2%8A%A5%E2%8A%A8%E2%86%90%E2%86%9B%E2%8A%95&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Mono&family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap">
 <style>
 :root{
@@ -132,6 +132,22 @@ summary{cursor:pointer;color:var(--accent);width:max-content;max-width:100%}
 .help th,.help td{padding:.3rem .8rem .3rem 0;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top}
 .help th{font-weight:400;color:var(--muted)}
 .help td.sym{font-size:1.15rem}
+.sem{margin-top:.6rem;display:grid;gap:1rem;font-size:.95rem}
+.sem h3{font-size:.8rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:400;margin:0}
+.sem p{margin:0;max-width:72ch}
+.sem .tw{overflow-x:auto}
+.sem table{border-collapse:collapse;font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace;font-size:.95rem;font-variant-numeric:tabular-nums}
+.sem th,.sem td{border:1px solid var(--rule);padding:.25rem .6rem;text-align:center}
+.sem thead th{background:var(--tint);font-weight:400}
+.sem th.lt,.sem td.lt{border-right:3px double var(--rule-strong)}
+.sem td.txt,.sem th.txt{font-family:"PT Serif",Georgia,serif;text-align:left}
+.sem .v1{color:var(--tv)}
+.sem .v0{color:var(--fv)}
+.sem dl{margin:0;display:grid;gap:.45rem;max-width:80ch}
+.sem dt{font-weight:700;display:inline}
+.sem dd{display:inline;margin:0}
+.sem dl > div{line-height:1.5}
+.sem .mono{font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace}
 .help code{font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace;font-size:.88rem;background:var(--tint);padding:.05rem .3rem;border-radius:4px;white-space:nowrap}
 
 /* settings */
@@ -244,6 +260,14 @@ span.cell:hover{background:transparent}
 .tt thead th.src{outline:2px dashed var(--accent);outline-offset:-3px}
 
 .actions{display:flex;flex-wrap:wrap;gap:.6rem}
+.tr{display:grid;gap:1rem;margin-top:.6rem}
+.tr-f{display:grid;gap:.35rem}
+.tr-f h3{margin:0;font-size:1rem;font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace;font-weight:700}
+.tr-row{display:grid;grid-template-columns:minmax(10rem,16rem) minmax(0,1fr);gap:.2rem 1rem;align-items:baseline}
+@media (max-width:640px){.tr-row{grid-template-columns:minmax(0,1fr)}}
+.tr-row > span:first-child{color:var(--muted);font-size:.9rem}
+.tr-row .mono{overflow-wrap:anywhere}
+.tr-row .none{color:var(--muted);font-style:italic}
 .export{display:grid;gap:.6rem;margin-top:.6rem}
 #exp-fmt{justify-self:start}
 #exp-out{width:100%;min-height:11rem;resize:vertical;font-family:"PT Mono",ui-monospace,Menlo,monospace;font-size:.85rem;line-height:1.45;padding:.5rem .65rem;border:1.5px solid var(--rule-strong);border-radius:6px;background:var(--tint);color:var(--text);white-space:pre;overflow:auto}
@@ -288,10 +312,12 @@ span.cell:hover{background:transparent}
     <div class="drawers">
       <button type="button" class="drawer-btn" data-panel="ex" aria-controls="panel-ex" aria-expanded="false"><span data-i18n="examplesTitle"></span></button>
       <button type="button" class="drawer-btn" data-panel="help" aria-controls="panel-help" aria-expanded="false"><span data-i18n="help"></span></button>
+      <button type="button" class="drawer-btn" data-panel="sem" aria-controls="panel-sem" aria-expanded="false"><span data-i18n="semTitle"></span></button>
       <button type="button" class="drawer-btn" data-panel="settings" aria-controls="panel-settings" aria-expanded="false"><span data-i18n="settingsTitle"></span></button>
     </div>
     <div class="panel" id="panel-ex" hidden><div class="examples" id="examples"></div></div>
     <div class="panel" id="panel-help" hidden><div class="help" id="help"></div></div>
+    <div class="panel" id="panel-sem" hidden><div class="sem" id="sem"></div></div>
     <div class="panel" id="panel-settings" hidden>
   <section class="settings" aria-label="Settings">
     <div class="opt"><span data-i18n="notation"></span>
@@ -350,6 +376,10 @@ span.cell:hover{background:transparent}
       <button type="button" class="btn" id="solve" data-i18n="solve"></button>
       <button type="button" class="btn quiet" id="clear" data-i18n="clear"></button>
     </div>
+    <details id="tr-details" data-remember="tr">
+      <summary data-i18n="trTitle"></summary>
+      <div class="tr" id="tr-out"></div>
+    </details>
     <details id="export-details" data-remember="export">
       <summary data-i18n="exportTitle"></summary>
       <div class="export">
@@ -387,6 +417,35 @@ ru:{
   h1:"Таблицы истинности", themeAuto:"Авто", themeLight:"Светлая", themeDark:"Тёмная", themeLabel:"Тема оформления", report:"Сообщить об ошибке",
   reportSubject:"Тренажёр таблиц истинности: ошибка", reportBody:f=>"Формула: "+f+"\nАдрес страницы: "+location.href+"\n\nЧто произошло:\n",
   lead:"Введите формулу и постройте её таблицу истинности сами: слева — наборы значений переменных, справа — значения подформул. Сайт подсвечивает верные и неверные ячейки, повторённые и пропущенные строки.",
+  semTitle:"Семантика и термины",
+  semConn:"Связки", semConnNote:"Таблица истинности каждой связки: значение формулы при всех наборах значений p и q.",
+  semRead:["¬p — «не p», отрицание: меняет значение на противоположное.","p∧q — «p и q», конъюнкция: истинна, только когда истинны обе.","p∨q — «p или q», дизъюнкция (нестрогая): ложна, только когда ложны обе.","p→q — «если p, то q», импликация: ложна, только когда p истинно, а q ложно. p — антецедент, q — консеквент.","p↔q — «p тогда и только тогда, когда q», эквиваленция: истинна, когда значения совпадают.","p⊻q — «либо p, либо q», строгая дизъюнкция: истинна, когда значения различны.","p|q — штрих Шеффера, «не (p и q)»: ложна, только когда истинны обе.","p↓q — стрелка Пирса, «ни p, ни q»: истинна, только когда ложны обе.","p←q — обратная импликация, «p, если q»: то же, что q→p.","p↛q — антиимпликация, «p и не q»: истинна, только когда p истинно, а q ложно."],
+  semTerms:"Свойства формул",
+  semDefs:[["Тавтология (общезначимая формула, закон логики)","истинна во всех строках таблицы, то есть при любых значениях переменных."],
+    ["Противоречие (невыполнимая, тождественно ложная формула)","ложна во всех строках."],
+    ["Выполнимая формула","истинна хотя бы в одной строке."],
+    ["Опровержимая формула","ложна хотя бы в одной строке."],
+    ["Случайная (нейтральная) формула","выполнима и опровержима: в одних строках истинна, в других ложна."],
+    ["Совместное множество формул","есть строка, в которой все формулы истинны одновременно; иначе множество несовместно."]],
+  semEnt:"Логическое следование",
+  semEntDefs:[["Γ ⊨ φ","из множества посылок Γ логически следует заключение φ, если в каждой строке, где истинны все посылки, истинно и заключение."],
+    ["Контрпример","строка, в которой все посылки истинны, а заключение ложно. Следование есть тогда и только тогда, когда контрпримеров нет."],
+    ["⊨ φ, {} ⊨ φ","следование из пустого множества посылок: φ — тавтология."],
+    ["Несовместные посылки","если нет строки, где все посылки истинны, из них следует любое заключение."]],
+  semRel:"Отношения между формулами A и B",
+  semRelNote:"Отношение определяется тем, какие сочетания значений A и B встречаются в таблице. «+» — встречается, «—» — не встречается, «±» — может встречаться или нет. Одновременно может выполняться несколько отношений: например, ⊥ и ⊤ контрадикторны, и при этом ⊥ ⊨ ⊤.",
+  semRelHead:["Отношение","Определение"],
+  semRelDefs:[["эквивалентность","значения A и B совпадают в каждой строке; то же, что A ⊨ B и B ⊨ A, или что A↔B — тавтология."],
+    ["контрадикторность (противоречие)","значения противоположны в каждой строке: A и B не бывают одновременно истинны и не бывают одновременно ложны."],
+    ["контрарность (противоположность)","A и B не бывают одновременно истинны, но бывают одновременно ложны."],
+    ["субконтрарность (подпротивоположность)","A и B не бывают одновременно ложны, но бывают одновременно истинны."],
+    ["подчинение","A ⊨ B, но не B ⊨ A: A — подчиняющая формула, B — подчинённая."],
+    ["независимость","встречаются все четыре сочетания значений."]],
+  trTitle:"Польская и обратная польская запись, ДНФ, КНФ, полином Жегалкина",
+  trPolish:"Польская (префиксная) запись", trRpolish:"Обратная польская (постфиксная) запись", trLukas:"В обозначениях Лукасевича", trSdnf:"СДНФ", trSknf:"СКНФ", trZheg:"Полином Жегалкина",
+  trNoSdnf:"не существует: формула — противоречие", trNoSknf:"не существует: формула — тавтология",
+  trMore:(k,n)=>" … и ещё "+k+" (всего "+n+")",
+  trNote:"СДНФ строится по строкам таблицы, где формула истинна, СКНФ — по строкам, где она ложна. В полиноме Жегалкина ⊕ — сложение по модулю 2 (строгая дизъюнкция), произведение pq — конъюнкция. Обозначения Лукасевича: N — ¬, K — ∧, A — ∨, C — →, E — ↔, J — ⊻, D — |, X — ↓, B — ←.",
   flabel:"Формула", build:"Построить таблицу", examplesTitle:"Примеры", settingsTitle:"Настройки", random:"Случайная формула",
   help:"Как вводить формулы",
   notation:"Обозначения", left:"Левая часть", manual:"заполняю сам", auto:"автоматически",
@@ -459,6 +518,35 @@ en:{
   h1:"Truth Tables", themeAuto:"Auto", themeLight:"Light", themeDark:"Dark", themeLabel:"Colour theme", report:"Report a bug",
   reportSubject:"Truth table trainer: bug report", reportBody:f=>"Formula: "+f+"\nPage: "+location.href+"\n\nWhat happened:\n",
   lead:"Enter a formula and build its truth table yourself: variable assignments on the left, values of subformulas on the right. Correct and wrong cells, repeated and missing rows are highlighted.",
+  semTitle:"Semantics and terms",
+  semConn:"Connectives", semConnNote:"The truth table of every connective: the value for each assignment to p and q.",
+  semRead:["¬p — “not p”, negation: flips the value.","p∧q — “p and q”, conjunction: true only when both are true.","p∨q — “p or q”, inclusive disjunction: false only when both are false.","p→q — “if p then q”, implication: false only when p is true and q is false. p is the antecedent, q the consequent.","p↔q — “p if and only if q”, biconditional: true when the values agree.","p⊻q — “either p or q”, exclusive or: true when the values differ.","p|q — Sheffer stroke, “not (p and q)”: false only when both are true.","p↓q — Peirce arrow, “neither p nor q”: true only when both are false.","p←q — converse implication, “p if q”: the same as q→p.","p↛q — non-implication, “p and not q”: true only when p is true and q is false."],
+  semTerms:"Properties of formulas",
+  semDefs:[["Tautology (valid formula, law of logic)","true in every row, i.e. for every assignment of values to the variables."],
+    ["Contradiction (unsatisfiable formula)","false in every row."],
+    ["Satisfiable formula","true in at least one row."],
+    ["Falsifiable formula","false in at least one row."],
+    ["Contingent formula","satisfiable and falsifiable: true in some rows and false in others."],
+    ["Consistent set of formulas","some row makes all of them true at once; otherwise the set is inconsistent."]],
+  semEnt:"Logical entailment",
+  semEntDefs:[["Γ ⊨ φ","the premises Γ entail the conclusion φ if φ is true in every row where all premises are true."],
+    ["Counterexample","a row where all premises are true and the conclusion is false. The entailment holds exactly when there is no counterexample."],
+    ["⊨ φ, {} ⊨ φ","entailment from the empty set of premises: φ is a tautology."],
+    ["Inconsistent premises","if no row makes all premises true, they entail any conclusion."]],
+  semRel:"Relations between formulas A and B",
+  semRelNote:"A relation is determined by which combinations of the values of A and B occur in the table. “+” occurs, “—” does not occur, “±” may or may not occur. Several relations can hold at once: ⊥ and ⊤ are contradictory, and also ⊥ ⊨ ⊤.",
+  semRelHead:["Relation","Definition"],
+  semRelDefs:[["equivalence","A and B have the same value in every row; the same as A ⊨ B and B ⊨ A, or A↔B being a tautology."],
+    ["contradictoriness","the values are opposite in every row: A and B are never true together and never false together."],
+    ["contrariety","A and B are never true together, but are sometimes false together."],
+    ["subcontrariety","A and B are never false together, but are sometimes true together."],
+    ["subalternation","A ⊨ B but not B ⊨ A: A is the superaltern, B the subaltern."],
+    ["independence","all four combinations of values occur."]],
+  trTitle:"Polish and reverse Polish notation, DNF, CNF, Zhegalkin polynomial",
+  trPolish:"Polish (prefix) notation", trRpolish:"Reverse Polish (postfix) notation", trLukas:"Łukasiewicz letters", trSdnf:"Full DNF", trSknf:"Full CNF", trZheg:"Zhegalkin polynomial",
+  trNoSdnf:"does not exist: the formula is a contradiction", trNoSknf:"does not exist: the formula is a tautology",
+  trMore:(k,n)=>" … and "+k+" more ("+n+" in total)",
+  trNote:"The full DNF is built from the rows where the formula is true, the full CNF from the rows where it is false. In the Zhegalkin polynomial ⊕ is addition mod 2 (exclusive or) and pq is conjunction. Łukasiewicz letters: N ¬, K ∧, A ∨, C →, E ↔, J ⊻, D |, X ↓, B ←.",
   flabel:"Formula", build:"Build table", examplesTitle:"Examples", settingsTitle:"Settings", random:"Random formula",
   help:"How to type formulas",
   notation:"Notation", left:"Left side", manual:"I fill it in", auto:"automatic",
@@ -1055,6 +1143,7 @@ function update(){
   statusEl.innerHTML=counters;
   resultEl.innerHTML=h;resultEl.hidden=!h;
   if(typeof renderExport==="function")renderExport();
+  if(typeof renderTransforms==="function")renderTransforms();
 }
 
 /* ---------- verdict and quiz ----------
@@ -1219,6 +1308,60 @@ table.addEventListener("focusin",e=>{
 });
 table.addEventListener("focusout",e=>{if(!table.contains(e.relatedTarget))clearSrc()});
 
+/* ---------- Polish notation, full DNF / CNF, Zhegalkin polynomial ---------- */
+const LUK={"¬":"N","∧":"K","∨":"A","→":"C","↔":"E","⊻":"J","|":"D","↓":"X","←":"B"};
+const rpolish=n=>n.t==="var"?n.name:n.t==="const"?(n.v?"⊤":"⊥"):n.t==="not"?rpolish(n.a)+"¬":rpolish(n.a)+rpolish(n.b)+n.op;
+const polish=n=>n.t==="var"?n.name:n.t==="const"?(n.v?"⊤":"⊥"):n.t==="not"?"¬"+polish(n.a):n.op+polish(n.a)+polish(n.b);
+function lukas(n){ // null if the formula has a connective or constant without a standard letter
+  if(n.t==="var")return n.name;
+  if(n.t==="const")return null;
+  const L_=LUK[n.t==="not"?"¬":n.op];if(!L_)return null;
+  const a=lukas(n.a);if(a==null)return null;
+  if(n.t==="not")return L_+a;
+  const b=lukas(n.b);return b==null?null:L_+a+b;
+}
+function normalForms(ast){
+  const m=S.model,vs=new Set();
+  (function w(n){if(n.t==="var")vs.add(n.name);else if(n.t==="not")w(n.a);else if(n.t==="bin"){w(n.a);w(n.b)}})(ast);
+  const vars=m.vars.filter(v=>vs.has(v)),K=vars.length,N=1<<K,vec=[];
+  for(let x=0;x<N;x++){const env={};vars.forEach((v,j)=>env[v]=((x>>(K-1-j))&1)===1);vec.push(ev(ast,env)?1:0)}
+  const lit=(x,j,pos)=>(((x>>(K-1-j))&1)===1)===pos?vars[j]:"¬"+vars[j];
+  const wrap=(t,many)=>many&&K>1?"("+t+")":t;
+  const tr=[],fa=[];for(let x=0;x<N;x++)(vec[x]?tr:fa).push(x);
+  const dnf=K===0?(vec[0]?["⊤"]:[]):tr.map(x=>wrap(vars.map((_,j)=>lit(x,j,true)).join("∧"),tr.length>1));
+  const cnf=K===0?(vec[0]?[]:["⊥"]):fa.map(x=>wrap(vars.map((_,j)=>lit(x,j,false)).join("∨"),fa.length>1));
+  const a=vec.slice();for(let b=1;b<N;b<<=1)for(let x=0;x<N;x++)if(x&b)a[x]^=a[x^b];
+  const mons=[];for(let x=0;x<N;x++)if(a[x])mons.push(x);
+  const deg=x=>{let c=0;for(let y=x;y;y&=y-1)c++;return c};
+  mons.sort((x,y)=>deg(y)-deg(x)||y-x);
+  const zh=mons.map(x=>x===0?"1":vars.filter((_,j)=>(x>>(K-1-j))&1).join(""));
+  return {dnf,cnf,zh};
+}
+let trKey="";
+function renderTransforms(){
+  if(!S.model||!$("tr-details").open)return;
+  const key=S.lang+"|"+S.model.text;if(key===trKey)return;trKey=key;
+  const lang=L(),f=x=>"<span class=\"mono\">"+esc(x)+"</span>";
+  const list=(arr,sep,none)=>{
+    if(!arr.length)return "<span class=\"none\">"+esc(none)+"</span>";
+    const cut=arr.length>64?arr.slice(0,64):arr;
+    return f(cut.join(sep))+(arr.length>64?esc(lang.trMore(arr.length-64,arr.length)):"");
+  };
+  let h="";
+  S.model.groups.forEach(g=>{
+    const nf=normalForms(g.ast),lk=lukas(g.ast);
+    h+="<div class=\"tr-f\"><h3>"+esc(g.text)+"</h3>";
+    h+="<div class=\"tr-row\"><span>"+esc(lang.trPolish)+"</span>"+f(polish(g.ast))+"</div>";
+    h+="<div class=\"tr-row\"><span>"+esc(lang.trRpolish)+"</span>"+f(rpolish(g.ast))+"</div>";
+    if(lk!=null&&lk!==polish(g.ast))h+="<div class=\"tr-row\"><span>"+esc(lang.trLukas)+"</span>"+f(lk)+"</div>";
+    h+="<div class=\"tr-row\"><span>"+esc(lang.trSdnf)+"</span>"+list(nf.dnf,"∨",lang.trNoSdnf)+"</div>";
+    h+="<div class=\"tr-row\"><span>"+esc(lang.trSknf)+"</span>"+list(nf.cnf,"∧",lang.trNoSknf)+"</div>";
+    h+="<div class=\"tr-row\"><span>"+esc(lang.trZheg)+"</span>"+(nf.zh.length?list(nf.zh," ⊕ ",""):f("0"))+"</div></div>";
+  });
+  $("tr-out").innerHTML=h+"<p class=\"hint\">"+esc(lang.trNote)+"</p>";
+}
+$("tr-details").addEventListener("toggle",renderTransforms);
+
 /* ---------- export ----------
    The table as currently shown: header cells, value rows, and a separator kind
    before each column ("lr" left|right, "g" between formulas, "c" before the conclusion,
@@ -1336,7 +1479,7 @@ document.querySelectorAll(".seg[data-set]").forEach(g=>{
   g.addEventListener("click",e=>{
     const b=e.target.closest("button");if(!b)return;
     const key=g.dataset.set,v=b.dataset.val;
-    if(key==="notation")S.notation=v;
+    if(key==="notation"){S.notation=v;buildSemantics()}
     if(key==="auto")S.auto=v==="1";
     if(key==="order")S.order=v;
     if(key==="cols")S.cols=v;
@@ -1349,6 +1492,24 @@ document.querySelectorAll(".seg[data-set]").forEach(g=>{
 });
 document.querySelectorAll("[data-lang]").forEach(b=>b.addEventListener("click",()=>{S.lang=b.dataset.lang;save("lang",S.lang);applyLang()}));
 
+/* "Semantics and terms" panel: connective truth tables, definitions, relation table */
+const REL_COMBOS=[["±","—","—","±"],["—","±","±","—"],["—","±","±","+"],["+","±","±","—"],["±","—","+","±"],["+","+","+","+"]];
+function buildSemantics(){
+  const lang=L(),v=b=>"<span class=\"v"+(b?1:0)+"\">"+esc(sym(b))+"</span>";
+  const ops=["∧","∨","→","↔","⊻","|","↓"].concat(S.extraOps?["←","↛"]:[]);
+  const rows=[[true,true],[true,false],[false,true],[false,false]];
+  let h="<h3>"+esc(lang.semConn)+"</h3><p>"+esc(lang.semConnNote)+"</p><div class=\"tw\"><table><thead><tr><th>p</th><th class=\"lt\">q</th><th>¬p</th>"+ops.map(o=>"<th>p"+esc(o)+"q</th>").join("")+"</tr></thead><tbody>";
+  rows.forEach(([p,q])=>{h+="<tr><td>"+v(p)+"</td><td class=\"lt\">"+v(q)+"</td><td>"+v(!p)+"</td>"+ops.map(o=>"<td>"+v(OPS[o](p,q))+"</td>").join("")+"</tr>"});
+  h+="</tbody></table></div><dl>"+lang.semRead.filter((_,i)=>i<8||S.extraOps).map(t=>{const k=t.indexOf(" — ");return "<div><dt class=\"mono\">"+esc(t.slice(0,k))+"</dt><dd> — "+esc(t.slice(k+3))+"</dd></div>"}).join("")+"</dl>";
+  const dl=list=>"<dl>"+list.map(([t,d])=>"<div><dt>"+esc(t)+"</dt><dd> — "+esc(d)+"</dd></div>").join("")+"</dl>";
+  h+="<h3>"+esc(lang.semTerms)+"</h3>"+dl(lang.semDefs);
+  h+="<h3>"+esc(lang.semEnt)+"</h3>"+dl(lang.semEntDefs);
+  const T=SYM[S.notation][1],F=SYM[S.notation][0];
+  h+="<h3>"+esc(lang.semRel)+"</h3><p>"+esc(lang.semRelNote)+"</p><div class=\"tw\"><table><thead><tr><th class=\"txt\">"+esc(lang.semRelHead[0])+"</th>"+
+    [[T,T],[T,F],[F,T],[F,F]].map(([a,b])=>"<th>A="+esc(a)+", B="+esc(b)+"</th>").join("")+"<th class=\"txt\">"+esc(lang.semRelHead[1])+"</th></tr></thead><tbody>";
+  lang.semRelDefs.forEach(([n,d],i)=>{h+="<tr><td class=\"txt\"><b>"+esc(n)+"</b></td>"+REL_COMBOS[i].map(c=>"<td>"+c+"</td>").join("")+"<td class=\"txt\">"+esc(d)+"</td></tr>"});
+  $("sem").innerHTML=h+"</tbody></table></div>";
+}
 function applyLang(){
   const lang=L();
   document.documentElement.lang=S.lang;
@@ -1363,6 +1524,7 @@ function applyLang(){
   });
   h+="</tbody></table></div><p>"+lang.helpList+"</p><p>"+lang.helpVars+"</p><p>"+lang.helpPrec+"</p>";
   $("help").innerHTML=h;
+  buildSemantics();
   if(S.lang==="en"&&S.notation==="IL"){S.notation="01";save("notation",S.notation)}
   document.querySelector("[data-set=notation] [data-val=IL]").hidden=S.lang==="en";
   buildKeys();buildExamples();syncSegs();
