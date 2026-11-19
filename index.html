@@ -410,9 +410,9 @@ ru:{
   done:"Таблица построена верно.",
   taut:"Формула — тавтология: она истинна во всех строках.",
   contr:"Формула — противоречие: она ложна во всех строках.",
-  sat:(t,n)=>"Формула выполнима, но не тавтология: истинна в "+t+" "+pluralRu(t,"строке","строках","строках")+" из "+n+".",
+  sat:(t,n)=>"Формула случайна (выполнима и опровержима): истинна в "+t+" "+pluralRu(t,"строке","строках","строках")+" из "+n+".",
   cellLabel:(r,h)=>"строка "+r+", "+h,
-  clsShort:(t,n)=>t===n?"тавтология":t===0?"противоречие":"выполнима, истинна в "+t+" из "+n+" строк",
+  clsShort:(t,n)=>t===n?"тавтология":t===0?"противоречие":"случайна (выполнима и опровержима), истинна в "+t+" из "+n+" строк",
   noteCounter:"контрпример",
   entailYes:rs=>rs.length?"Следование имеет место: во всех строках, где истинны все посылки ("+rowList(rs)+"), заключение тоже истинно.":"Следование имеет место: строк, где все посылки истинны, нет, поэтому контрпримера быть не может.",
   entailNo:rs=>"Следования нет. "+(rs.length===1?"Контрпример — строка ":"Контрпримеры — строки ")+rowList(rs)+": посылки истинны, а заключение ложно.",
@@ -439,6 +439,7 @@ ru:{
     badCmd:c=>"Неизвестная команда \\"+c+".",
     expectOperand:()=>"Здесь ожидается переменная, ¬ или открывающая скобка.",
     expectClose:()=>"Не хватает закрывающей скобки.",
+    expectBrace:()=>"Не хватает закрывающей фигурной скобки «}».",
     conclOne:()=>"После ⊨ должна стоять одна формула — заключение.",
     extra:c=>"Лишний символ «"+c+"»: возможно, пропущена связка или скобка.",
     tooMany:k=>"В формуле "+k+" переменных — это "+Math.pow(2,k).toLocaleString("ru")+" "+pluralRu(Math.pow(2,k),"строка","строки","строк")+". Больше "+MAX_VARS+" переменных браузер не выдержит."
@@ -446,7 +447,7 @@ ru:{
   helpIntro:"Связки можно вводить кнопками, клавиатурой или командами LaTeX. Сокращения превращаются в символы прямо при вводе: <code>-&gt;</code> станет <code>→</code>, <code>+</code> — <code>⊻</code>, <code>||</code> или <code>v</code> — <code>∨</code>, а <code>\\land</code> — <code>∧</code> после пробела.",
   helpHead:["Связка","","Клавиатура","LaTeX"],
   helpNames:["отрицание","конъюнкция","дизъюнкция","импликация","эквиваленция","исключающее «или»","штрих Шеффера","стрелка Пирса","истина, ложь","обратная импликация","антиимпликация"],
-  helpList:"Несколько формул пишутся через запятую: <code>p→q, ¬q→¬p</code>. Они получают общую левую часть, а справа — отдельный блок столбцов для каждой формулы; после заполнения сайт называет отношение между каждой парой формул. Логическое следование записывается через <code>⊨</code> (<code>|=</code>, <code>\\models</code>, <code>\\vDash</code>): <code>p, p→q ⊨ q</code>. Сайт проверит следование и укажет строки-контрпримеры.",
+  helpList:"Несколько формул пишутся через запятую: <code>p→q, ¬q→¬p</code>. Они получают общую левую часть, а справа — отдельный блок столбцов для каждой формулы; после заполнения сайт называет отношение между каждой парой формул. Логическое следование записывается через <code>⊨</code> (<code>|=</code>, <code>\\models</code>, <code>\\vDash</code>): <code>p, p→q ⊨ q</code>; посылки можно заключить в фигурные скобки: <code>{p, p→q} ⊨ q</code>, а <code>{} ⊨ q</code> — следование из пустого множества посылок. Сайт проверит следование и укажет строки-контрпримеры.",
   helpVars:"Переменные — буквы латинского или русского алфавита, можно с индексом: <code>p1</code>, <code>p_1</code> → p₁. Строчная <code>v</code> всегда означает дизъюнкцию ∨, поэтому переменной быть не может.",
   helpPrec:"Приоритет связок: ¬ сильнее всех, затем ∧ (и |), затем ∨ (и ↓), затем → (и ←, ↛), слабее всех ↔ и ⊻. Импликация правоассоциативна: p→q→r читается как p→(q→r). В заголовках таблицы скобки расставлены полностью."
 },
@@ -481,9 +482,9 @@ en:{
   done:"The table is correct.",
   taut:"The formula is a tautology: it is true in every row.",
   contr:"The formula is a contradiction: it is false in every row.",
-  sat:(t,n)=>"The formula is satisfiable but not a tautology: true in "+t+" of "+n+" rows.",
+  sat:(t,n)=>"The formula is contingent (satisfiable and falsifiable): true in "+t+" of "+n+" rows.",
   cellLabel:(r,h)=>"row "+r+", "+h,
-  clsShort:(t,n)=>t===n?"tautology":t===0?"contradiction":"satisfiable, true in "+t+" of "+n+" rows",
+  clsShort:(t,n)=>t===n?"tautology":t===0?"contradiction":"contingent (satisfiable and falsifiable), true in "+t+" of "+n+" rows",
   noteCounter:"counterexample",
   entailYes:rs=>rs.length?"The entailment holds: in every row where all premises are true ("+rowList(rs)+"), the conclusion is true as well.":"The entailment holds: no row makes all premises true, so there can be no counterexample.",
   entailNo:rs=>"The entailment fails. "+(rs.length===1?"Counterexample: row ":"Counterexamples: rows ")+rowList(rs)+", where the premises are true and the conclusion is false.",
@@ -510,6 +511,7 @@ en:{
     badCmd:c=>"Unknown command \\"+c+".",
     expectOperand:()=>"A variable, ¬ or an opening parenthesis is expected here.",
     expectClose:()=>"A closing parenthesis is missing.",
+    expectBrace:()=>"A closing brace “}” is missing.",
     conclOne:()=>"Only one formula, the conclusion, may follow ⊨.",
     extra:c=>"Unexpected “"+c+"”: a connective or parenthesis may be missing.",
     tooMany:k=>"The formula has "+k+" variables, which means "+Math.pow(2,k).toLocaleString("en")+" rows. A browser cannot handle more than "+MAX_VARS+" variables."
@@ -517,7 +519,7 @@ en:{
   helpIntro:"Type connectives with the buttons, the keyboard, or LaTeX commands. Shortcuts turn into symbols as you type: <code>-&gt;</code> becomes <code>→</code>, <code>+</code> becomes <code>⊻</code>, <code>||</code> or <code>v</code> becomes <code>∨</code>, and <code>\\land</code> becomes <code>∧</code> after a space.",
   helpHead:["Connective","","Keyboard","LaTeX"],
   helpNames:["negation","conjunction","disjunction","implication","biconditional","exclusive or","Sheffer stroke (nand)","Peirce arrow (nor)","true, false","converse implication","non-implication (anti-implication)"],
-  helpList:"Separate several formulas with commas: <code>p→q, ¬q→¬p</code>. They share one left side, each formula gets its own block of columns, and once the table is complete the relation between every pair of formulas is named. Write entailment with <code>⊨</code> (<code>|=</code>, <code>\\models</code>, <code>\\vDash</code>): <code>p, p→q ⊨ q</code>. The site checks it and points out counterexample rows.",
+  helpList:"Separate several formulas with commas: <code>p→q, ¬q→¬p</code>. They share one left side, each formula gets its own block of columns, and once the table is complete the relation between every pair of formulas is named. Write entailment with <code>⊨</code> (<code>|=</code>, <code>\\models</code>, <code>\\vDash</code>): <code>p, p→q ⊨ q</code>; the premises may be put in braces: <code>{p, p→q} ⊨ q</code>, and <code>{} ⊨ q</code> means the empty set of premises. The site checks it and points out counterexample rows.",
   helpVars:"Variables are single letters, optionally with an index: <code>p1</code>, <code>p_1</code> → p₁. A lowercase <code>v</code> always means disjunction ∨, so it cannot be a variable.",
   helpPrec:"Precedence: ¬ binds tightest, then ∧ (and |), then ∨ (and ↓), then → (and ←, ↛), and ↔ and ⊻ bind loosest. Implication associates to the right: p→q→r means p→(q→r). Table headers are fully parenthesised."
 }};
@@ -537,9 +539,9 @@ const HELP_ROWS=[
 const KEYS=[
   ["p",""],["q",""],["r",""],["s",""],["t",""],["⊤","1  \\top"],["⊥","0  \\bot"],null,
   ["¬","~  \\neg"],["∧","&  \\land"],["∨","v  ||  \\lor"],["→","->  \\to"],["←","<-  \\leftarrow",true],["↛","-/>  \\nrightarrow",true],["↔","<->  \\iff"],["⊻","+  \\veebar"],["|","|  \\mid"],["↓","\\downarrow"],null,
-  ["(",""],[")",""],[",",""],["⊨","|=  \\models"]
+  ["(",""],[")",""],[",",""],["{","\\{"],["}","\\}"],["⊨","|=  \\models"]
 ];
-const EXAMPLES=["p→q","p, p→q ⊨ q","p→q, q ⊨ p","p∧q, ¬p∨¬q, p∨q","p→q, ¬q→¬p","(p→q)∧¬r","¬(p∧q)↔¬p∨¬q","(p→q)↔(¬q→¬p)","((p→q)→p)→p","(p∨q)∧(p→r)∧(q→r)→r","p⊻q↔¬(p↔q)","p|q↔¬(p∧q)","p∧¬p"];
+const EXAMPLES=["p→q","{p, p→q} ⊨ q","p→q, q ⊨ p","p∧q, ¬p∨¬q, p∨q","p→q, ¬q→¬p","(p→q)∧¬r","¬(p∧q)↔¬p∨¬q","(p→q)↔(¬q→¬p)","((p→q)→p)→p","(p∨q)∧(p→r)∧(q→r)→r","p⊻q↔¬(p↔q)","p|q↔¬(p∧q)","p∧¬p"];
 const SYM={"01":["0","1"],"IL":["Л","И"],"TF":["F","T"]};
 const TRUE_KEYS=["1","t","T","и","И","y","Y"];
 const FALSE_KEYS=["0","f","F","л","Л","n","N"];
@@ -576,6 +578,8 @@ function tokenize(s){
     if(/\s/.test(ch)){i++;continue}
     if(ch==="("||ch===")"){out.push({k:ch,pos:i,len:1});i++;continue}
     if(ch===","||ch===";"){out.push({k:",",pos:i,len:1});i++;continue}
+    if(ch==="{"||ch==="}"){out.push({k:ch,pos:i,len:1});i++;continue}
+    if(s.startsWith("\\{",i)||s.startsWith("\\}",i)){out.push({k:s[i+1],pos:i,len:2});i+=2;continue}
     for(const [a,v] of ASCII){
       if(s.startsWith(a,i)){
         if(v==="⊤"||v==="⊥")out.push({k:"const",v:v==="⊤",pos:i,len:a.length});
@@ -632,14 +636,20 @@ function parse(s){
     throw new PErr("expectOperand",t.pos,t.len);
   }
   // premises, premises ⊨ conclusion, or ⊨ conclusion
-  const list=[];let entail=false;
+  const list=[];let entail=false,braces=false;
   const at=k=>p<toks.length&&toks[p].k===k;
-  if(!at("⊨")){list.push(iff());while(at(",")){p++;list.push(iff())}}
+  if(at("{")){
+    const open=toks[p];braces=true;p++;
+    if(!at("}")){list.push(iff());while(at(",")){p++;list.push(iff())}}
+    if(!at("}"))throw p<toks.length?new PErr("extra",toks[p].pos,toks[p].len,s.substr(toks[p].pos,toks[p].len)):new PErr("expectBrace",s.length,1);
+    p++;
+    if(!list.length&&!at("⊨"))throw new PErr("expectOperand",open.pos+1,1);
+  }else if(!at("⊨")){list.push(iff());while(at(",")){p++;list.push(iff())}}
   if(at("⊨")){
     entail=true;p++;list.push(iff());
     if(at(","))throw new PErr("conclOne",toks[p].pos,1);
   }
-  list.entail=entail;
+  list.entail=entail;list.braces=braces;
   if(p<toks.length){const t=toks[p];throw new PErr("extra",t.pos,t.len,s.substr(t.pos,t.len))}
   return list;
 }
@@ -672,7 +682,7 @@ function liveNorm(str){
     .replace(/-\/>/g,"↛").replace(/<-(?=[^>])/g,"←").replace(/[~!∼]/g,"¬").replace(/-(?=[^>\/])/g,"¬").replace(/\+/g,"⊻")
     .replace(/(\\[A-Za-z]*)|v/g,(m,cmd)=>cmd?m:"∨")
     .replace(/⇒|⊃/g,"→").replace(/⇔|≡/g,"↔").replace(/⊕/g,"⊻").replace(/↑/g,"|")
-    .replace(/\s*([∧∨→←↛↔⊻|↓])\s*/g,"$1").replace(/¬\s+/g,"¬").replace(/\(\s+/g,"(").replace(/\s+\)/g,")").replace(/\s*([,;])(?=\S)/g,"$1 ").replace(/\s*⊨\s*/g," ⊨ ").replace(/^ ⊨/,"⊨");
+    .replace(/\s*([∧∨→←↛↔⊻|↓])\s*/g,"$1").replace(/¬\s+/g,"¬").replace(/\(\s+/g,"(").replace(/\s+\)/g,")").replace(/\s*([,;])(?=\S)/g,"$1 ").replace(/\\([{}])/g,"$1").replace(/\{\s+/g,"{").replace(/\s+\}/g,"}").replace(/\s*⊨\s*/g," ⊨ ").replace(/^ ⊨/,"⊨");
 }
 
 /* ---------- model ---------- */
@@ -721,7 +731,8 @@ function buildModel(input){
   });
   cols.forEach((c,i)=>{c.first=i===0||cols[i-1].g!==c.g});
   const entail=!!input.entail,prem=groups.slice(0,entail?-1:groups.length).map(x=>x.text).join(", ");
-  const text=entail?(prem?prem+" ":"")+"⊨ "+groups[groups.length-1].text:prem;
+  const premTxt=input.braces?"{"+prem+"}":prem;
+  const text=entail?(premTxt?premTxt+" ":"")+"⊨ "+groups[groups.length-1].text:premTxt;
   return {asts,groups,text,entail,concl:entail?groups.length-1:-1,vars,cols,n:1<<vars.length,pieces,islots,
     mains:new Set(groups.map(x=>x.main)),mainsI:new Set(groups.map(x=>x.mainI))};
 }
