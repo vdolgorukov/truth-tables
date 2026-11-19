@@ -312,6 +312,12 @@ span.cell:hover{background:transparent}
         <button type="button" data-val="main" data-i18n="colsMain"></button>
       </div>
     </div>
+    <div class="opt"><span data-i18n="reveal"></span>
+      <div class="seg" data-set="reveal">
+        <button type="button" data-val="1" data-i18n="revealShow"></button>
+        <button type="button" data-val="0" data-i18n="revealAsk"></button>
+      </div>
+    </div>
   </section>
   </details>
 
@@ -365,6 +371,7 @@ ru:{
   help:"Как вводить формулы",
   notation:"Обозначения", left:"Левая часть", manual:"заполняю сам", auto:"автоматически",
   order:"Порядок строк", layout:"Вид таблицы", layoutCols:"подформулы в столбцах", layoutInline:"значения под связками",
+  reveal:"Следование и отношения", revealAsk:"спрашивать", revealShow:"показывать сразу",
   cols:"Что вычислять", colsAll:"все подформулы", colsMain:"только формулу",
   checkBtn:"Проверить", solve:"Показать ответ", clear:"Очистить",
   keyhint:"Ввод в ячейку: 1, И или T — истина; 0, Л или F — ложь; Backspace — стереть; стрелки — переход. Клик по ячейке перебирает значения. При фокусе на ячейке справа пунктирной рамкой отмечены ячейки, от которых зависит её значение. Истина показана зелёным, ложь — красным; после проверки неверные ячейки выделяются оранжевой рамкой. В записи «под связками» значения, уже использованные для вычисления, зачёркиваются.",
@@ -434,6 +441,7 @@ en:{
   help:"How to type formulas",
   notation:"Notation", left:"Left side", manual:"I fill it in", auto:"automatic",
   order:"Row order", layout:"Table layout", layoutCols:"subformula columns", layoutInline:"values under connectives",
+  reveal:"Entailment and relations", revealAsk:"ask", revealShow:"show at once",
   cols:"What to compute", colsAll:"all subformulas", colsMain:"formula only",
   checkBtn:"Check", solve:"Show answer", clear:"Clear",
   keyhint:"In a cell: 1 or T means true; 0 or F means false; Backspace clears; arrow keys move. Clicking a cell cycles its value. When a right-hand cell has focus, the cells it depends on get a dashed outline. True is shown in green and false in red; after checking, wrong cells get an orange outline. In the “under connectives” layout, values already used in a computation are crossed out.",
@@ -522,7 +530,7 @@ function save(k,v){try{localStorage.setItem("tt-"+k,JSON.stringify(v))}catch(e){
 
 const S={
   lang:load("lang","ru"), notation:load("notation","01"), auto:load("auto",false), order:load("order","asc"),
-  cols:load("cols","all"), layout:load("layout","cols"),
+  cols:load("cols","all"), layout:load("layout","cols"), reveal:load("reveal",false),
   model:null, left:[], right:[], checked:false, quiz:{entail:null,rel:{},checked:false}
 };
 
@@ -791,7 +799,7 @@ function build(force){
   save("formula",inp.value);
 }
 function setModel(m,restore){
-  S.model=m;S.checked=false;S.quiz=newQuiz();
+  S.model=m;S.checked=false;S.quiz=newQuiz();S.lastFilled=null;
   emptyGrids();
   const fits=(g,h,w)=>Array.isArray(g)&&g.length===h&&(h===0||(Array.isArray(g[0])&&g[0].length===w));
   if(restore&&restore.text===m.text&&fits(restore.left,m.n,m.vars.length)&&fits(restore.right,m.n,m.cols.length)){
@@ -946,9 +954,10 @@ function update(){
         const td=S.cells[r]["P"+i];
         if(td.classList.contains("copy"))paint(td.firstChild,p.c==="v"?row.vals[p.vj]:p.t==="⊤");
       });
-      // a value is crossed out once the connective above it has been computed
+      // a value is crossed out once the connective above it has been computed and the
+      // student has gone on to fill another cell (the last filled cell keeps its inputs visible)
       const used=new Set();
-      A.sl.forEach(x=>{if(store(x.s)[r][x.c]!=null)x.kids.forEach(id=>{if(id[0]==="P")used.add(id)})});
+      A.sl.forEach(x=>{if(store(x.s)[r][x.c]!=null&&S.lastFilled!==x.s+":"+r+":"+x.c)x.kids.forEach(id=>{if(id[0]==="P")used.add(id)})});
       m.pieces.forEach((p,i)=>S.cells[r]["P"+i].classList.toggle("used",used.has("P"+i)));
     }
     A.sl.forEach(x=>{
@@ -959,7 +968,7 @@ function update(){
     });
     const note=tr.lastElementChild;
     note.className="note";
-    const isCounter=marks&&A.done&&S.quiz.checked&&A.counter.includes(r+1);
+    const isCounter=marks&&A.done&&(S.quiz.checked||S.reveal)&&A.counter.includes(r+1);
     tr.classList.toggle("counter",isCounter);
     if(isCounter)note.textContent=lang.noteCounter;
     else if(marks&&row.dupOf!=null)note.textContent=lang.noteDup(row.dupOf+1);
@@ -995,6 +1004,7 @@ const REL_OPTS=["equiv","contradict","contrary","subcontrary","sub1","sub-1","in
 const relKey=r=>r.kind==="sub"?(r.dir>0?"sub1":"sub-1"):r.kind;
 function newQuiz(){return {entail:null,rel:{},checked:false,warn:false}}
 function verdictHtml(A){
+  if(S.reveal)return answerHtml(A);
   const m=S.model,lang=L(),Q=S.quiz,f=x=>"<span class=\"mono\">"+esc(x)+"</span>";
   const optCls=(chosen,correct)=>"qopt"+(!Q.checked?"":chosen&&correct?" right":chosen?" wrong":correct?" missed":"");
   const btn=Q.checked?"<button type=\"button\" class=\"btn sm\" id=\"q-retry\">"+esc(lang.qRetry)+"</button>"
@@ -1042,6 +1052,26 @@ function verdictHtml(A){
   if(Q.checked)b+="<div class=\"qscore\">"+esc(lang.qScore(right,total))+"</div><div>"+esc(A.jointRows.length?lang.joint(A.jointRows):lang.noJoint)+"</div>";
   return "<div class=\"banner\">"+b+btnRow(btn)+"</div></div>";
 }
+/* the same verdict with the answers shown at once (setting "show at once") */
+function answerHtml(A){
+  const m=S.model,lang=L(),f=x=>"<span class=\"mono\">"+esc(x)+"</span>";
+  let b="<b>"+esc(lang.done)+"</b> ";
+  if(m.entail){
+    const noPrem=m.groups.length===1,holds=!A.counter.length;
+    const t=noPrem?(holds?lang.validYes:lang.validNo(A.counter)):(holds?lang.entailYes(A.premRows):lang.entailNo(A.counter));
+    return "<div class=\"banner\">"+b+(holds?esc(t):"<span class=\"neg\">"+esc(t)+"</span>")+"</div>";
+  }
+  if(m.groups.length===1){const t=A.trues[0];return "<div class=\"banner\">"+b+esc(t===m.n?lang.taut:t===0?lang.contr:lang.sat(t,m.n))+"</div>"}
+  b+="<ul>";
+  m.groups.forEach((g,i)=>{b+="<li>"+f(g.text)+": "+esc(lang.clsShort(A.trues[i],m.n))+"</li>"});
+  b+="</ul><div>"+esc(lang.relHead)+"</div><ul class=\"rel\">";
+  for(let i=0;i<m.groups.length;i++)for(let j=i+1;j<m.groups.length;j++){
+    const A_=m.groups[i].text,B_=m.groups[j].text;
+    b+="<li>"+f(A_)+" "+esc(lang.and)+" "+f(B_)+": "+relations(A.vecs[i],A.vecs[j]).map(r=>
+      "<b>"+esc(lang.rel[r.kind])+"</b> — "+(r.kind==="sub"?f(r.dir>0?A_:B_)+" ⊨ "+f(r.dir>0?B_:A_)+", "+esc(lang.notBack):esc(lang.relWhy[r.kind]))).join("; ")+"</li>";
+  }
+  return "<div class=\"banner\">"+b+"</ul>"+esc(A.jointRows.length?lang.joint(A.jointRows):lang.noJoint)+"</div>";
+}
 const btnRow=btn=>"<div class=\"qbtns\">"+btn+(S.quiz.warn?"<span class=\"qwarn\">"+esc(S.model.entail?L().qNeedOne:L().qNeed)+"</span>":"")+"</div>";
 function quizAnswered(){
   const m=S.model,Q=S.quiz;
@@ -1083,6 +1113,8 @@ function cellAt(s,r,c){return table.querySelector("button[data-s=\""+s+"\"][data
 function navCols(){const a=S.auto?[]:S.model.vars.map((_,j)=>({s:"L",c:j}));return a.concat(slots().map(x=>({s:x.s,c:x.c})))}
 function setVal(s,r,c,v){
   store(s)[r][c]=v;
+  const id=s+":"+r+":"+c;
+  if(v!=null)S.lastFilled=id;else if(S.lastFilled===id)S.lastFilled=null;
   S.checked=false;S.quiz.checked=false;
   update();saveProgress();
 }
@@ -1216,7 +1248,7 @@ function reportHref(){
 }
 ["pointerdown","focus","click"].forEach(ev=>$("report").addEventListener(ev,()=>{$("report").href=reportHref()}));
 $("check").addEventListener("click",()=>{S.checked=true;update()});
-$("clear").addEventListener("click",()=>{S.checked=false;S.quiz=newQuiz();emptyGrids();update();saveProgress()});
+$("clear").addEventListener("click",()=>{S.checked=false;S.quiz=newQuiz();S.lastFilled=null;emptyGrids();update();saveProgress()});
 $("solve").addEventListener("click",()=>{
   const m=S.model;
   for(let r=0;r<m.n;r++){
@@ -1225,12 +1257,13 @@ $("solve").addEventListener("click",()=>{
     m.cols.forEach((c,i)=>{S.right[r][i]=ev(c.node,env)});
     m.islots.forEach((x,i)=>{S.rightI[r][i]=ev(x.node,env)});
   }
+  S.lastFilled=null;
   S.checked=true;update();saveProgress();
 });
 
 /* ---------- settings ---------- */
 function syncSegs(){
-  const val={notation:S.notation,auto:S.auto?"1":"0",order:S.order,layout:S.layout,cols:S.cols};
+  const val={notation:S.notation,auto:S.auto?"1":"0",order:S.order,layout:S.layout,cols:S.cols,reveal:S.reveal?"1":"0"};
   document.querySelectorAll(".seg[data-set]").forEach(g=>{
     g.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.val===val[g.dataset.set])));
   });
@@ -1248,6 +1281,7 @@ document.querySelectorAll(".seg[data-set]").forEach(g=>{
     if(key==="order")S.order=v;
     if(key==="cols")S.cols=v;
     if(key==="layout")S.layout=v;
+    if(key==="reveal")S.reveal=v==="1";
     save(key,S[key]);syncSegs();
     if(key==="auto"||key==="cols"||key==="layout")renderTable();else update();
   });
