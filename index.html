@@ -268,6 +268,9 @@ span.cell:hover{background:transparent}
 .tr-row > span:first-child{color:var(--muted);font-size:.9rem}
 .tr-row .mono{overflow-wrap:anywhere}
 .tr-row .none{color:var(--muted);font-style:italic}
+.tr-row .nf{line-height:1.9}
+/* a separate bar over each negated variable, so p̄q̄ never reads as the negation of pq */
+.ovl{display:inline-block;border-top:1.5px solid currentColor;padding-top:1px;margin:0 1.5px;line-height:1.15}
 .export{display:grid;gap:.6rem;margin-top:.6rem}
 #exp-fmt{justify-self:start}
 #exp-out{width:100%;min-height:11rem;resize:vertical;font-family:"PT Mono",ui-monospace,Menlo,monospace;font-size:.85rem;line-height:1.45;padding:.5rem .65rem;border:1.5px solid var(--rule-strong);border-radius:6px;background:var(--tint);color:var(--text);white-space:pre;overflow:auto}
@@ -442,10 +445,10 @@ ru:{
     ["подчинение","A ⊨ B, но не B ⊨ A: A — подчиняющая формула, B — подчинённая."],
     ["независимость","встречаются все четыре сочетания значений."]],
   trTitle:"Польская и обратная польская запись, ДНФ, КНФ, полином Жегалкина",
-  trPolish:"Польская (префиксная) запись", trRpolish:"Обратная польская (постфиксная) запись", trLukas:"В обозначениях Лукасевича", trSdnf:"СДНФ", trSknf:"СКНФ", trZheg:"Полином Жегалкина",
+  trPolish:"Польская (префиксная) запись", trRpolish:"Обратная польская (постфиксная) запись", trLukas:"Польская в обозначениях Лукасевича", trRlukas:"Обратная польская в обозначениях Лукасевича", trSdnf:"СДНФ", trSknf:"СКНФ", trZheg:"Полином Жегалкина",
   trNoSdnf:"не существует: формула — противоречие", trNoSknf:"не существует: формула — тавтология",
   trMore:(k,n)=>" … и ещё "+k+" (всего "+n+")",
-  trNote:"СДНФ строится по строкам таблицы, где формула истинна, СКНФ — по строкам, где она ложна. В полиноме Жегалкина ⊕ — сложение по модулю 2 (строгая дизъюнкция), произведение pq — конъюнкция. Обозначения Лукасевича: N — ¬, K — ∧, A — ∨, C — →, E — ↔, J — ⊻, D — |, X — ↓, B — ←.",
+  trNote:"СДНФ строится по строкам таблицы, где формула истинна, СКНФ — по строкам, где она ложна. Запись pq означает конъюнкцию p∧q, черта над переменной — её отрицание. В полиноме Жегалкина ⊕ — сложение по модулю 2 (строгая дизъюнкция). Обозначения Лукасевича: N — ¬, K — ∧, A — ∨, C — →, E — ↔, J — ⊻, D — |, X — ↓, B — ←.",
   flabel:"Формула", build:"Построить таблицу", examplesTitle:"Примеры", settingsTitle:"Настройки", random:"Случайная формула",
   help:"Как вводить формулы",
   notation:"Обозначения", left:"Левая часть", manual:"заполняю сам", auto:"автоматически",
@@ -543,10 +546,10 @@ en:{
     ["subalternation","A ⊨ B but not B ⊨ A: A is the superaltern, B the subaltern."],
     ["independence","all four combinations of values occur."]],
   trTitle:"Polish and reverse Polish notation, DNF, CNF, Zhegalkin polynomial",
-  trPolish:"Polish (prefix) notation", trRpolish:"Reverse Polish (postfix) notation", trLukas:"Łukasiewicz letters", trSdnf:"Full DNF", trSknf:"Full CNF", trZheg:"Zhegalkin polynomial",
+  trPolish:"Polish (prefix) notation", trRpolish:"Reverse Polish (postfix) notation", trLukas:"Polish, Łukasiewicz letters", trRlukas:"Reverse Polish, Łukasiewicz letters", trSdnf:"Full DNF", trSknf:"Full CNF", trZheg:"Zhegalkin polynomial",
   trNoSdnf:"does not exist: the formula is a contradiction", trNoSknf:"does not exist: the formula is a tautology",
   trMore:(k,n)=>" … and "+k+" more ("+n+" in total)",
-  trNote:"The full DNF is built from the rows where the formula is true, the full CNF from the rows where it is false. In the Zhegalkin polynomial ⊕ is addition mod 2 (exclusive or) and pq is conjunction. Łukasiewicz letters: N ¬, K ∧, A ∨, C →, E ↔, J ⊻, D |, X ↓, B ←.",
+  trNote:"The full DNF is built from the rows where the formula is true, the full CNF from the rows where it is false. pq stands for the conjunction p∧q and a bar over a variable for its negation. In the Zhegalkin polynomial ⊕ is addition mod 2 (exclusive or). Łukasiewicz letters: N ¬, K ∧, A ∨, C →, E ↔, J ⊻, D |, X ↓, B ←.",
   flabel:"Formula", build:"Build table", examplesTitle:"Examples", settingsTitle:"Settings", random:"Random formula",
   help:"How to type formulas",
   notation:"Notation", left:"Left side", manual:"I fill it in", auto:"automatic",
@@ -1320,6 +1323,14 @@ function lukas(n){ // null if the formula has a connective or constant without a
   if(n.t==="not")return L_+a;
   const b=lukas(n.b);return b==null?null:L_+a+b;
 }
+function rlukas(n){ // reverse Polish with Łukasiewicz letters; null in the same cases as lukas()
+  if(n.t==="var")return n.name;
+  if(n.t==="const")return null;
+  const L_=LUK[n.t==="not"?"¬":n.op];if(!L_)return null;
+  const a=rlukas(n.a);if(a==null)return null;
+  if(n.t==="not")return a+L_;
+  const b=rlukas(n.b);return b==null?null:a+b+L_;
+}
 function normalForms(ast){
   const m=S.model,vs=new Set();
   (function w(n){if(n.t==="var")vs.add(n.name);else if(n.t==="not")w(n.a);else if(n.t==="bin"){w(n.a);w(n.b)}})(ast);
@@ -1335,7 +1346,11 @@ function normalForms(ast){
   const deg=x=>{let c=0;for(let y=x;y;y&=y-1)c++;return c};
   mons.sort((x,y)=>deg(y)-deg(x)||y-x);
   const zh=mons.map(x=>x===0?"1":vars.filter((_,j)=>(x>>(K-1-j))&1).join(""));
-  return {dnf,cnf,zh};
+  // the same forms as lists of literals, for the page's notation (pq for ∧, a bar over a negated variable)
+  const bit=(x,j)=>((x>>(K-1-j))&1)===1;
+  const dnfL=K===0?null:tr.map(x=>vars.map((v,j)=>({v,neg:!bit(x,j)})));
+  const cnfL=K===0?null:fa.map(x=>vars.map((v,j)=>({v,neg:bit(x,j)})));
+  return {dnf,cnf,zh,dnfL,cnfL};
 }
 let trKey="";
 function renderTransforms(){
@@ -1347,15 +1362,26 @@ function renderTransforms(){
     const cut=arr.length>64?arr.slice(0,64):arr;
     return f(cut.join(sep))+(arr.length>64?esc(lang.trMore(arr.length-64,arr.length)):"");
   };
+  // DNF: terms pq̄r joined by ∨; CNF: clauses (p∨q̄∨r) written side by side
+  const litH=l=>l.neg?"<span class=\"ovl\">"+esc(l.v)+"</span>":esc(l.v);
+  const litList=(items,dnf,none)=>{
+    if(!items.length)return "<span class=\"none\">"+esc(none)+"</span>";
+    const cut=items.length>64?items.slice(0,64):items;
+    const parts=cut.map(t=>dnf?t.map(litH).join(""):(t.length>1&&items.length>1?"("+t.map(litH).join("∨")+")":t.map(litH).join(" ∨ ")));
+    return "<span class=\"mono nf\">"+parts.join(dnf?" ∨ ":"")+"</span>"+(items.length>64?esc(lang.trMore(items.length-64,items.length)):"");
+  };
   let h="";
   S.model.groups.forEach(g=>{
     const nf=normalForms(g.ast),lk=lukas(g.ast);
     h+="<div class=\"tr-f\"><h3>"+esc(g.text)+"</h3>";
     h+="<div class=\"tr-row\"><span>"+esc(lang.trPolish)+"</span>"+f(polish(g.ast))+"</div>";
     h+="<div class=\"tr-row\"><span>"+esc(lang.trRpolish)+"</span>"+f(rpolish(g.ast))+"</div>";
-    if(lk!=null&&lk!==polish(g.ast))h+="<div class=\"tr-row\"><span>"+esc(lang.trLukas)+"</span>"+f(lk)+"</div>";
-    h+="<div class=\"tr-row\"><span>"+esc(lang.trSdnf)+"</span>"+list(nf.dnf,"∨",lang.trNoSdnf)+"</div>";
-    h+="<div class=\"tr-row\"><span>"+esc(lang.trSknf)+"</span>"+list(nf.cnf,"∧",lang.trNoSknf)+"</div>";
+    if(lk!=null&&lk!==polish(g.ast)){
+      h+="<div class=\"tr-row\"><span>"+esc(lang.trLukas)+"</span>"+f(lk)+"</div>";
+      h+="<div class=\"tr-row\"><span>"+esc(lang.trRlukas)+"</span>"+f(rlukas(g.ast))+"</div>";
+    }
+    h+="<div class=\"tr-row\"><span>"+esc(lang.trSdnf)+"</span>"+(nf.dnfL?litList(nf.dnfL,true,lang.trNoSdnf):list(nf.dnf,"∨",lang.trNoSdnf))+"</div>";
+    h+="<div class=\"tr-row\"><span>"+esc(lang.trSknf)+"</span>"+(nf.cnfL?litList(nf.cnfL,false,lang.trNoSknf):list(nf.cnf,"∧",lang.trNoSknf))+"</div>";
     h+="<div class=\"tr-row\"><span>"+esc(lang.trZheg)+"</span>"+(nf.zh.length?list(nf.zh," ⊕ ",""):f("0"))+"</div></div>";
   });
   $("tr-out").innerHTML=h+"<p class=\"hint\">"+esc(lang.trNote)+"</p>";
