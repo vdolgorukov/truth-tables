@@ -327,6 +327,7 @@ span.cell:hover{background:transparent}
     <div class="frow">
       <input id="f-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
       <button type="button" class="btn primary" id="build" data-i18n="build"></button>
+      <button type="button" class="btn quiet" id="share" data-i18n="share"></button>
     </div>
     <div class="keys" id="keys"></div>
     <div class="preview" id="preview" aria-live="polite"></div>
@@ -487,7 +488,7 @@ ru:{
   trNotes:{nota:"Обозначения Лукасевича: N — ¬, K — ∧, A — ∨, C — →, E — ↔, J — ⊻, D — |, X — ↓, B — ←; запись Лукасевича показывается, если в формуле нет констант и ↛. В графах Пирса запись рядом — конъюнкция, скобки (разрез) — отрицание.",
     nf:"СДНФ строится по строкам таблицы, где формула истинна, СКНФ — по строкам, где она ложна. Запись pq означает конъюнкцию p∧q, черта над переменной — её отрицание. В полиноме Жегалкина ⊕ — сложение по модулю 2 (строгая дизъюнкция).",
     post:"Классы Поста: T₀ — сохраняющие 0 (f(0,…,0)=0), T₁ — сохраняющие 1 (f(1,…,1)=1), S — самодвойственные (f(x̄₁,…,x̄ₙ)=¬f(x₁,…,xₙ)), M — монотонные, L — линейные (полином Жегалкина не выше первой степени). По теореме Поста система функций полна тогда и только тогда, когда она не содержится целиком ни в одном из пяти классов."},
-  flabel:"Формула", build:"Построить таблицу", examplesTitle:"Примеры", settingsTitle:"Настройки", random:"Случайная формула",
+  flabel:"Формула", build:"Построить таблицу", share:"Ссылка на задание", shareDone:"Ссылка скопирована", shareFail:"Скопируйте адрес страницы", examplesTitle:"Примеры", settingsTitle:"Настройки", random:"Случайная формула",
   help:"Как вводить формулы",
   notation:"Обозначения", left:"Левая часть", manual:"заполняю сам", auto:"автоматически",
   order:"Порядок строк", layout:"Вид таблицы", layoutCols:"подформулы в столбцах", layoutInline:"значения под связками",
@@ -603,7 +604,7 @@ en:{
   trNotes:{nota:"Łukasiewicz letters: N ¬, K ∧, A ∨, C →, E ↔, J ⊻, D |, X ↓, B ←; shown when the formula has no constants and no ↛. In Peirce’s graphs juxtaposition is conjunction and brackets (a cut) are negation.",
     nf:"The full DNF is built from the rows where the formula is true, the full CNF from the rows where it is false. pq stands for the conjunction p∧q and a bar over a variable for its negation. In the Zhegalkin polynomial ⊕ is addition mod 2 (exclusive or).",
     post:"Post’s classes: T₀ preserve 0 (f(0,…,0)=0), T₁ preserve 1 (f(1,…,1)=1), S self-dual (f(x̄₁,…,x̄ₙ)=¬f(x₁,…,xₙ)), M monotone, L linear (Zhegalkin polynomial of degree at most 1). By Post’s theorem a set of functions is complete exactly when it is not contained in any one of the five classes."},
-  flabel:"Formula", build:"Build table", examplesTitle:"Examples", settingsTitle:"Settings", random:"Random formula",
+  flabel:"Formula", build:"Build table", share:"Link to this task", shareDone:"Link copied", shareFail:"Copy the page address", examplesTitle:"Examples", settingsTitle:"Settings", random:"Random formula",
   help:"How to type formulas",
   notation:"Notation", left:"Left side", manual:"I fill it in", auto:"automatic",
   order:"Row order", layout:"Table layout", layoutCols:"subformula columns", layoutInline:"values under connectives",
@@ -988,7 +989,14 @@ function build(force){
   setModel(m);
   save("formula",inp.value);
 }
+/* the task lives in the address: …/truth-tables/?f=<formula> */
+const PAGES_URL="https://vdolgorukov.github.io/truth-tables/";
+function taskUrl(text){
+  const here=/github\.io$|^localhost$|^127\.0\.0\.1$/.test(location.hostname)?location.origin+location.pathname:PAGES_URL;
+  return here+"?f="+encodeURIComponent(text);
+}
 function setModel(m,restore){
+  try{if(/^https?:$/.test(location.protocol)&&/github\.io$|^localhost$|^127\.0\.0\.1$/.test(location.hostname))history.replaceState(null,"",taskUrl(m.text))}catch(e){}
   S.model=m;S.checked=false;S.quiz=newQuiz();S.lastFilled=null;
   emptyGrids();
   const fits=(g,h,w)=>Array.isArray(g)&&g.length===h&&(h===0||(Array.isArray(g[0])&&g[0].length===w));
@@ -1875,12 +1883,24 @@ function applyTheme(t){
 document.querySelectorAll("[data-theme-set]").forEach(b=>b.addEventListener("click",()=>applyTheme(b.dataset.themeSet)));
 applyTheme(load("theme","auto"));
 
+$("share").addEventListener("click",()=>{
+  const b=$("share"),url=taskUrl(S.model.text);
+  const say=t=>{b.textContent=t;setTimeout(()=>{b.textContent=L().share},1800)};
+  try{navigator.clipboard.writeText(url).then(()=>say(L().shareDone),()=>say(L().shareFail))}catch(e){say(L().shareFail)}
+});
+
 /* ---------- start ---------- */
-inp.value=liveNorm(load("formula","(p→q)∧¬r"));
+// a formula in the address (?f=…) wins over the one remembered in this browser
+const linkF=(()=>{try{return new URLSearchParams(location.search).get("f")}catch(e){return null}})();
+inp.value=liveNorm(linkF!=null?linkF:load("formula","(p→q)∧¬r"));
 applyLang();
+if(linkF!=null)S.showErr=true;
 let ast=renderPreview();
-if(!ast){inp.value="(p→q)∧¬r";ast=renderPreview()}
-setModel(buildModel(ast),load("progress",null));
+if(ast){setModel(buildModel(ast),load("progress",null));if(linkF!=null)save("formula",inp.value)}
+else{ // a broken formula: show its error, keep the address, build the default table underneath
+  const bad=inp.value,href=location.href;inp.value="(p→q)∧¬r";setModel(buildModel(renderPreview()),null);
+  inp.value=bad;renderPreview();try{history.replaceState(null,"",href)}catch(e){}
+}
 })();
 </script>
 </body>
