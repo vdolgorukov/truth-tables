@@ -275,8 +275,8 @@ span.cell:hover{background:transparent}
 .frege-wrap{overflow-x:auto;max-width:100%}
 .bgtex{display:block;font-family:"PT Mono",ui-monospace,Menlo,monospace;font-size:.84rem;background:var(--tint);border:1px solid var(--rule);border-radius:6px;padding:.35rem .55rem;overflow-wrap:anywhere}
 .tr-row:has(.frege-wrap){align-items:start}
-.frege-cell{display:flex;flex-wrap:wrap;align-items:flex-end;gap:.5rem 1rem}
-.frege-cell .bgtex{flex-basis:100%}
+.tr-row .bg-copy{display:block;margin-top:.4rem;min-height:0;padding:.1rem .55rem;font-size:.75rem;line-height:1.5;border-width:1px}
+.tr-row > span:first-child .bgtex{margin-top:.35rem;font-size:.72rem;color:var(--text)}
 .frege{display:block;color:var(--text)}
 .peirce{display:block;color:var(--text)}
 .peirce .sheet{fill:none;stroke:var(--rule-strong);stroke-width:1;stroke-dasharray:4 3}
@@ -1652,7 +1652,9 @@ function renderTransforms(){
       h+=row(lang.trFregeLin,f(show(fr)),lang.trFregeLinNote);
       const tex=begriffCode(fr);
       const copyBtn="<button type=\"button\" class=\"btn sm bg-copy\" data-tex=\""+esc(tex)+"\" title=\""+esc(lang.trBegriffNote)+"\">"+esc(lang.trBegriffCopy)+"</button>";
-      h+=row(lang.trFrege,"<div class=\"frege-cell\">"+(fregeSize(fr)>120?"<span class=\"none\">"+esc(lang.trFregeBig)+"</span>":"<div class=\"frege-wrap\">"+fregeSvg(fr)+"</div>")+copyBtn+"</div>",lang.trFregeNote);
+      // the copy button sits in the label column, under the name of the notation
+      h+="<div class=\"tr-row\"><span>"+esc(lang.trFrege)+"<small>"+esc(lang.trFregeNote)+"</small>"+copyBtn+"</span>"+
+        (fregeSize(fr)>120?"<span class=\"none\">"+esc(lang.trFregeBig)+"</span>":"<div class=\"frege-wrap\">"+fregeSvg(fr)+"</div>")+"</div>";
     }else if(tab==="nf"){
       const nf=normalForms(g.ast);
       h+=row(lang.trSdnf,nf.dnfL?litList(nf.dnfL,true,lang.trNoSdnf):list(nf.dnf,"∨",lang.trNoSdnf))+minRows(g.ast,"dnf");
