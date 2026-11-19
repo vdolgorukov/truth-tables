@@ -273,8 +273,15 @@ span.cell:hover{background:transparent}
 .tr-row .nf{line-height:1.9}
 /* a separate bar over each negated variable, so p̄q̄ never reads as the negation of pq */
 .frege-wrap{overflow-x:auto;max-width:100%}
+.bgtex{display:block;font-family:"PT Mono",ui-monospace,Menlo,monospace;font-size:.84rem;background:var(--tint);border:1px solid var(--rule);border-radius:6px;padding:.35rem .55rem;overflow-wrap:anywhere}
 .tr-row:has(.frege-wrap){align-items:start}
+.frege-cell{display:flex;flex-wrap:wrap;align-items:flex-end;gap:.5rem 1rem}
+.frege-cell .bgtex{flex-basis:100%}
 .frege{display:block;color:var(--text)}
+.peirce{display:block;color:var(--text)}
+.peirce .sheet{fill:none;stroke:var(--rule-strong);stroke-width:1;stroke-dasharray:4 3}
+.peirce .cut{fill:none;stroke:currentColor;stroke-width:1.6}
+.peirce text{fill:currentColor;font-family:"PT Mono",ui-monospace,Menlo,monospace;font-size:15px}
 .frege .fl line{stroke:currentColor;stroke-width:1.6;stroke-linecap:square}
 .frege .ft text{fill:currentColor;font-family:"PT Mono",ui-monospace,Menlo,monospace;font-size:15px}
 .post{display:inline-flex;flex-wrap:wrap;gap:.35rem}
@@ -418,7 +425,6 @@ span.cell:hover{background:transparent}
         <p class="hint" data-i18n="exportNote"></p>
       </div>
     </details>
-    <p class="hint" data-i18n="keyhint"></p>
   </section>
 </main>
 <a class="report" id="report" href="mailto:vdolgorukov+truthtable@gmail.com" title="vdolgorukov+truthtable@gmail.com" data-i18n="report"></a>
@@ -466,6 +472,8 @@ ru:{
   trFregeLin:"Через ¬ и → (как у Фреге)", trFregeLinNote:"A∧B = ¬(A→¬B), A∨B = ¬A→B, A↔B = ¬((A→B)→¬(B→A))",
   trFrege:"Begriffsschrift (нотация Фреге)", trFregeNote:"черта под линией — отрицание; в условии следствие сверху, условие снизу",
   trFregeBig:"формула слишком большая для чертежа",
+  trBegriffCopy:"Копировать LaTeX (begriff)", trBegriffNote:"код для пакета begriff; в преамбуле: \\usepackage{begriff}",
+  trPeirceImg:"Графы Пирса (рисунок)", trPeirceImgNote:"пунктир — лист утверждения; овал (разрез) — отрицание того, что внутри; рядом — конъюнкция",
   trPeirce:"Графы Пирса (линейная запись)", trPeirceNote:"запись рядом — конъюнкция, скобки — отрицание; (()) — пустой лист, истина; () — ложь",
   trPost:"Классы Поста", postSym:{T0:"T₀",T1:"T₁",S:"S",M:"M",L:"L"},
   postName:{T0:"сохраняет 0",T1:"сохраняет 1",S:"самодвойственная",M:"монотонная",L:"линейная"}, postYes:"да", postNo:"нет",
@@ -487,7 +495,6 @@ ru:{
   reveal:"Следование и отношения", revealAsk:"спрашивать", revealShow:"показывать сразу",
   cols:"Что вычислять", colsAll:"все подформулы", colsMain:"только формулу",
   checkBtn:"Проверить", solve:"Показать ответ", clear:"Очистить",
-  keyhint:"Ввод в ячейку: 1, И или T — истина; 0, Л или F — ложь; Backspace — стереть; стрелки — переход. Клик по ячейке перебирает значения. При фокусе на ячейке справа пунктирной рамкой отмечены ячейки, от которых зависит её значение. Истина показана зелёным, ложь — красным; после проверки неверные ячейки выделяются оранжевой рамкой. В записи «под связками» значения, уже использованные для вычисления, зачёркиваются.",
   clearInput:"стереть",
   vars:n=>n+" "+pluralRu(n,"переменная","переменные","переменных"),
   rows:n=>n+" "+pluralRu(n,"строка","строки","строк"),
@@ -581,6 +588,8 @@ en:{
   trFregeLin:"With ¬ and → only (as in Frege)", trFregeLinNote:"A∧B = ¬(A→¬B), A∨B = ¬A→B, A↔B = ¬((A→B)→¬(B→A))",
   trFrege:"Begriffsschrift (Frege’s notation)", trFregeNote:"a stroke under the line is negation; in a conditional the consequent is on top, the condition below",
   trFregeBig:"the formula is too large to draw",
+  trBegriffCopy:"Copy LaTeX (begriff)", trBegriffNote:"code for the begriff package; in the preamble: \\usepackage{begriff}",
+  trPeirceImg:"Peirce’s graphs (drawing)", trPeirceImgNote:"dashed frame: the sheet of assertion; an oval (cut) negates what is inside; side by side means conjunction",
   trPeirce:"Peirce’s graphs (linear form)", trPeirceNote:"juxtaposition is conjunction, brackets are negation; (()) is the blank sheet, true; () is false",
   trPost:"Post’s classes", postSym:{T0:"T₀",T1:"T₁",S:"S",M:"M",L:"L"},
   postName:{T0:"preserves 0",T1:"preserves 1",S:"self-dual",M:"monotone",L:"linear"}, postYes:"yes", postNo:"no",
@@ -602,7 +611,6 @@ en:{
   reveal:"Entailment and relations", revealAsk:"ask", revealShow:"show at once",
   cols:"What to compute", colsAll:"all subformulas", colsMain:"formula only",
   checkBtn:"Check", solve:"Show answer", clear:"Clear",
-  keyhint:"In a cell: 1 or T means true; 0 or F means false; Backspace clears; arrow keys move. Clicking a cell cycles its value. When a right-hand cell has focus, the cells it depends on get a dashed outline. True is shown in green and false in red; after checking, wrong cells get an orange outline. In the “under connectives” layout, values already used in a computation are crossed out.",
   clearInput:"clear",
   vars:n=>n+" variable"+(n===1?"":"s"),
   rows:n=>n+" row"+(n===1?"":"s"),
@@ -1397,6 +1405,55 @@ function peirceItems(n){
 }
 // items side by side: a space only between two letters, as in p q, p(q), (p)(q)
 function peirceJoin(items){let r="";items.forEach((t,i)=>{if(i&&!/[)]$/.test(r)&&t[0]!=="(")r+=" ";r+=t});return r}
+/* the same graph as a tree, for drawing: items are {v:"p"} or {cut:[items]} */
+function peirceTree(n){
+  const cut=x=>({cut:x});
+  if(n.t==="var")return [{v:n.name}];
+  if(n.t==="const")return n.v?[]:[cut([])];
+  if(n.t==="not")return [cut(peirceTree(n.a))];
+  const A=peirceTree(n.a),B=peirceTree(n.b);
+  switch(n.op){
+    case "∧":return A.concat(B);
+    case "∨":return [cut([cut(A),cut(B)])];
+    case "→":return [cut(A.concat([cut(B)]))];
+    case "←":return [cut(B.concat([cut(A)]))];
+    case "↔":return [cut(A.concat([cut(B)])),cut(B.concat([cut(A)]))];
+    case "⊻":return [cut(A.concat(B)),cut([cut(A),cut(B)])];
+    case "|":return [cut(A.concat(B))];
+    case "↓":return [cut(A),cut(B)];
+    case "↛":return A.concat([cut(B)]);
+  }
+}
+const peirceTreeSize=items=>items.reduce((a,i)=>a+1+(i.cut?peirceTreeSize(i.cut):0),0);
+/* Drawing: juxtaposed items left to right; a cut is an oval (stadium) around its contents;
+   everything sits on the sheet of assertion (the outer rectangle). */
+function peirceSvg(items){
+  const CH=9.2,GAP=10,PADX=12,PADY=8,TXT=20,EMPTY=22;
+  const lay=list=>{
+    const kids=list.map(it=>{
+      if(it.v!=null)return {v:it.v,w:[...it.v].length*CH,h:TXT};
+      const inner=lay(it.cut);
+      const w=Math.max(inner.w,0)+2*PADX+(inner.kids.length?0:EMPTY),h=Math.max(inner.h,TXT)+2*PADY;
+      return {cut:inner,w,h};
+    });
+    const w=kids.reduce((a,k)=>a+k.w,0)+Math.max(0,kids.length-1)*GAP,h=kids.reduce((a,k)=>Math.max(a,k.h),0);
+    return {kids,w,h};
+  };
+  const root=lay(items);let out="";
+  const draw=(L,x,cy)=>{
+    L.kids.forEach(k=>{
+      if(k.v!=null)out+="<text x=\""+x+"\" y=\""+(cy+5)+"\">"+esc(k.v)+"</text>";
+      else{
+        out+="<rect class=\"cut\" x=\""+x+"\" y=\""+(cy-k.h/2)+"\" width=\""+k.w+"\" height=\""+k.h+"\" rx=\""+Math.min(k.h/2,k.w/2)+"\"/>";
+        const iw=k.cut.w;draw(k.cut,x+(k.w-iw)/2,cy);
+      }
+      x+=k.w+GAP;
+    });
+  };
+  const M=10,W=Math.max(root.w,40)+2*M,H=Math.max(root.h,TXT)+2*M;
+  draw(root,M,H/2);
+  return "<svg class=\"peirce\" viewBox=\"0 0 "+W+" "+H+"\" width=\""+W+"\" height=\""+H+"\" role=\"img\" aria-label=\"Peirce graph\"><rect class=\"sheet\" x=\"0.75\" y=\"0.75\" width=\""+(W-1.5)+"\" height=\""+(H-1.5)+"\"/>"+out+"</svg>";
+}
 const peirce=n=>{const t=peirceJoin(peirceItems(n));return t===""?"(())":t};
 /* Frege's Begriffsschrift (propositional part): only negation and the conditional.
    Other connectives are first rewritten through ¬ and →. */
@@ -1417,6 +1474,10 @@ function fregeOf(n){
     case "⊻":return FC(FC(A,B),FN(FC(B,A)));
   }
 }
+/* LaTeX for the begriff package: \BGconditional{antecedent}{consequent}, \BGnot, \BGcontent */
+const bgAtom=t=>t.replace(/[₀-₉]+/g,d=>"_{"+fromSub(d)+"}");
+const bgTex=n=>n.t==="var"?bgAtom(n.name):n.t==="const"?(n.v?"\\top":"\\bot"):n.t==="not"?"\\BGnot "+bgTex(n.a):"\\BGconditional{"+bgTex(n.a)+"}{"+bgTex(n.b)+"}";
+const begriffCode=fr=>"\\[ \\BGcontent "+bgTex(fr)+" \\]";
 const fregeSize=n=>n.t==="not"?1+fregeSize(n.a):n.t==="bin"?1+fregeSize(n.a)+fregeSize(n.b):1;
 /* Layout: every subformula is a block entered from the left at its content line (ay).
    A conditional puts the consequent on top and the antecedent below, joined by a vertical stroke;
@@ -1585,9 +1646,13 @@ function renderTransforms(){
       h+=row(lang.trPolish,f(polish(g.ast)))+row(lang.trRpolish,f(rpolish(g.ast)));
       if(lk!=null&&lk!==polish(g.ast))h+=row(lang.trLukas,f(lk))+row(lang.trRlukas,f(rlukas(g.ast)));
       h+=row(lang.trPeirce,f(peirce(g.ast)),lang.trPeirceNote);
+      const pt=peirceTree(g.ast);
+      h+=row(lang.trPeirceImg,peirceTreeSize(pt)>150?"<span class=\"none\">"+esc(lang.trFregeBig)+"</span>":"<div class=\"frege-wrap\">"+peirceSvg(pt)+"</div>",lang.trPeirceImgNote);
       const fr=fregeOf(g.ast);
       h+=row(lang.trFregeLin,f(show(fr)),lang.trFregeLinNote);
-      h+=row(lang.trFrege,fregeSize(fr)>120?"<span class=\"none\">"+esc(lang.trFregeBig)+"</span>":"<div class=\"frege-wrap\">"+fregeSvg(fr)+"</div>",lang.trFregeNote);
+      const tex=begriffCode(fr);
+      const copyBtn="<button type=\"button\" class=\"btn sm bg-copy\" data-tex=\""+esc(tex)+"\" title=\""+esc(lang.trBegriffNote)+"\">"+esc(lang.trBegriffCopy)+"</button>";
+      h+=row(lang.trFrege,"<div class=\"frege-cell\">"+(fregeSize(fr)>120?"<span class=\"none\">"+esc(lang.trFregeBig)+"</span>":"<div class=\"frege-wrap\">"+fregeSvg(fr)+"</div>")+copyBtn+"</div>",lang.trFregeNote);
     }else if(tab==="nf"){
       const nf=normalForms(g.ast);
       h+=row(lang.trSdnf,nf.dnfL?litList(nf.dnfL,true,lang.trNoSdnf):list(nf.dnf,"∨",lang.trNoSdnf))+minRows(g.ast,"dnf");
@@ -1601,6 +1666,14 @@ function renderTransforms(){
 S.trTab=load("trTab","nota");
 $("tr-tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;S.trTab=b.dataset.tab;save("trTab",S.trTab);trKey="";renderTransforms()});
 $("tr-details").addEventListener("toggle",renderTransforms);
+$("tr-out").addEventListener("click",e=>{
+  const b=e.target.closest(".bg-copy");if(!b)return;
+  const done=()=>{b.textContent=L().exportCopied;setTimeout(()=>{b.textContent=L().trBegriffCopy},1500)};
+  // copying refused: show the code once, selected, so it can be copied by hand
+  const fail=()=>{let c=b.nextElementSibling;if(!c||!c.classList.contains("bgtex")){c=document.createElement("code");c.className="bgtex";c.textContent=b.dataset.tex;b.after(c)}
+    const r=document.createRange();r.selectNodeContents(c);const sel=getSelection();sel.removeAllRanges();sel.addRange(r)};
+  try{navigator.clipboard.writeText(b.dataset.tex).then(done,fail)}catch(err){fail()}
+});
 
 /* ---------- export ----------
    The table as currently shown: header cells, value rows, and a separator kind
