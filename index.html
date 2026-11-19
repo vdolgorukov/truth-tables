@@ -26,6 +26,7 @@
   --tv:#1b7a3d;
   --fv:#c23a2c;
   --good-bg:#e3e9f6;
+  --prem-bg:#cfd9f5;
   --src-bg:#fdf1c9;
   --tint:#f3f5fa;
   --key-bg:#dfe5f0; --key-bg-hover:#cfd8ea; --key-border:#aab5cc;
@@ -35,14 +36,14 @@
   :root:not([data-theme="light"]){
     --paper:#16181d; --text:#e4e6ec; --muted:#9aa0b1;
     --rule:#2d313c; --rule-strong:#565c6e; --accent:#a4b3f2; --on-accent:#141826;
-    --ok:#66c48b; --err:#ffb35c; --ok-bg:#1c3326; --err-bg:#4a3313; --src-bg:#3a3321; --tv:#6fd394; --fv:#ff8a7a; --good-bg:#232f48;
+    --ok:#66c48b; --err:#ffb35c; --ok-bg:#1c3326; --err-bg:#4a3313; --src-bg:#3a3321; --tv:#6fd394; --fv:#ff8a7a; --good-bg:#232f48; --prem-bg:#2f3f6e;
     --tint:#1e2129; --key-bg:#2b3244; --key-bg-hover:#353e55; --key-border:#4b5670; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --paper:#16181d; --text:#e4e6ec; --muted:#9aa0b1;
   --rule:#2d313c; --rule-strong:#565c6e; --accent:#a4b3f2; --on-accent:#141826;
-  --ok:#66c48b; --err:#ffb35c; --ok-bg:#1c3326; --err-bg:#4a3313; --src-bg:#3a3321; --tv:#6fd394; --fv:#ff8a7a; --good-bg:#232f48;
+  --ok:#66c48b; --err:#ffb35c; --ok-bg:#1c3326; --err-bg:#4a3313; --src-bg:#3a3321; --tv:#6fd394; --fv:#ff8a7a; --good-bg:#232f48; --prem-bg:#2f3f6e;
   --tint:#1e2129; --key-bg:#2b3244; --key-bg-hover:#353e55; --key-border:#4b5670; color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:inherit}
@@ -182,7 +183,11 @@ table.tt{border-collapse:collapse;font-family:"Noto Sans Math","PT Mono",ui-mono
 .tt .lastL{border-right:4px double var(--rule-strong)}
 .tt .gsep,.tt.inline td.fp.gsep,.tt.inline th.fp.gsep{border-left:4px double var(--rule-strong)}
 .tt .gconcl,.tt.inline td.fp.gconcl,.tt.inline th.fp.gconcl{border-left:6px solid var(--accent)}
-.tt tr.counter th.rn{color:var(--err);font-weight:700}
+.tt tr.counter th.rn{color:var(--err);font-weight:700;box-shadow:inset 4px 0 0 var(--err)}
+.tt tr.prem th.rn{color:var(--accent);font-weight:700;box-shadow:inset 4px 0 0 var(--accent)}
+/* rows where all premises are true are tinted; counterexamples among them get the error tint */
+.tt tr.prem > td:not(.note),.tt tr.prem > th.rn{background:var(--prem-bg)}
+.tt tr.counter > td:not(.note),.tt tr.counter > th.rn{background:var(--err-bg)}
 .tt tr.counter td.note{font-weight:700}
 .rel{margin:.3rem 0 .4rem;padding-left:1.2rem}
 .rel li{margin:.15rem 0}
@@ -968,9 +973,14 @@ function update(){
     });
     const note=tr.lastElementChild;
     note.className="note";
-    const isCounter=marks&&A.done&&(S.quiz.checked||S.reveal)&&A.counter.includes(r+1);
+    // entailment: rows where all premises are true, and among them the counterexamples
+    const shown=marks&&A.done&&(S.quiz.checked||S.reveal);
+    const isCounter=shown&&A.counter.includes(r+1);
+    const isPrem=shown&&m.entail&&m.groups.length>1&&A.premRows.includes(r+1);
     tr.classList.toggle("counter",isCounter);
+    tr.classList.toggle("prem",isPrem&&!isCounter);
     if(isCounter)note.textContent=lang.noteCounter;
+    else if(isPrem)note.textContent="";
     else if(marks&&row.dupOf!=null)note.textContent=lang.noteDup(row.dupOf+1);
     else if(S.checked&&!row.complete){note.textContent=lang.noteEmpty;note.className="note info"}
     else note.textContent="";
