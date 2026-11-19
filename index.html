@@ -916,10 +916,10 @@ function buildKeys(){
   }
   const bs=document.createElement("button");bs.type="button";bs.className="key";bs.textContent="⌫";bs.setAttribute("aria-label","Backspace");
   bs.addEventListener("click",()=>{const s=inp.selectionStart,e=inp.selectionEnd,v=inp.value;
-    if(s!==e){inp.value=v.slice(0,s)+v.slice(e);setCaret(s)}else if(s>0){inp.value=v.slice(0,s-1)+v.slice(s);setCaret(s-1)}else inp.focus();onFormulaInput()});
+    if(s!==e){inp.value=v.slice(0,s)+v.slice(e);setCaret(s)}else if(s>0){inp.value=v.slice(0,s-1)+v.slice(s);setCaret(s-1)}else inp.focus();onFormulaInput(true)});
   box.appendChild(bs);
   const cl=document.createElement("button");cl.type="button";cl.className="key aux";cl.id="key-clear";cl.textContent=L().clearInput;
-  cl.addEventListener("click",()=>{inp.value="";setCaret(0);onFormulaInput()});
+  cl.addEventListener("click",()=>{inp.value="";setCaret(0);onFormulaInput(true)});
   box.appendChild(cl);
 }
 function setCaret(p){inp.focus();inp.setSelectionRange(p,p)}
@@ -929,14 +929,18 @@ function insertAtCaret(t){
   inp.value=v.slice(0,s)+ins+v.slice(e);
   setCaret(s+ins.length);onFormulaInput();
 }
-function onFormulaInput(){
+// deleting must not trigger auto-corrections, otherwise the spaces around ⊨ (and after a comma)
+// come straight back and the symbol next to them can never be removed
+function onFormulaInput(deleting){
   S.showErr=false;
   const v=inp.value,c=inp.selectionStart??v.length;
-  const a=liveNorm(v.slice(0,c)),b=liveNorm(v.slice(c));
-  if(a+b!==v){inp.value=a+b;inp.setSelectionRange(a.length,a.length)}
+  if(!deleting){
+    const a=liveNorm(v.slice(0,c)),b=liveNorm(v.slice(c));
+    if(a+b!==v){inp.value=a+b;inp.setSelectionRange(a.length,a.length)}
+  }
   renderPreview();
 }
-inp.addEventListener("input",e=>{if(e.isComposing)return;onFormulaInput()});
+inp.addEventListener("input",e=>{if(e.isComposing)return;onFormulaInput(/^delete/.test(e.inputType||""))});
 inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();build()}});
 $("build").addEventListener("click",()=>build());
 preview.addEventListener("click",e=>{if(e.target.id==="big-go")build(true)});
