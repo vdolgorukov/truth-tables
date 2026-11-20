@@ -596,6 +596,7 @@ ru:{
   trBegriffCopy:"Копировать LaTeX (begriff)", trBegriffNote:"код для пакета begriff; в преамбуле: \\usepackage{begriff}",
   trPeirceImg:"Графы Пирса (рисунок)", trPeirceImgNote:"пунктир — лист утверждения; овал (разрез) — отрицание того, что внутри; рядом — конъюнкция",
   trPeirce:"Графы Пирса (линейная запись)", trPeirceNote:"запись рядом — конъюнкция, скобки — отрицание; (()) — пустой лист, истина; () — ложь",
+  trSheffer:"Только через штрих Шеффера |", trPeirceArrow:"Только через стрелку Пирса ↓", trTooLong:"запись получается слишком длинной (больше 600 символов)",
   trTree:"Дерево разбора", trTreeInfo:t=>(t.main?"главная связка "+t.main+"; ":"")+"глубина "+t.depth+"; связок "+t.conn+"; разных подформул со связками "+t.distinct,
   trCircuit:"Логическая схема", trCircuitNote:"& — И, ≥1 — ИЛИ, =1 — исключающее ИЛИ, = — эквиваленция, 1 — НЕ; кружок на выходе — отрицание. Импликация собрана как A→B = ¬A∨B",
   trVector:"Вектор значений", trVectorNote:vs=>"значения на наборах ("+vs.join(", ")+") от "+"0".repeat(vs.length)+" до "+"1".repeat(vs.length), trVectorBig:"слишком длинный вектор (больше 8 переменных)",
@@ -753,6 +754,7 @@ en:{
   trBegriffCopy:"Copy LaTeX (begriff)", trBegriffNote:"code for the begriff package; in the preamble: \\usepackage{begriff}",
   trPeirceImg:"Peirce’s graphs (drawing)", trPeirceImgNote:"dashed frame: the sheet of assertion; an oval (cut) negates what is inside; side by side means conjunction",
   trPeirce:"Peirce’s graphs (linear form)", trPeirceNote:"juxtaposition is conjunction, brackets are negation; (()) is the blank sheet, true; () is false",
+  trSheffer:"Sheffer stroke | only", trPeirceArrow:"Peirce arrow ↓ only", trTooLong:"the formula gets too long (over 600 characters)",
   trTree:"Parse tree", trTreeInfo:t=>(t.main?"main connective "+t.main+"; ":"")+"depth "+t.depth+"; connectives "+t.conn+"; distinct compound subformulas "+t.distinct,
   trCircuit:"Logic circuit", trCircuitNote:"& AND, ≥1 OR, =1 exclusive OR, = equivalence, 1 NOT; a circle at an output means negation. Implication is built as A→B = ¬A∨B",
   trVector:"Vector of values", trVectorNote:vs=>"values on the assignments to ("+vs.join(", ")+") from "+"0".repeat(vs.length)+" to "+"1".repeat(vs.length), trVectorBig:"the vector is too long (more than 8 variables)",
@@ -1988,6 +1990,50 @@ function treeInfo(ast){
 /* gates in IEC/ГОСТ style: a box with its symbol, a small circle for an inverted output */
 const GATE={"∧":["&",0],"∨":["≥1",0],"⊻":["=1",0],"↔":["=",0],"|":["&",1],"↓":["≥1",1],"¬":["1",1]};
 // connectives without a standard gate are built from standard ones: A→B = ¬A∨B, A←B = A∨¬B, A↛B = A∧¬B
+/* the formula written with the Sheffer stroke only, or with the Peirce arrow only */
+function shefferOnly(n){
+  const S_=(a,b)=>({t:"bin",op:"|",a,b}),NOT=a=>a.t==="bin"&&a.op==="|"&&a.a===a.b?a.a:S_(a,a);
+  if(n.t==="var"||n.t==="const")return n;
+  if(n.t==="not")return NOT(shefferOnly(n.a));
+  const a=shefferOnly(n.a),b=shefferOnly(n.b);
+  switch(n.op){
+    case "|":return S_(a,b);
+    case "∧":return NOT(S_(a,b));
+    case "∨":return S_(NOT(a),NOT(b));
+    case "→":return S_(a,NOT(b));
+    case "←":return S_(NOT(a),b);
+    case "↛":return NOT(S_(a,NOT(b)));
+    case "↓":return NOT(S_(NOT(a),NOT(b)));
+    case "↔":return S_(S_(a,b),S_(NOT(a),NOT(b)));
+    case "⊻":return S_(S_(a,S_(a,b)),S_(b,S_(a,b)));
+  }
+}
+function peirceOnly(n){
+  const P=(a,b)=>({t:"bin",op:"↓",a,b}),NOT=a=>a.t==="bin"&&a.op==="↓"&&a.a===a.b?a.a:P(a,a);
+  if(n.t==="var"||n.t==="const")return n;
+  if(n.t==="not")return NOT(peirceOnly(n.a));
+  const a=peirceOnly(n.a),b=peirceOnly(n.b);
+  switch(n.op){
+    case "↓":return P(a,b);
+    case "∨":return NOT(P(a,b));
+    case "∧":return P(NOT(a),NOT(b));
+    case "→":return NOT(P(NOT(a),b));
+    case "←":return NOT(P(a,NOT(b)));
+    case "↛":return P(NOT(a),b);
+    case "|":return NOT(P(NOT(a),NOT(b)));
+    case "↔":return P(P(NOT(a),b),P(a,NOT(b)));
+    case "⊻":return NOT(P(P(NOT(a),b),P(a,NOT(b))));
+  }
+}
+// length of the written formula without building the string (parts are shared, the text is not)
+function shownLength(n,limit){
+  let len=0;
+  const go=n=>{if(len>limit)return;
+    if(n.t==="var"){len+=n.name.length;return}if(n.t==="const"){len++;return}
+    if(n.t==="not"){len++;if(n.a.t==="bin")len+=2;go(n.a);return}
+    len++;[n.a,n.b].forEach(x=>{if(x.t==="bin")len+=2;go(x)})};
+  go(n);return len;
+}
 function circuitAst(n){
   if(n.t==="var"||n.t==="const")return n;
   if(n.t==="not")return {t:"not",a:circuitAst(n.a)};
@@ -2095,6 +2141,11 @@ function renderTransforms(){
       h+=row(lang.trVector,vv.vars.length>8?"<span class=\"none\">"+esc(lang.trVectorBig)+"</span>":"<span class=\"mono vec\">"+esc(vv.vec)+"</span>",lang.trVectorNote(vv.vars));
       if(vv.num!=null)h+=row(lang.trNumber,f(vv.num),lang.trNumberNote);
       h+=row(lang.trVenn,vv.vars.length>=1&&vv.vars.length<=3?"<canvas class=\"venn\" data-g=\""+S.model.groups.indexOf(g)+"\" role=\"img\" aria-label=\"Venn\"></canvas>":"<span class=\"none\">"+esc(lang.trVennOnly)+"</span>",lang.trVennNote);
+      // the same function with a single connective: the Sheffer stroke, the Peirce arrow
+      for(const [name,fn] of [[lang.trSheffer,shefferOnly],[lang.trPeirceArrow,peirceOnly]]){
+        const t=fn(g.ast);
+        h+=row(name,shownLength(t,600)>600?"<span class=\"none\">"+esc(lang.trTooLong)+"</span>":f(show(t)));
+      }
       // Polish and Łukasiewicz notations go right before Peirce's graphs
       const lk=lukas(g.ast);
       h+=row(lang.trPolish,f(polish(g.ast)))+row(lang.trRpolish,f(rpolish(g.ast)));
