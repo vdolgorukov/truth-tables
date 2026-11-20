@@ -577,7 +577,7 @@ ru:{
       "⊻":(a,b)=>a!==b?"Значения частей различны, поэтому строгая дизъюнкция истинна":"Значения частей совпадают, поэтому строгая дизъюнкция ложна",
       "|":(a,b)=>"Штрих Шеффера ложен, только когда истинны обе части","↓":(a,b)=>"Стрелка Пирса истинна, только когда ложны обе части",
       "←":(a,b)=>"Обратная импликация ложна, только когда левая часть ложна, а правая истинна","↛":(a,b)=>"Антиимпликация истинна, только когда левая часть истинна, а правая ложна"},
-    hintLeft:r=>"Строка "+r+": впишите набор значений, которого ещё нет в таблице, например", wrongHere:"Значение в этой ячейке неверное.",
+    hintLeft:r=>"Строка "+r+": впишите набор значений, которого ещё нет в таблице, например", wrongHere:"Значение в этой ячейке неверное.", fillLeft:r=>"Сначала заполните левую часть строки "+r+": значения переменных.",
     nothing:"Подсказывать нечего: все заполненные ячейки верны, пустых нет.",
     next:(i,n)=>"Следующая ошибка ("+i+" из "+n+")"},
   genTitle:"Генератор вариантов", genType:"Задание", genTypeKind:"таблица формулы", genTypeEntail:"следование", genTypeRel:"отношения двух формул",
@@ -719,7 +719,7 @@ en:{
       "⊻":(a,b)=>a!==b?"The parts differ, so exclusive or is true":"The parts agree, so exclusive or is false",
       "|":(a,b)=>"The Sheffer stroke is false only when both parts are true","↓":(a,b)=>"The Peirce arrow is true only when both parts are false",
       "←":(a,b)=>"Converse implication is false only when the left part is false and the right part true","↛":(a,b)=>"Non-implication is true only when the left part is true and the right part false"},
-    hintLeft:r=>"Row "+r+": write an assignment that is not in the table yet, for example", wrongHere:"The value in this cell is wrong.",
+    hintLeft:r=>"Row "+r+": write an assignment that is not in the table yet, for example", wrongHere:"The value in this cell is wrong.", fillLeft:r=>"Fill in the left side of row "+r+" first: the values of the variables.",
     nothing:"Nothing to hint: every filled cell is right and none is empty.",
     next:(i,n)=>"Next mistake ("+i+" of "+n+")"},
   genTitle:"Variant generator", genType:"Task", genTypeKind:"truth table of a formula", genTypeEntail:"entailment", genTypeRel:"relation of two formulas",
@@ -1598,6 +1598,18 @@ table.addEventListener("mouseover",e=>{
 });
 $("hint").addEventListener("click",()=>{
   const m=S.model,A=analyze(),lang=L();
+  // a selected cell gets the hint about itself
+  if(S.sel){
+    const [s,rs,cs]=S.sel.split(":"),r=+rs,c=+cs,b=cellAt(s,r,c);
+    if(b){
+      const row=A.rows[r];
+      if(s!=="L"&&row.complete){S.hintKey=S.sel;b.focus();showExplain(explainHtml(s,r,c,true));return}
+      if(!S.auto&&(!row.complete||row.dupOf!=null)&&A.missing.length&&m.vars.length){
+        b.focus();
+        showExplain(esc(lang.ex.hintLeft(r+1))+" <span class=\"mono\">("+esc(m.vars.join(", "))+") = ("+A.missing[0].split("").map(x=>esc(sym(x==="1"))).join(", ")+")</span>.");return}
+      if(s!=="L"&&!row.complete){b.focus();showExplain(esc(lang.ex.fillLeft(r+1)));return}
+    }
+  }
   // left side first: an unfilled or repeated row gets the first missing assignment
   if(!S.auto&&A.missing.length&&m.vars.length){
     let r=A.rows.findIndex(x=>!x.complete);if(r<0)r=A.rows.findIndex(x=>x.dupOf!=null);
