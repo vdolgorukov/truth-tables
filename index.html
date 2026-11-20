@@ -77,9 +77,17 @@ h2{font-size:1.05rem;font-weight:700;margin:0}
 .seg button:hover{color:var(--accent)}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
 .seg button:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
-.topctl{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:.5rem;margin-top:.3rem;flex-shrink:0}
+.topctl{position:relative;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:.5rem;margin-top:.3rem;flex-shrink:0}
 .theme button{font-size:.85rem;padding:0 .7rem}
 @media (max-width:640px){.top{flex-direction:column}.topctl{justify-content:flex-start}}
+.gear{font:inherit;font-size:.85rem;min-height:34px;padding:0 .75rem;border:1.5px solid var(--key-border);border-radius:6px;background:var(--key-bg);color:var(--text);cursor:pointer}
+.gear span[aria-hidden]{font-size:1rem}
+.gear:hover,.gear[aria-expanded="true"]{border-color:var(--accent);color:var(--accent)}
+.gear:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.popover{position:absolute;top:calc(100% + .4rem);right:0;z-index:20;width:min(780px,calc(100vw - 32px));max-height:75vh;overflow:auto;
+  margin:0;padding:.9rem 1rem;background:var(--paper);border:1px solid var(--rule-strong);border-radius:8px;box-shadow:0 8px 28px rgba(10,15,30,.25);text-align:left}
+@media (max-width:640px){.popover{left:0;right:auto}}
+.test-mode #gear{display:none!important}
 .lang button{letter-spacing:.04em;font-size:.85rem;padding:0 .6rem}
 
 .btn{
@@ -142,7 +150,11 @@ summary{cursor:pointer;color:var(--accent);width:max-content;max-width:100%}
 .help table{border-collapse:collapse;font-size:.92rem}
 .help th,.help td{padding:.3rem .8rem .3rem 0;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top}
 .help th{font-weight:400;color:var(--muted)}
-.help td.sym{font-size:1.15rem}
+.help td.sym{vertical-align:middle}
+.help td.sym span{display:inline-flex;align-items:center;justify-content:center;min-width:2rem;height:1.8rem;padding:0 .35rem;border-radius:5px;
+  font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace;font-size:1.2rem;line-height:1;background:var(--kc-conn)}
+.help td.sym span.k-const{background:var(--kc-const)}
+.help td{vertical-align:middle}
 .about{margin-top:.6rem;display:grid;gap:.8rem;font-size:.95rem;max-width:80ch}
 .about h3{font-size:.8rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:400;margin:0}
 .about ul{margin:.3rem 0 0;padding-left:1.2rem;display:grid;gap:.25rem}
@@ -175,6 +187,8 @@ summary{cursor:pointer;color:var(--accent);width:max-content;max-width:100%}
 .drawer-btn:hover span{text-decoration:underline;text-underline-offset:2px}
 .drawer-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .panel{padding:.1rem 0 .75rem;border-bottom:1px solid var(--rule)}
+.panel.popover{padding:1rem 1.2rem;border:1px solid var(--rule-strong)}
+.popover .settings{margin:0}
 .settings{display:flex;flex-wrap:wrap;gap:1rem 1.6rem;margin:.9rem 0 .4rem}
 .opt{display:grid;gap:.35rem;align-content:start}
 .opt > span{color:var(--muted);font-size:.8rem;letter-spacing:.05em;text-transform:uppercase}
@@ -194,7 +208,13 @@ summary{cursor:pointer;color:var(--accent);width:max-content;max-width:100%}
 .missing{flex-basis:100%;color:var(--err)}
 .missing .mono{color:var(--text)}
 .result{display:flex}
-.banner{flex-basis:100%;padding:.6rem .9rem;border-radius:6px;background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok)}
+.banner{flex-basis:100%;padding:.7rem 1rem;border-radius:8px;background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok);border-left-width:5px}
+.banner b.done{font-size:1.05rem}
+.progress{display:inline-flex;align-items:center;gap:.5rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.progress .bar{display:inline-block;width:110px;height:7px;border-radius:999px;background:var(--rule);overflow:hidden}
+.progress .bar i{display:block;height:100%;background:var(--accent);border-radius:999px;transition:width .2s}
+.plaque{display:inline-flex;align-items:center;gap:.4rem;padding:.3rem .85rem;border-radius:6px;font-weight:700;font-variant-numeric:tabular-nums}
+.plaque.err{color:var(--err);background:var(--err-bg);border:1px solid var(--err);border-left-width:5px}
 .banner b{font-weight:700}
 .banner .neg{color:var(--err);font-weight:700}
 .quiz{margin-top:.6rem;padding:.75rem .9rem;border-radius:6px;background:var(--paper);color:var(--text);border:1px solid var(--rule);display:grid;gap:.75rem}
@@ -397,30 +417,8 @@ canvas.venn{display:block;max-width:100%;height:auto;border-radius:4px}
         <button type="button" data-lang="ru">RU</button>
         <button type="button" data-lang="en">EN</button>
       </div>
-    </div>
-  </header>
-
-  <section class="entry">
-    <div class="test-note" id="test-note" hidden data-i18n="testNote"></div>
-    <div class="frow">
-      <input id="f-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-      <button type="button" class="btn primary" id="build" data-i18n="build"></button>
-      <button type="button" class="btn" id="rand-task" data-i18n="randTask"></button>
-    </div>
-    <div class="keys" id="keys"></div>
-    <div class="preview" id="preview" aria-live="polite"></div>
-    <div class="drawers">
-      <button type="button" class="drawer-btn" data-panel="ex" aria-controls="panel-ex" aria-expanded="false"><span data-i18n="examplesTitle"></span></button>
-      <button type="button" class="drawer-btn" data-panel="help" aria-controls="panel-help" aria-expanded="false"><span data-i18n="help"></span></button>
-      <button type="button" class="drawer-btn" data-panel="sem" aria-controls="panel-sem" aria-expanded="false"><span data-i18n="semTitle"></span></button>
-      <button type="button" class="drawer-btn" data-panel="settings" aria-controls="panel-settings" aria-expanded="false"><span data-i18n="settingsTitle"></span></button>
-      <button type="button" class="drawer-btn" data-panel="about" aria-controls="panel-about" aria-expanded="false"><span data-i18n="aboutTitle"></span></button>
-    </div>
-    <div class="panel" id="panel-ex" hidden><div class="examples" id="examples"></div></div>
-    <div class="panel" id="panel-help" hidden><div class="help" id="help"></div></div>
-    <div class="panel" id="panel-sem" hidden><div class="sem" id="sem"></div></div>
-    <div class="panel" id="panel-about" hidden><div class="about" id="about"></div></div>
-    <div class="panel" id="panel-settings" hidden>
+      <button type="button" class="gear" id="gear" aria-controls="panel-settings" aria-expanded="false"><span aria-hidden="true">⚙</span> <span data-i18n="settingsTitle"></span></button>
+    <div class="panel popover" id="panel-settings" hidden role="dialog" aria-labelledby="gear">
   <section class="settings" aria-label="Settings">
     <div class="opt"><span data-i18n="notation"></span>
       <div class="seg" data-set="notation">
@@ -479,6 +477,28 @@ canvas.venn{display:block;max-width:100%;height:auto;border-radius:4px}
     </div>
   </section>
     </div>
+    </div>
+  </header>
+
+  <section class="entry">
+    <div class="test-note" id="test-note" hidden data-i18n="testNote"></div>
+    <div class="frow">
+      <input id="f-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      <button type="button" class="btn primary" id="build" data-i18n="build"></button>
+      <button type="button" class="btn" id="rand-task" data-i18n="randTask"></button>
+    </div>
+    <div class="keys" id="keys"></div>
+    <div class="preview" id="preview" aria-live="polite"></div>
+    <div class="drawers">
+      <button type="button" class="drawer-btn" data-panel="ex" aria-controls="panel-ex" aria-expanded="false"><span data-i18n="examplesTitle"></span></button>
+      <button type="button" class="drawer-btn" data-panel="help" aria-controls="panel-help" aria-expanded="false"><span data-i18n="help"></span></button>
+      <button type="button" class="drawer-btn" data-panel="sem" aria-controls="panel-sem" aria-expanded="false"><span data-i18n="semTitle"></span></button>
+      <button type="button" class="drawer-btn" data-panel="about" aria-controls="panel-about" aria-expanded="false"><span data-i18n="aboutTitle"></span></button>
+    </div>
+    <div class="panel" id="panel-ex" hidden><div class="examples" id="examples"></div></div>
+    <div class="panel" id="panel-help" hidden><div class="help" id="help"></div></div>
+    <div class="panel" id="panel-sem" hidden><div class="sem" id="sem"></div></div>
+    <div class="panel" id="panel-about" hidden><div class="about" id="about"></div></div>
   </section>
 
   <section class="work">
@@ -686,7 +706,7 @@ ru:{
   sets:(a,n)=>"Различных наборов: "+a+" из "+n,
   dups:n=>"Повторов: "+n,
   vals:(a,n)=>"Значений справа: "+a+" из "+n,
-  errs:n=>"Ошибок: "+n,
+  errs:n=>"Ошибок: "+n, filledOf:(a,n)=>"Заполнено: "+a+" из "+n,
   missing:"Пропущены наборы",
   noteDup:i=>"повторяет строку "+i,
   noteEmpty:"набор не заполнен",
@@ -856,7 +876,7 @@ en:{
   sets:(a,n)=>"Distinct assignments: "+a+" of "+n,
   dups:n=>"Repeats: "+n,
   vals:(a,n)=>"Right-hand values: "+a+" of "+n,
-  errs:n=>"Mistakes: "+n,
+  errs:n=>"Mistakes: "+n, filledOf:(a,n)=>"Filled: "+a+" of "+n,
   missing:"Missing assignments",
   noteDup:i=>"repeats row "+i,
   noteEmpty:"assignment not filled in",
@@ -1495,12 +1515,15 @@ function update(){
   });
 
   let h="";
+  const pct=A.total?Math.round(100*A.filled/A.total):0;
+  h+="<span class=\"progress\" title=\""+pct+"%\"><span class=\"bar\"><i style=\"width:"+pct+"%\"></i></span>"+esc(lang.filledOf(A.filled,A.total))+"</span>";
   if(!S.auto){
     const good=A.distinct===m.n;
     h+="<span class=\"pill"+(good?" ok":"")+"\">"+esc(lang.sets(A.distinct,m.n))+"</span>";
     if(marks&&A.dupRows)h+="<span class=\"pill err\">"+esc(lang.dups(A.dupRows))+"</span>";
   }
-  if(marks)h+="<span class=\"pill"+(A.errors?" err":" ok")+"\">"+esc(lang.errs(A.errors))+"</span>";
+  if(marks)h+=A.errors?"<span class=\"plaque err\"><span aria-hidden=\"true\">⚠</span> "+esc(lang.errs(A.errors))+"</span>"
+                       :"<span class=\"pill ok\">✓ "+esc(lang.errs(0))+"</span>";
   if(marks&&!S.auto&&A.missing.length&&(A.allLeft||S.checked)&&m.vars.length){
     const list=A.missing.slice(0,24).map(key=>"("+key.split("").map(b=>sym(b==="1")).join(", ")+")");
     const more=A.missing.length>24?" … ("+A.missing.length+")":"";
@@ -1528,7 +1551,7 @@ function verdictHtml(A){
   const optCls=(chosen,correct)=>"qopt"+(!Q.checked?"":chosen&&correct?" right":chosen?" wrong":correct?" missed":"");
   const btn=Q.checked?"<button type=\"button\" class=\"btn sm\" id=\"q-retry\">"+esc(lang.qRetry)+"</button>"
                      :"<button type=\"button\" class=\"btn sm primary\" id=\"q-check\">"+esc(lang.qCheck)+"</button>";
-  let b="<b>"+esc(lang.done)+"</b>";
+  let b="<b class=\"done\"><span aria-hidden=\"true\">✓</span> "+esc(lang.done)+"</b>";
   if(m.entail){
     const holds=!A.counter.length,noPrem=m.groups.length===1;
     b+="<div class=\"quiz\"><div class=\"q\">"+esc(noPrem?lang.qValid:lang.qEntail)+" "+f(m.text)+"</div><div class=\"opts\">";
@@ -2452,7 +2475,7 @@ function applyLang(){
   HELP_ROWS.forEach((row,i)=>{
     if(row[3]&&!S.extraOps)return;
     const codes=s=>s?s.split(/\s{2,}/).map(x=>"<code>"+esc(x)+"</code>").join(" "):"";
-    h+="<tr><td>"+esc(lang.helpNames[i])+"</td><td class=\"sym\">"+esc(row[0])+"</td><td>"+codes(row[1])+"</td><td>"+codes(row[2])+"</td></tr>";
+    h+="<tr><td>"+esc(lang.helpNames[i])+"</td><td class=\"sym\"><span class=\""+(/[⊤⊥]/.test(row[0])?"k-const":"k-conn")+"\">"+esc(row[0])+"</span></td><td>"+codes(row[1])+"</td><td>"+codes(row[2])+"</td></tr>";
   });
   h+="</tbody></table></div><p>"+lang.helpList+"</p><p>"+lang.helpVars+"</p><p>"+lang.helpPrec+"</p>";
   $("help").innerHTML=h;
@@ -2466,12 +2489,29 @@ function applyLang(){
   renderPreview();
 }
 
-document.querySelectorAll(".drawer-btn").forEach(b=>{
+// the drawers under the input work as an accordion: opening one closes the others,
+// so the table stays close to the formula
+const drawers=[...document.querySelectorAll(".drawer-btn")].map(b=>{
   const k=b.dataset.panel,p=$("panel-"+k);
   const set=open=>{b.setAttribute("aria-expanded",String(open));p.hidden=!open;save("open-"+k,open)};
-  set(!!load("open-"+k,false));
-  b.addEventListener("click",()=>{const open=p.hidden;if(open&&k==="ex")buildExamples();set(open)});
+  return {b,k,p,set};
 });
+let firstOpen=false;
+drawers.forEach(d=>{const o=!firstOpen&&!!load("open-"+d.k,false);if(o)firstOpen=true;d.set(o)});
+drawers.forEach(d=>d.b.addEventListener("click",()=>{
+  const open=d.p.hidden;if(open&&d.k==="ex")buildExamples();
+  if(open)drawers.forEach(x=>{if(x!==d)x.set(false)});
+  d.set(open);
+}));
+// settings: a popover under the gear button; closes on Esc or a click outside
+{
+  const g=$("gear"),p=$("panel-settings");
+  const set=open=>{g.setAttribute("aria-expanded",String(open));p.hidden=!open};
+  set(false);
+  g.addEventListener("click",e=>{e.stopPropagation();set(p.hidden)});
+  document.addEventListener("click",e=>{if(!p.hidden&&!p.contains(e.target)&&e.target!==g)set(false)});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!p.hidden){set(false);g.focus()}});
+}
 document.querySelectorAll("details[data-remember]").forEach(d=>{
   if(load("open-"+d.dataset.remember,false))d.open=true;
   d.addEventListener("toggle",()=>save("open-"+d.dataset.remember,d.open));
