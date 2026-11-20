@@ -267,6 +267,18 @@ span.cell:hover{background:transparent}
 .tt .src{outline:2px dashed var(--accent);outline-offset:-3px}
 .tt thead th.src{outline:2px dashed var(--accent);outline-offset:-3px}
 
+.tt td.cur-err{outline:3px solid var(--accent);outline-offset:-3px}
+.explain .btn{margin-left:.4rem;vertical-align:baseline}
+.explain{padding:.6rem .85rem;border-radius:6px;border:1px solid var(--accent);background:var(--tint);font-size:.95rem;max-width:80ch}
+.explain .mono{font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace}
+.explain .v1{color:var(--tv)}
+.explain .v0{color:var(--fv)}
+.test-note{padding:.5rem .85rem;border-radius:6px;background:var(--tint);border:1px solid var(--accent);color:var(--text);font-size:.95rem}
+/* test mode: the task is fixed and nothing reveals the answer */
+.test-mode #solve,.test-mode #hint,.test-mode #explain,.test-mode #tr-details,.test-mode #export-details,
+.test-mode [data-panel=settings],.test-mode [data-panel=ex],.test-mode #panel-settings,.test-mode #panel-ex,
+.test-mode #keys,.test-mode #build,.test-mode #share,.test-mode #share-test{display:none!important}
+.test-mode #f-input{background:var(--tint)}
 .actions{display:flex;flex-wrap:wrap;gap:.6rem}
 .tr{display:grid;gap:1rem;margin-top:.8rem}
 .tr-tabs{margin-top:.6rem}
@@ -331,11 +343,13 @@ span.cell:hover{background:transparent}
   </header>
 
   <section class="entry">
+    <div class="test-note" id="test-note" hidden data-i18n="testNote"></div>
     <label for="f-input" data-i18n="flabel"></label>
     <div class="frow">
       <input id="f-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
       <button type="button" class="btn primary" id="build" data-i18n="build"></button>
       <button type="button" class="btn quiet" id="share" data-i18n="share"></button>
+      <button type="button" class="btn quiet" id="share-test" data-i18n="shareTest"></button>
     </div>
     <div class="keys" id="keys"></div>
     <div class="preview" id="preview" aria-live="polite"></div>
@@ -406,9 +420,11 @@ span.cell:hover{background:transparent}
   <section class="work">
     <div class="status" id="status" aria-live="polite"></div>
     <div class="tablewrap"><table class="tt" id="tt"></table></div>
+    <div class="explain" id="explain" aria-live="polite" hidden></div>
     <div class="result" id="result" aria-live="polite" hidden></div>
     <div class="actions">
       <button type="button" class="btn primary" id="check" data-i18n="checkBtn"></button>
+      <button type="button" class="btn" id="hint" data-i18n="hintBtn"></button>
       <button type="button" class="btn" id="solve" data-i18n="solve"></button>
       <button type="button" class="btn quiet" id="clear" data-i18n="clear"></button>
     </div>
@@ -502,6 +518,19 @@ ru:{
   trNotes:{nota:"Обозначения Лукасевича: N — ¬, K — ∧, A — ∨, C — →, E — ↔, J — ⊻, D — |, X — ↓, B — ←; запись Лукасевича показывается, если в формуле нет констант и ↛. В графах Пирса запись рядом — конъюнкция, скобки (разрез) — отрицание.",
     nf:"СДНФ строится по строкам таблицы, где формула истинна, СКНФ — по строкам, где она ложна. Запись pq означает конъюнкцию p∧q, черта над переменной — её отрицание. В полиноме Жегалкина ⊕ — сложение по модулю 2 (строгая дизъюнкция).",
     post:"Классы Поста: T₀ — сохраняющие 0 (f(0,…,0)=0), T₁ — сохраняющие 1 (f(1,…,1)=1), S — самодвойственные (f(x̄₁,…,x̄ₙ)=¬f(x₁,…,xₙ)), M — монотонные, L — линейные (полином Жегалкина не выше первой степени). По теореме Поста система функций полна тогда и только тогда, когда она не содержится целиком ни в одном из пяти классов."},
+  hintBtn:"Подсказать", shareTest:"Ссылка для контрольной", shareTestDone:"Ссылка для контрольной скопирована",
+  testNote:"Контрольное задание: формула и настройки заданы преподавателем, подсказки и ответы отключены.",
+  ex:{row:r=>"Строка "+r, so:"Значит,", yours:"У вас:", var:"Значение переменной берётся из левой части", "const":"Значение константы не зависит от строки",
+    not:"Отрицание меняет значение на противоположное",
+    op:{"∧":(a,b)=>"Конъюнкция истинна, только когда истинны обе части","∨":(a,b)=>"Дизъюнкция ложна, только когда ложны обе части",
+      "→":(a,b)=>!a?"Антецедент ложен, поэтому импликация истинна":b?"Консеквент истинен, поэтому импликация истинна":"Антецедент истинен, а консеквент ложен, поэтому импликация ложна",
+      "↔":(a,b)=>a===b?"Значения частей совпадают, поэтому эквиваленция истинна":"Значения частей различны, поэтому эквиваленция ложна",
+      "⊻":(a,b)=>a!==b?"Значения частей различны, поэтому строгая дизъюнкция истинна":"Значения частей совпадают, поэтому строгая дизъюнкция ложна",
+      "|":(a,b)=>"Штрих Шеффера ложен, только когда истинны обе части","↓":(a,b)=>"Стрелка Пирса истинна, только когда ложны обе части",
+      "←":(a,b)=>"Обратная импликация ложна, только когда левая часть ложна, а правая истинна","↛":(a,b)=>"Антиимпликация истинна, только когда левая часть истинна, а правая ложна"},
+    hintLeft:r=>"Строка "+r+": подставлен пропущенный набор значений переменных.",
+    nothing:"Подсказывать нечего: все заполненные ячейки верны, пустых нет.",
+    next:(i,n)=>"Следующая ошибка ("+i+" из "+n+")"},
   flabel:"Формула", build:"Построить таблицу", share:"Ссылка на задание", shareDone:"Ссылка скопирована", shareFail:"Скопируйте адрес страницы", examplesTitle:"Примеры", settingsTitle:"Настройки", random:"Случайная формула",
   help:"Как вводить формулы",
   notation:"Обозначения", left:"Левая часть", manual:"заполняю сам", auto:"автоматически",
@@ -621,6 +650,19 @@ en:{
   trNotes:{nota:"Łukasiewicz letters: N ¬, K ∧, A ∨, C →, E ↔, J ⊻, D |, X ↓, B ←; shown when the formula has no constants and no ↛. In Peirce’s graphs juxtaposition is conjunction and brackets (a cut) are negation.",
     nf:"The full DNF is built from the rows where the formula is true, the full CNF from the rows where it is false. pq stands for the conjunction p∧q and a bar over a variable for its negation. In the Zhegalkin polynomial ⊕ is addition mod 2 (exclusive or).",
     post:"Post’s classes: T₀ preserve 0 (f(0,…,0)=0), T₁ preserve 1 (f(1,…,1)=1), S self-dual (f(x̄₁,…,x̄ₙ)=¬f(x₁,…,xₙ)), M monotone, L linear (Zhegalkin polynomial of degree at most 1). By Post’s theorem a set of functions is complete exactly when it is not contained in any one of the five classes."},
+  hintBtn:"Hint", shareTest:"Link for a test", shareTestDone:"Test link copied",
+  testNote:"Test task: the formula and settings are set by the teacher; hints and answers are turned off.",
+  ex:{row:r=>"Row "+r, so:"So", yours:"Yours:", var:"A variable takes its value from the left side", "const":"A constant has the same value in every row",
+    not:"Negation flips the value",
+    op:{"∧":(a,b)=>"A conjunction is true only when both parts are true","∨":(a,b)=>"A disjunction is false only when both parts are false",
+      "→":(a,b)=>!a?"The antecedent is false, so the implication is true":b?"The consequent is true, so the implication is true":"The antecedent is true and the consequent false, so the implication is false",
+      "↔":(a,b)=>a===b?"The parts agree, so the biconditional is true":"The parts differ, so the biconditional is false",
+      "⊻":(a,b)=>a!==b?"The parts differ, so exclusive or is true":"The parts agree, so exclusive or is false",
+      "|":(a,b)=>"The Sheffer stroke is false only when both parts are true","↓":(a,b)=>"The Peirce arrow is true only when both parts are false",
+      "←":(a,b)=>"Converse implication is false only when the left part is false and the right part true","↛":(a,b)=>"Non-implication is true only when the left part is true and the right part false"},
+    hintLeft:r=>"Row "+r+": a missing assignment has been filled in.",
+    nothing:"Nothing to hint: every filled cell is right and none is empty.",
+    next:(i,n)=>"Next mistake ("+i+" of "+n+")"},
   flabel:"Formula", build:"Build table", share:"Link to this task", shareDone:"Link copied", shareFail:"Copy the page address", examplesTitle:"Examples", settingsTitle:"Settings", random:"Random formula",
   help:"How to type formulas",
   notation:"Notation", left:"Left side", manual:"I fill it in", auto:"automatic",
@@ -1006,6 +1048,7 @@ function renderPreview(){
 }
 
 function build(force){
+  if(S.test)return; // the task is fixed in test mode
   S.showErr=true;
   const ast=renderPreview();
   if(!ast){inp.focus();return}
@@ -1019,13 +1062,36 @@ function build(force){
 }
 /* the task lives in the address: …/truth-tables/?f=<formula> */
 const PAGES_URL="https://vdolgorukov.github.io/truth-tables/";
-function taskUrl(text){
+function taskUrl(text,withSettings,test){
   const here=/github\.io$|^localhost$|^127\.0\.0\.1$/.test(location.hostname)?location.origin+location.pathname:PAGES_URL;
-  return here+"?f="+encodeURIComponent(text);
+  let q="?f="+encodeURIComponent(text);
+  if(withSettings){
+    const p={n:S.notation,lay:S.layout,c:S.cols,l:S.auto?"auto":"manual",o:S.order,r:S.reveal?"show":"ask",x:S.extraOps?"1":"0",lang:S.lang};
+    if(S.notation==="custom"){p.tv=S.custT;p.fv=S.custF}
+    if(test)p.mode="test";
+    for(const k in p)q+="&"+k+"="+encodeURIComponent(p[k]);
+  }
+  return here+q;
+}
+/* settings and test mode from the address; they apply to this visit and are not remembered */
+function applyUrlSettings(P){
+  const g=(k,ok)=>{const v=P.get(k);return ok.includes(v)?v:null};
+  let v;
+  if((v=g("n",["01","IL","TF","custom"])))S.notation=v;
+  const tv=(P.get("tv")||"").trim().slice(0,3),fv=(P.get("fv")||"").trim().slice(0,3);
+  if(tv&&fv&&tv!==fv){S.custT=tv;S.custF=fv}
+  if((v=g("lay",["cols","inline"])))S.layout=v;
+  if((v=g("c",["all","main"])))S.cols=v;
+  if((v=g("l",["auto","manual"])))S.auto=v==="auto";
+  if((v=g("o",["asc","desc","rand"])))S.order=v;
+  if((v=g("r",["show","ask"])))S.reveal=v==="show";
+  if((v=g("x",["1","0"])))S.extraOps=v==="1";
+  if((v=g("lang",["ru","en"])))S.lang=v;
+  S.test=P.get("mode")==="test";
 }
 function setModel(m,restore){
-  S.perm=null;
-  try{if(/^https?:$/.test(location.protocol)&&/github\.io$|^localhost$|^127\.0\.0\.1$/.test(location.hostname))history.replaceState(null,"",taskUrl(m.text))}catch(e){}
+  S.perm=null;S.hintKey=null;if($("explain"))showExplain("");
+  try{if(!S.test&&/^https?:$/.test(location.protocol)&&/github\.io$|^localhost$|^127\.0\.0\.1$/.test(location.hostname))history.replaceState(null,"",taskUrl(m.text))}catch(e){}
   S.model=m;S.checked=false;S.quiz=newQuiz();S.lastFilled=null;
   emptyGrids();
   const fits=(g,h,w)=>Array.isArray(g)&&g.length===h&&(h===0||(Array.isArray(g[0])&&g[0].length===w));
@@ -1368,6 +1434,7 @@ function cellAt(s,r,c){return table.querySelector("button[data-s=\""+s+"\"][data
 function navCols(){const a=S.auto?[]:S.model.vars.map((_,j)=>({s:"L",c:j}));return a.concat(slots().map(x=>({s:x.s,c:x.c})))}
 function setVal(s,r,c,v){
   store(s)[r][c]=v;
+  showExplain("");S.hintKey=null;table.querySelectorAll("td.cur-err").forEach(t=>t.classList.remove("cur-err"));
   const id=s+":"+r+":"+c;
   if(v!=null)S.lastFilled=id;else if(S.lastFilled===id)S.lastFilled=null;
   S.checked=false;S.quiz.checked=false;
@@ -1405,9 +1472,74 @@ table.addEventListener("keydown",e=>{
   }
 });
 function clearSrc(){table.querySelectorAll(".src").forEach(x=>x.classList.remove("src"))}
+/* why a right-hand cell has the value it has, from the row's assignment */
+function explainHtml(s,r,c){
+  const m=S.model,lang=L(),env={};let full=true;
+  m.vars.forEach((v,j)=>{const x=leftVal(r,j);if(x==null)full=false;env[v]=x});
+  if(!full)return "";
+  const n=s==="R"?m.cols[c].node:m.islots[c].node,val=ev(n,env);
+  const f=x=>"<span class=\"mono\">"+esc(x)+"</span>",V=x=>"<b class=\"v"+(x?1:0)+"\">"+esc(sym(x))+"</b>";
+  let parts="",rule;
+  if(n.t==="var")rule=lang.ex.var;
+  else if(n.t==="const")rule=lang.ex["const"];
+  else if(n.t==="not"){const a=ev(n.a,env);parts=f(show(n.a))+" = "+V(a)+". ";rule=lang.ex.not}
+  else{const a=ev(n.a,env),b=ev(n.b,env);parts=f(show(n.a))+" = "+V(a)+", "+f(show(n.b))+" = "+V(b)+". ";rule=lang.ex.op[n.op](a,b)}
+  const st=store(s)[r][c];
+  return "<b>"+esc(lang.ex.row(r+1))+"</b> ("+m.vars.map(v=>f(v)+" = "+V(env[v])).join(", ")+"). "+parts+esc(rule)+". "+esc(lang.ex.so)+" "+f(show(n))+" = "+V(val)+"."+
+    (st!=null&&st!==val?" "+esc(lang.ex.yours)+" "+V(st)+".":"");
+}
+function showExplain(html){const e=$("explain");e.innerHTML=html||"";e.hidden=!html||S.test}
+function errorCells(){ // wrong right-hand cells in reading order (rows, then columns)
+  if(!S.checked||!S.model)return [];
+  const A=analyze(),out=[];
+  A.rows.forEach((row,r)=>A.sl.forEach(x=>{if(row.cells[x.td]==="err")out.push({s:x.s,r,c:x.c})}));
+  return out;
+}
+function showError(i){
+  const list=errorCells();if(!list.length){showExplain("");return}
+  S.errIdx=(i+list.length)%list.length;const e=list[S.errIdx];
+  let h=explainHtml(e.s,e.r,e.c);
+  if(list.length>1)h+=" <button type=\"button\" class=\"btn sm\" id=\"next-err\">"+esc(L().ex.next(S.errIdx+1,list.length))+"</button>";
+  showExplain(h);
+  const b=cellAt(e.s,e.r,e.c);if(b){table.querySelectorAll("td.cur-err").forEach(t=>t.classList.remove("cur-err"));b.parentElement.classList.add("cur-err")}
+}
+$("explain").addEventListener("click",e=>{if(e.target.id==="next-err")showError((S.errIdx||0)+1)});
+table.addEventListener("mouseover",e=>{
+  const td=e.target.closest("td.err");if(!td||!S.checked)return;
+  const b=td.querySelector("button.cell");if(!b)return;
+  const list=errorCells(),i=list.findIndex(x=>x.s===b.dataset.s&&x.r===+b.dataset.r&&x.c===+b.dataset.c);
+  if(i>=0&&i!==S.errIdx)showError(i);
+});
+$("hint").addEventListener("click",()=>{
+  const m=S.model,A=analyze(),lang=L();
+  // left side first: an unfilled or repeated row gets the first missing assignment
+  if(!S.auto&&A.missing.length&&m.vars.length){
+    let r=A.rows.findIndex(x=>!x.complete);if(r<0)r=A.rows.findIndex(x=>x.dupOf!=null);
+    if(r>=0){const key=A.missing[0];m.vars.forEach((_,j)=>{S.left[r][j]=key[j]==="1"});S.checked=false;S.quiz.checked=false;update();saveProgress();showExplain(esc(lang.ex.hintLeft(r+1)));return}
+  }
+  // then a wrong cell, then an empty one
+  let t=null;
+  for(const wrong of [true,false]){
+    for(let r=0;r<m.n&&!t;r++){if(!A.rows[r].complete)continue;
+      for(const x of A.sl){const v=store(x.s)[r][x.c],want=ev(x.node,A.rows[r].env);if(wrong?(v!=null&&v!==want):v==null){t={x,r,want};break}}}
+    if(t)break;
+  }
+  if(!t){showExplain(esc(lang.ex.nothing));return}
+  setVal(t.x.s,t.r,t.x.c,t.want);
+  S.hintKey=t.x.s+":"+t.r+":"+t.x.c;
+  const b=cellAt(t.x.s,t.r,t.x.c);if(b)b.focus();
+  showExplain(explainHtml(t.x.s,t.r,t.x.c));
+});
 table.addEventListener("focusin",e=>{
   clearSrc();
-  const b=e.target.closest("button.cell");if(!b||b.dataset.s==="L")return;
+  const b=e.target.closest("button.cell");
+  if(b&&b.dataset.s!=="L"){ // explanation for a cell marked wrong after "Check", or the one just hinted
+    const key=b.dataset.s+":"+b.dataset.r+":"+b.dataset.c;
+    if(S.checked&&b.parentElement.classList.contains("err")){
+      const i=errorCells().findIndex(x=>x.s===b.dataset.s&&x.r===+b.dataset.r&&x.c===+b.dataset.c);if(i>=0&&i!==S.errIdx)showError(i);
+    }else if(S.hintKey===key)showExplain(explainHtml(b.dataset.s,+b.dataset.r,+b.dataset.c));
+  }
+  if(!b||b.dataset.s==="L")return;
   const m=S.model,c=+b.dataset.c;
   const kids=b.dataset.s==="R"?m.cols[c].kids:m.islots[c].kids;
   const tr=table.tBodies[0].rows[+b.dataset.r];
@@ -1820,8 +1952,8 @@ function reportHref(){
   return "mailto:vdolgorukov+truthtable@gmail.com?subject="+encodeURIComponent(lang.reportSubject)+"&body="+encodeURIComponent(lang.reportBody(f));
 }
 ["pointerdown","focus","click"].forEach(ev=>$("report").addEventListener(ev,()=>{$("report").href=reportHref()}));
-$("check").addEventListener("click",()=>{S.checked=true;update()});
-$("clear").addEventListener("click",()=>{S.checked=false;S.quiz=newQuiz();S.lastFilled=null;emptyGrids();update();saveProgress()});
+$("check").addEventListener("click",()=>{S.checked=true;S.hintKey=null;update();S.errIdx=-1;showError(0)});
+$("clear").addEventListener("click",()=>{S.checked=false;S.quiz=newQuiz();S.lastFilled=null;S.hintKey=null;showExplain("");emptyGrids();update();saveProgress()});
 $("solve").addEventListener("click",()=>{
   const m=S.model;
   for(let r=0;r<m.n;r++){
@@ -1937,15 +2069,21 @@ function applyTheme(t){
 document.querySelectorAll("[data-theme-set]").forEach(b=>b.addEventListener("click",()=>applyTheme(b.dataset.themeSet)));
 applyTheme(load("theme","auto"));
 
-$("share").addEventListener("click",()=>{
-  const b=$("share"),url=taskUrl(S.model.text);
-  const say=t=>{b.textContent=t;setTimeout(()=>{b.textContent=L().share},1800)};
-  try{navigator.clipboard.writeText(url).then(()=>say(L().shareDone),()=>say(L().shareFail))}catch(e){say(L().shareFail)}
-});
+function copyLink(id,url,done,label){
+  const b=$(id),say=t=>{b.textContent=t;setTimeout(()=>{b.textContent=L()[label]},1800)};
+  try{navigator.clipboard.writeText(url).then(()=>say(done),()=>say(L().shareFail))}catch(e){say(L().shareFail)}
+}
+$("share").addEventListener("click",()=>copyLink("share",taskUrl(S.model.text,true,false),L().shareDone,"share"));
+$("share-test").addEventListener("click",()=>copyLink("share-test",taskUrl(S.model.text,true,true),L().shareTestDone,"shareTest"));
 
 /* ---------- start ---------- */
 // a formula in the address (?f=…) wins over the one remembered in this browser
-const linkF=(()=>{try{return new URLSearchParams(location.search).get("f")}catch(e){return null}})();
+const urlP=(()=>{try{return new URLSearchParams(location.search)}catch(e){return new URLSearchParams("")}})();
+const linkF=urlP.get("f");
+applyUrlSettings(urlP);
+if(linkF==null)S.test=false;
+document.body.classList.toggle("test-mode",S.test);
+$("test-note").hidden=!S.test;inp.readOnly=S.test;
 inp.value=liveNorm(linkF!=null?linkF:load("formula","(p→q)∧¬r"));
 applyLang();
 if(linkF!=null)S.showErr=true;
