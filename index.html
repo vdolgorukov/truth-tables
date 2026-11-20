@@ -128,6 +128,7 @@ h2{font-size:1.05rem;font-weight:700;margin:0}
 .key.sym{font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace;font-size:1.2rem;line-height:1}
 .preview{min-height:1.6em;font-size:.97rem;color:var(--muted)}
 .preview .f{font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace;color:var(--text)}
+.preview .readas{color:var(--muted)}.preview .readas .mono{color:var(--text);font-size:1.1em}
 .preview.err{color:var(--err)}
 .preview.err .src{font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace;color:var(--text);white-space:pre-wrap}
 .preview mark{background:var(--err-bg);color:var(--err);border-bottom:2px solid var(--err);padding:0 .1em}
@@ -734,6 +735,7 @@ ru:{
   order:"Порядок строк", layout:"Вид таблицы", layoutCols:"подформулы в столбцах", layoutInline:"значения под связками",
   notCustom:"свои", custT:"истина", custF:"ложь",
   keysOpt:"Кнопки ввода", keysShow:"показывать", keysHide:"скрыть",
+  readAs:"Читается как:",
   omitAnd:"Знак конъюнкции ∧ в записи формул", omitAndOff:"писать: p∧q", omitAndOn:"опускать: pq",
   negBar:"Отрицание в записи формул", negBarOff:"знаком: ¬p", negBarOn:"чертой сверху",
   extraOps:"Связки ←, ↛, ↚ (обратная импликация, антиимпликация, обратная антиимпликация)", extraOff:"не использовать", extraOn:"использовать",
@@ -798,7 +800,7 @@ ru:{
     extra:c=>"Лишний символ «"+c+"»: возможно, пропущена связка или скобка.",
     tooMany:k=>"В формуле "+k+" переменных — это "+Math.pow(2,k).toLocaleString("ru")+" "+pluralRu(Math.pow(2,k),"строка","строки","строк")+". Больше "+MAX_VARS+" переменных браузер не выдержит."
   },
-  helpIntro:"Связки можно вводить кнопками, клавиатурой или командами LaTeX. Сокращения превращаются в символы прямо при вводе: <code>-&gt;</code> станет <code>→</code>, <code>+</code> — <code>⊻</code>, <code>||</code> или <code>v</code> — <code>∨</code>, а <code>\\land</code> — <code>∧</code> после пробела.",
+  helpIntro:"Связки можно вводить кнопками, клавиатурой или командами LaTeX. Сокращения превращаются в символы прямо при вводе: <code>-&gt;</code> станет <code>→</code>, <code>+</code> — <code>⊻</code>, <code>||</code> или <code>v</code> — <code>∨</code>, а <code>\\land</code> — <code>∧</code> после пробела. Знак ∧ можно опускать: <code>pq∨rs</code> читается как <code>(p∧q)∨(r∧s)</code>; такая запись связывает сильнее любой связки. Чтобы поставить отрицание над частью формулы, выделите её и нажмите <code>¬</code> (или <code>~</code>, <code>!</code>, <code>-</code>): выделенное возьмётся в скобки со знаком ¬.",
   helpHead:["Связка","","Клавиатура","LaTeX"],
   helpNames:["отрицание","конъюнкция","дизъюнкция","импликация","эквиваленция","исключающее «или»","штрих Шеффера","стрелка Пирса","истина, ложь","обратная импликация","антиимпликация","обратная антиимпликация"],
   helpList:"Несколько формул пишутся через запятую: <code>p→q, ¬q→¬p</code>. Они получают общую левую часть, а справа — отдельный блок столбцов для каждой формулы; после заполнения сайт называет отношение между каждой парой формул. Логическое следование записывается через <code>⊨</code> (<code>|=</code>, <code>\\models</code>, <code>\\vDash</code>): <code>p, p→q ⊨ q</code>; посылки можно заключить в фигурные скобки: <code>{p, p→q} ⊨ q</code>, а <code>{} ⊨ q</code> — следование из пустого множества посылок. Сайт проверит следование и укажет строки-контрпримеры.",
@@ -922,6 +924,7 @@ en:{
   order:"Row order", layout:"Table layout", layoutCols:"subformula columns", layoutInline:"values under connectives",
   notCustom:"custom", custT:"true", custF:"false",
   keysOpt:"Input buttons", keysShow:"show", keysHide:"hide",
+  readAs:"Read as:",
   omitAnd:"Conjunction sign ∧ in formulas", omitAndOff:"write: p∧q", omitAndOn:"omit: pq",
   negBar:"Negation in formulas", negBarOff:"sign: ¬p", negBarOn:"bar above",
   extraOps:"Connectives ←, ↛, ↚ (converse implication, non-implication, converse non-implication)", extraOff:"off", extraOn:"on",
@@ -986,7 +989,7 @@ en:{
     extra:c=>"Unexpected “"+c+"”: a connective or parenthesis may be missing.",
     tooMany:k=>"The formula has "+k+" variables, which means "+Math.pow(2,k).toLocaleString("en")+" rows. A browser cannot handle more than "+MAX_VARS+" variables."
   },
-  helpIntro:"Type connectives with the buttons, the keyboard, or LaTeX commands. Shortcuts turn into symbols as you type: <code>-&gt;</code> becomes <code>→</code>, <code>+</code> becomes <code>⊻</code>, <code>||</code> or <code>v</code> becomes <code>∨</code>, and <code>\\land</code> becomes <code>∧</code> after a space.",
+  helpIntro:"Type connectives with the buttons, the keyboard, or LaTeX commands. Shortcuts turn into symbols as you type: <code>-&gt;</code> becomes <code>→</code>, <code>+</code> becomes <code>⊻</code>, <code>||</code> or <code>v</code> becomes <code>∨</code>, and <code>\\land</code> becomes <code>∧</code> after a space. The sign ∧ may be omitted: <code>pq∨rs</code> is read as <code>(p∧q)∨(r∧s)</code>; such juxtaposition binds tighter than any connective. To negate a part of the formula, select it and press <code>¬</code> (or <code>~</code>, <code>!</code>, <code>-</code>): the selection gets brackets and the sign ¬.",
   helpHead:["Connective","","Keyboard","LaTeX"],
   helpNames:["negation","conjunction","disjunction","implication","biconditional","exclusive or","Sheffer stroke (nand)","Peirce arrow (nor)","true, false","converse implication","non-implication (anti-implication)","converse non-implication"],
   helpList:"Separate several formulas with commas: <code>p→q, ¬q→¬p</code>. They share one left side, each formula gets its own block of columns, and once the table is complete the relation between every pair of formulas is named. Write entailment with <code>⊨</code> (<code>|=</code>, <code>\\models</code>, <code>\\vDash</code>): <code>p, p→q ⊨ q</code>; the premises may be put in braces: <code>{p, p→q} ⊨ q</code>, and <code>{} ⊨ q</code> means the empty set of premises. The site checks it and points out counterexample rows.",
@@ -1097,6 +1100,7 @@ function tokenize(s){
 }
 
 function parse(s){
+  parse.implicit=false;
   const toks=tokenize(s);
   if(!toks.length)throw new PErr("empty",0,0);
   let p=0;
@@ -1105,7 +1109,10 @@ function parse(s){
   function iff(){let a=imp();while(isOp("↔","⊻")){const op=toks[p++].v;a={t:"bin",op,a,b:imp()}}return a}
   function imp(){const a=disj();if(isOp("→","←","↛","↚")){const op=toks[p++].v;return {t:"bin",op,a,b:imp()}}return a}
   function disj(){let a=conj();while(isOp("∨","↓")){const op=toks[p++].v;a={t:"bin",op,a,b:conj()}}return a}
-  function conj(){let a=un();while(isOp("∧","|")){const op=toks[p++].v;a={t:"bin",op,a,b:un()}}return a}
+  function conj(){let a=juxt();while(isOp("∧","|")){const op=toks[p++].v;a={t:"bin",op,a,b:juxt()}}return a}
+  // written side by side (pq, p(q∨r), p¬q) means conjunction; it binds tighter than any connective sign
+  const startsOperand=()=>p<toks.length&&(toks[p].k==="var"||toks[p].k==="const"||toks[p].k==="("||toks[p].k==="op"&&toks[p].v==="¬");
+  function juxt(){let a=un();while(startsOperand()){parse.implicit=true;a={t:"bin",op:"∧",a,b:un()}}return a}
   function un(){if(isOp("¬")){p++;return {t:"not",a:un()}}return atom()}
   function atom(){
     const t=peek();
@@ -1151,7 +1158,8 @@ function show(n){
    the negated part (then it needs no brackets). show() stays the plain text used for keys and links */
 function showH(n){
   const omit=S.omitAnd,bar=S.negBar;
-  const w=(x,op)=>x.t!=="bin"||omit&&op==="∧"&&x.op==="∧"?showH(x):"("+showH(x)+")";
+  // with ∧ omitted, pq binds tighter than any connective (as in the input), so it never needs brackets
+  const w=(x,op)=>x.t!=="bin"||omit&&x.op==="∧"?showH(x):"("+showH(x)+")";
   switch(n.t){
     case "var":return esc(n.name);
     case "const":return n.v?"⊤":"⊥";
@@ -1289,7 +1297,22 @@ function buildKeys(){
   box.appendChild(cl);
 }
 function setCaret(p){inp.focus();inp.setSelectionRange(p,p)}
+function negateSelection(){
+  let s=inp.selectionStart,e=inp.selectionEnd;const v=inp.value;
+  while(s<e&&/\s/.test(v[s]))s++;while(e>s&&/\s/.test(v[e-1]))e--;
+  if(s===e)return false;
+  const sel=v.slice(s,e);
+  // a variable, a constant, a negation or a part already in brackets needs no new brackets
+  const closed=t=>{if(t[0]!=="("||t[t.length-1]!==")")return false;let d=0;for(let i=0;i<t.length;i++){d+=t[i]==="("?1:t[i]===")"?-1:0;if(d===0&&i<t.length-1)return false}return true};
+  const simple=/^[A-Za-zА-Яа-яЁё](?:_?\{?\d+\}?|[₀-₉]+)?$|^[⊤⊥01]$/.test(sel)||/^¬/.test(sel)&&!/[∧∨→←↛↚↔⊻|↓]/.test(sel.replace(/\([^()]*\)/g,""))||closed(sel);
+  const out="¬"+(simple?sel:"("+sel+")");
+  inp.value=v.slice(0,s)+out+v.slice(e);
+  inp.focus();inp.setSelectionRange(s,s+out.length); // stays selected: ¬ once more gives a double negation
+  onFormulaInput(true);
+  return true;
+}
 function insertAtCaret(t){
+  if(t==="¬"&&inp.selectionStart!==inp.selectionEnd&&negateSelection())return;
   const s=inp.selectionStart??inp.value.length,e=inp.selectionEnd??s,v=inp.value;
   const ins=t;
   inp.value=v.slice(0,s)+ins+v.slice(e);
@@ -1307,7 +1330,8 @@ function onFormulaInput(deleting){
   renderPreview();
 }
 inp.addEventListener("input",e=>{if(e.isComposing)return;onFormulaInput(/^delete/.test(e.inputType||""))});
-inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();build()}});
+inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();build()}
+  else if(["~","!","-","¬"].includes(e.key)&&!e.ctrlKey&&!e.metaKey&&inp.selectionStart!==inp.selectionEnd&&negateSelection())e.preventDefault()});
 $("build").addEventListener("click",()=>build());
 preview.addEventListener("click",e=>{if(e.target.id==="big-go")build(true)});
 
@@ -1325,6 +1349,7 @@ function renderPreview(){
       if(S.askBig===m.text)html+=" <button type=\"button\" class=\"btn sm\" id=\"big-go\">"+esc(L().bigGo(m.n))+"</button>";
       html+="</div>";
     }
+    if(s.trim()&&(parse.implicit||S.negBar||S.omitAnd))html+="<div class=\"readas\">"+esc(L().readAs)+" "+modelH(m)+"</div>";
     preview.innerHTML=html;preview.hidden=!html;
     return ast;
   }catch(e){
