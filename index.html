@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- math font only for connective glyphs; letters stay in PT Mono -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&text=%C2%AC%E2%88%A7%E2%88%A8%E2%86%92%E2%86%94%E2%8A%BB%E2%86%93%E2%8A%A4%E2%8A%A5%E2%8A%A8%E2%86%90%E2%86%9B%E2%8A%95&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Math&text=%C2%AC%E2%88%A7%E2%88%A8%E2%86%92%E2%86%94%E2%8A%BB%E2%86%93%E2%8A%A4%E2%8A%A5%E2%8A%A8%E2%86%90%E2%86%9B%E2%8A%95%E2%86%9A&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Mono&family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap">
 <style>
 :root{
@@ -557,7 +557,7 @@ ru:{
   randTask:"Случайное задание",
   aboutTitle:"О сайте",
   about:[
-    ["Ввод формул",["кнопками, с клавиатуры (<code>-&gt;</code>, <code>&lt;-&gt;</code>, <code>&amp;</code>, <code>v</code>, <code>~</code>, <code>+</code>, <code>|</code>, <code>~v</code>, <code>|=</code>) или командами LaTeX (<code>\\to</code>, <code>\\land</code>, <code>\\neg</code>…) — сокращения сразу превращаются в символы","связки ¬ ∧ ∨ → ↔ ⊻ | ↓, по желанию ← и ↛, константы ⊤ и ⊥, переменные с индексами (p₁)","несколько формул через запятую и логическое следование: <code>p, p→q ⊨ q</code> или <code>{p, p→q} ⊨ q</code>","«Случайное задание» рядом с «Построить таблицу»: одна формула, несколько формул или следование; примеры и случайная формула"]],
+    ["Ввод формул",["кнопками, с клавиатуры (<code>-&gt;</code>, <code>&lt;-&gt;</code>, <code>&amp;</code>, <code>v</code>, <code>~</code>, <code>+</code>, <code>|</code>, <code>~v</code>, <code>|=</code>) или командами LaTeX (<code>\\to</code>, <code>\\land</code>, <code>\\neg</code>…) — сокращения сразу превращаются в символы","связки ¬ ∧ ∨ → ↔ ⊻ | ↓, по желанию ←, ↛ и ↚, константы ⊤ и ⊥, переменные с индексами (p₁)","несколько формул через запятую и логическое следование: <code>p, p→q ⊨ q</code> или <code>{p, p→q} ⊨ q</code>","«Случайное задание» рядом с «Построить таблицу»: одна формула, несколько формул или следование; примеры и случайная формула"]],
     ["Таблица истинности",["студент сам заполняет левую часть (наборы значений) и значения подформул; левую часть можно строить автоматически в порядке 000→111, 111→000 или в случайном порядке","два вида: подформулы в столбцах или значения прямо под связками формулы, с номерами порядка действий; можно вычислять все подформулы или только формулу","в записи «под связками» значения переменных копируются под формулу, а использованные значения зачёркиваются, когда студент переходит к следующей ячейке","обозначения 1/0, И/Л, T/F или свои; истина зелёная, ложь красная; первый клик выбирает ячейку, следующие перебирают значения","после «Проверить» — неверные ячейки, повторённые и пропущенные строки и объяснение каждой ошибки; «Подсказать» объясняет правило для выбранной ячейки, не называя ответ; «Показать ответ» заполняет таблицу"]],
     ["Что сайт определяет",["для формулы: тавтология, противоречие или случайная формула","для следования: есть ли оно и какие строки — контрпримеры; строки, где все посылки истинны, подсвечиваются","для нескольких формул: эквивалентность, контрадикторность, контрарность, субконтрарность, подчинение, независимость, а также совместность","ответ на следование и отношения можно сначала спросить у студента (с проверкой и «частично верно») или показать сразу"]],
     ["Другие записи и формы",["дерево разбора, логическая схема из стандартных вентилей, диаграмма Венна для 1–3 переменных","вектор значений функции и её номер","запись только через штрих Шеффера и только через стрелку Пирса","польская и обратная польская запись, в символах и буквами Лукасевича","графы Пирса: линейная запись и рисунок; Begriffsschrift Фреге: запись через ¬ и →, чертёж и LaTeX для пакета begriff","СДНФ, СКНФ, сокращённые, куайновские и минимальные ДНФ и КНФ, полином Жегалкина","классы Поста T₀, T₁, S, M, L, таблица Поста для нескольких формул и проверка функциональной полноты системы"]],
@@ -565,7 +565,7 @@ ru:{
     ["Прочее",["светлая, тёмная или системная тема; русский и английский язык","настройки и заполненная таблица сохраняются в этом браузере","кнопка «Сообщить об ошибке» внизу справа"]]],
   semTitle:"Семантика и термины",
   semConn:"Связки", semConnNote:"Таблица истинности каждой связки: значение формулы при всех наборах значений p и q.",
-  semRead:["¬p — «не p», отрицание: меняет значение на противоположное.","p∧q — «p и q», конъюнкция: истинна, только когда истинны обе.","p∨q — «p или q», дизъюнкция (нестрогая): ложна, только когда ложны обе.","p→q — «если p, то q», импликация: ложна, только когда p истинно, а q ложно. p — антецедент, q — консеквент.","p↔q — «p тогда и только тогда, когда q», эквиваленция: истинна, когда значения совпадают.","p⊻q — «либо p, либо q», строгая дизъюнкция: истинна, когда значения различны.","p|q — штрих Шеффера, «не (p и q)»: ложна, только когда истинны обе.","p↓q — стрелка Пирса, «ни p, ни q»: истинна, только когда ложны обе.","p←q — обратная импликация, «p, если q»: то же, что q→p.","p↛q — антиимпликация, «p и не q»: истинна, только когда p истинно, а q ложно."],
+  semRead:["¬p — «не p», отрицание: меняет значение на противоположное.","p∧q — «p и q», конъюнкция: истинна, только когда истинны обе.","p∨q — «p или q», дизъюнкция (нестрогая): ложна, только когда ложны обе.","p→q — «если p, то q», импликация: ложна, только когда p истинно, а q ложно. p — антецедент, q — консеквент.","p↔q — «p тогда и только тогда, когда q», эквиваленция: истинна, когда значения совпадают.","p⊻q — «либо p, либо q», строгая дизъюнкция: истинна, когда значения различны.","p|q — штрих Шеффера, «не (p и q)»: ложна, только когда истинны обе.","p↓q — стрелка Пирса, «ни p, ни q»: истинна, только когда ложны обе.","p←q — обратная импликация, «p, если q»: то же, что q→p.","p↛q — антиимпликация, «p и не q»: истинна, только когда p истинно, а q ложно.","p↚q — обратная антиимпликация, «не p, но q»: истинна, только когда p ложно, а q истинно."],
   semTerms:"Свойства формул",
   semDefs:[["Тавтология (общезначимая формула, закон логики)","истинна во всех строках таблицы, то есть при любых значениях переменных."],
     ["Противоречие (невыполнимая, тождественно ложная формула)","ложна во всех строках."],
@@ -625,7 +625,7 @@ ru:{
       "↔":(a,b)=>a===b?"Значения частей совпадают, поэтому эквиваленция истинна":"Значения частей различны, поэтому эквиваленция ложна",
       "⊻":(a,b)=>a!==b?"Значения частей различны, поэтому строгая дизъюнкция истинна":"Значения частей совпадают, поэтому строгая дизъюнкция ложна",
       "|":(a,b)=>"Штрих Шеффера ложен, только когда истинны обе части","↓":(a,b)=>"Стрелка Пирса истинна, только когда ложны обе части",
-      "←":(a,b)=>"Обратная импликация ложна, только когда левая часть ложна, а правая истинна","↛":(a,b)=>"Антиимпликация истинна, только когда левая часть истинна, а правая ложна"},
+      "←":(a,b)=>"Обратная импликация ложна, только когда левая часть ложна, а правая истинна","↛":(a,b)=>"Антиимпликация истинна, только когда левая часть истинна, а правая ложна","↚":(a,b)=>"Обратная антиимпликация истинна, только когда левая часть ложна, а правая истинна"},
     hintLeft:r=>"Строка "+r+": впишите набор значений, которого ещё нет в таблице, например", wrongHere:"Значение в этой ячейке неверное.", fillLeft:r=>"Сначала заполните левую часть строки "+r+": значения переменных.",
     nothing:"Подсказывать нечего: все заполненные ячейки верны, пустых нет.",
     next:(i,n)=>"Следующая ошибка ("+i+" из "+n+")"},
@@ -644,7 +644,7 @@ ru:{
   notation:"Обозначения", left:"Левая часть", manual:"заполняю сам", auto:"автоматически",
   order:"Порядок строк", layout:"Вид таблицы", layoutCols:"подформулы в столбцах", layoutInline:"значения под связками",
   notCustom:"свои", custT:"истина", custF:"ложь",
-  extraOps:"Обратная импликация ← и антиимпликация ↛", extraOff:"не использовать", extraOn:"использовать",
+  extraOps:"Связки ←, ↛, ↚ (обратная импликация, антиимпликация, обратная антиимпликация)", extraOff:"не использовать", extraOn:"использовать",
   ordRand:"случайный",
   reveal:"Следование и отношения", revealAsk:"спрашивать", revealShow:"показывать сразу",
   cols:"Что вычислять", colsAll:"все подформулы", colsMain:"только формулу",
@@ -704,10 +704,10 @@ ru:{
   },
   helpIntro:"Связки можно вводить кнопками, клавиатурой или командами LaTeX. Сокращения превращаются в символы прямо при вводе: <code>-&gt;</code> станет <code>→</code>, <code>+</code> — <code>⊻</code>, <code>||</code> или <code>v</code> — <code>∨</code>, а <code>\\land</code> — <code>∧</code> после пробела.",
   helpHead:["Связка","","Клавиатура","LaTeX"],
-  helpNames:["отрицание","конъюнкция","дизъюнкция","импликация","эквиваленция","исключающее «или»","штрих Шеффера","стрелка Пирса","истина, ложь","обратная импликация","антиимпликация"],
+  helpNames:["отрицание","конъюнкция","дизъюнкция","импликация","эквиваленция","исключающее «или»","штрих Шеффера","стрелка Пирса","истина, ложь","обратная импликация","антиимпликация","обратная антиимпликация"],
   helpList:"Несколько формул пишутся через запятую: <code>p→q, ¬q→¬p</code>. Они получают общую левую часть, а справа — отдельный блок столбцов для каждой формулы; после заполнения сайт называет отношение между каждой парой формул. Логическое следование записывается через <code>⊨</code> (<code>|=</code>, <code>\\models</code>, <code>\\vDash</code>): <code>p, p→q ⊨ q</code>; посылки можно заключить в фигурные скобки: <code>{p, p→q} ⊨ q</code>, а <code>{} ⊨ q</code> — следование из пустого множества посылок. Сайт проверит следование и укажет строки-контрпримеры.",
   helpVars:"Переменные — буквы латинского или русского алфавита, можно с индексом: <code>p1</code>, <code>p_1</code> → p₁. Строчная <code>v</code> всегда означает дизъюнкцию ∨, поэтому переменной быть не может.",
-  helpPrec:"Приоритет связок: ¬ сильнее всех, затем ∧ (и |), затем ∨ (и ↓), затем → (и ←, ↛), слабее всех ↔ и ⊻. Импликация правоассоциативна: p→q→r читается как p→(q→r). В заголовках таблицы скобки расставлены полностью."
+  helpPrec:"Приоритет связок: ¬ сильнее всех, затем ∧ (и |), затем ∨ (и ↓), затем → (и ←, ↛, ↚), слабее всех ↔ и ⊻. Импликация правоассоциативна: p→q→r читается как p→(q→r). В заголовках таблицы скобки расставлены полностью."
 },
 en:{
   h1:"Truth Tables", themeAuto:"Auto", themeLight:"Light", themeDark:"Dark", themeLabel:"Colour theme", report:"Report a bug",
@@ -715,7 +715,7 @@ en:{
   randTask:"Random task",
   aboutTitle:"About",
   about:[
-    ["Typing formulas",["with buttons, the keyboard (<code>-&gt;</code>, <code>&lt;-&gt;</code>, <code>&amp;</code>, <code>v</code>, <code>~</code>, <code>+</code>, <code>|</code>, <code>~v</code>, <code>|=</code>) or LaTeX commands (<code>\\to</code>, <code>\\land</code>, <code>\\neg</code>…); shortcuts turn into symbols as you type","connectives ¬ ∧ ∨ → ↔ ⊻ | ↓, optionally ← and ↛, constants ⊤ and ⊥, indexed variables (p₁)","several formulas separated by commas, and entailment: <code>p, p→q ⊨ q</code> or <code>{p, p→q} ⊨ q</code>","“Random task” next to “Build table”: one formula, several formulas or an entailment; examples and a random formula"]],
+    ["Typing formulas",["with buttons, the keyboard (<code>-&gt;</code>, <code>&lt;-&gt;</code>, <code>&amp;</code>, <code>v</code>, <code>~</code>, <code>+</code>, <code>|</code>, <code>~v</code>, <code>|=</code>) or LaTeX commands (<code>\\to</code>, <code>\\land</code>, <code>\\neg</code>…); shortcuts turn into symbols as you type","connectives ¬ ∧ ∨ → ↔ ⊻ | ↓, optionally ←, ↛ and ↚, constants ⊤ and ⊥, indexed variables (p₁)","several formulas separated by commas, and entailment: <code>p, p→q ⊨ q</code> or <code>{p, p→q} ⊨ q</code>","“Random task” next to “Build table”: one formula, several formulas or an entailment; examples and a random formula"]],
     ["The truth table",["the student fills in the left side (assignments) and the values of subformulas; the left side can be generated in the order 000→111, 111→000 or at random","two layouts: subformula columns, or values right under the connectives with order-of-operations numbers; compute all subformulas or the formula only","under connectives the values of variables are copied under the formula and used values are struck out once the student moves on","notation 1/0, И/Л, T/F or your own; true is green, false red; the first click selects a cell, the next ones cycle its value","after “Check”: wrong cells, repeated and missing rows, and an explanation of every mistake; “Hint” explains the rule for the selected cell without giving the answer; “Show answer” fills the table"]],
     ["What the site determines",["for a formula: tautology, contradiction or contingent","for an entailment: whether it holds and which rows are counterexamples; rows where all premises are true are highlighted","for several formulas: equivalence, contradictoriness, contrariety, subcontrariety, subalternation, independence, and consistency","the student can be asked first (with checking and “partly correct”), or the answer shown at once"]],
     ["Other notations and forms",["parse tree, logic circuit of standard gates, Venn diagram for 1–3 variables","the vector of values of the function and its number","the formula with the Sheffer stroke only and with the Peirce arrow only","Polish and reverse Polish notation, in symbols and Łukasiewicz letters","Peirce’s graphs: linear form and drawing; Frege’s Begriffsschrift: ¬/→ form, drawing and LaTeX for the begriff package","full, abbreviated, Quine and minimal DNF and CNF, Zhegalkin polynomial","Post’s classes T₀, T₁, S, M, L, Post’s table for several formulas and a check of functional completeness"]],
@@ -723,7 +723,7 @@ en:{
     ["Other",["light, dark or system theme; Russian and English","settings and the filled table are kept in this browser","a “Report a bug” button at the bottom right"]]],
   semTitle:"Semantics and terms",
   semConn:"Connectives", semConnNote:"The truth table of every connective: the value for each assignment to p and q.",
-  semRead:["¬p — “not p”, negation: flips the value.","p∧q — “p and q”, conjunction: true only when both are true.","p∨q — “p or q”, inclusive disjunction: false only when both are false.","p→q — “if p then q”, implication: false only when p is true and q is false. p is the antecedent, q the consequent.","p↔q — “p if and only if q”, biconditional: true when the values agree.","p⊻q — “either p or q”, exclusive or: true when the values differ.","p|q — Sheffer stroke, “not (p and q)”: false only when both are true.","p↓q — Peirce arrow, “neither p nor q”: true only when both are false.","p←q — converse implication, “p if q”: the same as q→p.","p↛q — non-implication, “p and not q”: true only when p is true and q is false."],
+  semRead:["¬p — “not p”, negation: flips the value.","p∧q — “p and q”, conjunction: true only when both are true.","p∨q — “p or q”, inclusive disjunction: false only when both are false.","p→q — “if p then q”, implication: false only when p is true and q is false. p is the antecedent, q the consequent.","p↔q — “p if and only if q”, biconditional: true when the values agree.","p⊻q — “either p or q”, exclusive or: true when the values differ.","p|q — Sheffer stroke, “not (p and q)”: false only when both are true.","p↓q — Peirce arrow, “neither p nor q”: true only when both are false.","p←q — converse implication, “p if q”: the same as q→p.","p↛q — non-implication, “p and not q”: true only when p is true and q is false.","p↚q — converse non-implication, “not p but q”: true only when p is false and q is true."],
   semTerms:"Properties of formulas",
   semDefs:[["Tautology (valid formula, law of logic)","true in every row, i.e. for every assignment of values to the variables."],
     ["Contradiction (unsatisfiable formula)","false in every row."],
@@ -783,7 +783,7 @@ en:{
       "↔":(a,b)=>a===b?"The parts agree, so the biconditional is true":"The parts differ, so the biconditional is false",
       "⊻":(a,b)=>a!==b?"The parts differ, so exclusive or is true":"The parts agree, so exclusive or is false",
       "|":(a,b)=>"The Sheffer stroke is false only when both parts are true","↓":(a,b)=>"The Peirce arrow is true only when both parts are false",
-      "←":(a,b)=>"Converse implication is false only when the left part is false and the right part true","↛":(a,b)=>"Non-implication is true only when the left part is true and the right part false"},
+      "←":(a,b)=>"Converse implication is false only when the left part is false and the right part true","↛":(a,b)=>"Non-implication is true only when the left part is true and the right part false","↚":(a,b)=>"Converse non-implication is true only when the left part is false and the right part true"},
     hintLeft:r=>"Row "+r+": write an assignment that is not in the table yet, for example", wrongHere:"The value in this cell is wrong.", fillLeft:r=>"Fill in the left side of row "+r+" first: the values of the variables.",
     nothing:"Nothing to hint: every filled cell is right and none is empty.",
     next:(i,n)=>"Next mistake ("+i+" of "+n+")"},
@@ -802,7 +802,7 @@ en:{
   notation:"Notation", left:"Left side", manual:"I fill it in", auto:"automatic",
   order:"Row order", layout:"Table layout", layoutCols:"subformula columns", layoutInline:"values under connectives",
   notCustom:"custom", custT:"true", custF:"false",
-  extraOps:"Converse implication ← and non-implication ↛", extraOff:"off", extraOn:"on",
+  extraOps:"Connectives ←, ↛, ↚ (converse implication, non-implication, converse non-implication)", extraOff:"off", extraOn:"on",
   ordRand:"random",
   reveal:"Entailment and relations", revealAsk:"ask", revealShow:"show at once",
   cols:"What to compute", colsAll:"all subformulas", colsMain:"formula only",
@@ -862,10 +862,10 @@ en:{
   },
   helpIntro:"Type connectives with the buttons, the keyboard, or LaTeX commands. Shortcuts turn into symbols as you type: <code>-&gt;</code> becomes <code>→</code>, <code>+</code> becomes <code>⊻</code>, <code>||</code> or <code>v</code> becomes <code>∨</code>, and <code>\\land</code> becomes <code>∧</code> after a space.",
   helpHead:["Connective","","Keyboard","LaTeX"],
-  helpNames:["negation","conjunction","disjunction","implication","biconditional","exclusive or","Sheffer stroke (nand)","Peirce arrow (nor)","true, false","converse implication","non-implication (anti-implication)"],
+  helpNames:["negation","conjunction","disjunction","implication","biconditional","exclusive or","Sheffer stroke (nand)","Peirce arrow (nor)","true, false","converse implication","non-implication (anti-implication)","converse non-implication"],
   helpList:"Separate several formulas with commas: <code>p→q, ¬q→¬p</code>. They share one left side, each formula gets its own block of columns, and once the table is complete the relation between every pair of formulas is named. Write entailment with <code>⊨</code> (<code>|=</code>, <code>\\models</code>, <code>\\vDash</code>): <code>p, p→q ⊨ q</code>; the premises may be put in braces: <code>{p, p→q} ⊨ q</code>, and <code>{} ⊨ q</code> means the empty set of premises. The site checks it and points out counterexample rows.",
   helpVars:"Variables are single letters, optionally with an index: <code>p1</code>, <code>p_1</code> → p₁. A lowercase <code>v</code> always means disjunction ∨, so it cannot be a variable.",
-  helpPrec:"Precedence: ¬ binds tightest, then ∧ (and |), then ∨ (and ↓), then → (and ←, ↛), and ↔ and ⊻ bind loosest. Implication associates to the right: p→q→r means p→(q→r). Table headers are fully parenthesised."
+  helpPrec:"Precedence: ¬ binds tightest, then ∧ (and |), then ∨ (and ↓), then → (and ←, ↛, ↚), and ↔ and ⊻ bind loosest. Implication associates to the right: p→q→r means p→(q→r). Table headers are fully parenthesised."
 }};
 const HELP_ROWS=[
   ["¬","~  !  -","\\neg  \\lnot"],
@@ -878,11 +878,12 @@ const HELP_ROWS=[
   ["↓","~v  !v","\\downarrow  \\nor"],
   ["⊤  ⊥","1  0","\\top  \\bot"],
   ["←","<-","\\leftarrow  \\gets  \\impliedby",true],
-  ["↛","-/>","\\nrightarrow  \\nrarr",true]
+  ["↛","-/>","\\nrightarrow  \\nrarr",true],
+  ["↚","</-","\\nleftarrow  \\nlarr",true]
 ];
 const KEYS=[
   ["p",""],["q",""],["r",""],["s",""],["t",""],["⊤","1  \\top"],["⊥","0  \\bot"],null,
-  ["¬","~  \\neg"],["∧","&  \\land"],["∨","v  ||  \\lor"],["→","->  \\to"],["←","<-  \\leftarrow",true],["↛","-/>  \\nrightarrow",true],["↔","<->  \\iff"],["⊻","+  \\veebar"],["|","|  \\mid"],["↓","~v  \\downarrow"],null,
+  ["¬","~  \\neg"],["∧","&  \\land"],["∨","v  ||  \\lor"],["→","->  \\to"],["←","<-  \\leftarrow",true],["↛","-/>  \\nrightarrow",true],["↚","</-  \\nleftarrow",true],["↔","<->  \\iff"],["⊻","+  \\veebar"],["|","|  \\mid"],["↓","~v  \\downarrow"],null,
   ["(",""],[")",""],[",",""],["{","\\{"],["}","\\}"],["⊨","|=  \\models"]
 ];
 const EXAMPLES=["p→q","{p, p→q} ⊨ q","p→q, q ⊨ p","p∧q, ¬p∨¬q, p∨q","p→q, ¬q→¬p","(p→q)∧¬r","¬(p∧q)↔¬p∨¬q","(p→q)↔(¬q→¬p)","((p→q)→p)→p","(p∨q)∧(p→r)∧(q→r)→r","p⊻q↔¬(p↔q)","p|q↔¬(p∧q)","p∧¬p"];
@@ -905,11 +906,11 @@ const S={
 const LATEX={to:"→",rightarrow:"→",Rightarrow:"→",implies:"→",supset:"→",rarr:"→",
   leftrightarrow:"↔",Leftrightarrow:"↔",iff:"↔",equiv:"↔",lrarr:"↔",
   land:"∧",wedge:"∧",with:"∧",lor:"∨",vee:"∨",neg:"¬",lnot:"¬",sim:"¬",
-  models:"⊨",vDash:"⊨",entails:"⊨",leftarrow:"←",gets:"←",impliedby:"←",larr:"←",nrightarrow:"↛",nrarr:"↛",oplus:"⊻",xor:"⊻",veebar:"⊻",uparrow:"|",nand:"|",mid:"|",downarrow:"↓",nor:"↓",top:"⊤",bot:"⊥",bottom:"⊥"};
-const ASCII=[["|=","⊨"],["⊨","⊨"],["~v","↓"],["!v","↓"],["-v","↓"],["¬∨","↓"],["¬v","↓"],["<->","↔"],["<=>","↔"],["-/>","↛"],["<-","←"],["->","→"],["=>","→"],["/\\","∧"],["\\/","∨"],["\\&","∧"],["&&","∧"],["||","∨"],
+  models:"⊨",vDash:"⊨",entails:"⊨",leftarrow:"←",gets:"←",impliedby:"←",larr:"←",nrightarrow:"↛",nrarr:"↛",nleftarrow:"↚",nlarr:"↚",oplus:"⊻",xor:"⊻",veebar:"⊻",uparrow:"|",nand:"|",mid:"|",downarrow:"↓",nor:"↓",top:"⊤",bot:"⊥",bottom:"⊥"};
+const ASCII=[["|=","⊨"],["⊨","⊨"],["~v","↓"],["!v","↓"],["-v","↓"],["¬∨","↓"],["¬v","↓"],["<->","↔"],["<=>","↔"],["-/>","↛"],["</-","↚"],["<-","←"],["->","→"],["=>","→"],["/\\","∧"],["\\/","∨"],["\\&","∧"],["&&","∧"],["||","∨"],
   ["&","∧"],["|","|"],["^","∧"],["~","¬"],["!","¬"],["-","¬"],["+","⊻"],
   ["⇒","→"],["⊃","→"],["⇔","↔"],["≡","↔"],["·","∧"],["⊕","⊻"],["↑","|"],["∼","¬"],
-  ["¬","¬"],["∧","∧"],["∨","∨"],["→","→"],["↔","↔"],["⊻","⊻"],["↓","↓"],["←","←"],["↛","↛"],["⊤","⊤"],["⊥","⊥"]];
+  ["¬","¬"],["∧","∧"],["∨","∨"],["→","→"],["↔","↔"],["⊻","⊻"],["↓","↓"],["←","←"],["↛","↛"],["↚","↚"],["⊤","⊤"],["⊥","⊥"]];
 const SUB="₀₁₂₃₄₅₆₇₈₉";
 const toSub=d=>d.replace(/\d/g,x=>SUB[+x]);
 const fromSub=s=>s.replace(/[₀-₉]/g,x=>String(SUB.indexOf(x)));
@@ -963,7 +964,7 @@ function parse(s){
   const peek=()=>toks[p];
   const isOp=(...v)=>p<toks.length&&toks[p].k==="op"&&v.includes(toks[p].v);
   function iff(){let a=imp();while(isOp("↔","⊻")){const op=toks[p++].v;a={t:"bin",op,a,b:imp()}}return a}
-  function imp(){const a=disj();if(isOp("→","←","↛")){const op=toks[p++].v;return {t:"bin",op,a,b:imp()}}return a}
+  function imp(){const a=disj();if(isOp("→","←","↛","↚")){const op=toks[p++].v;return {t:"bin",op,a,b:imp()}}return a}
   function disj(){let a=conj();while(isOp("∨","↓")){const op=toks[p++].v;a={t:"bin",op,a,b:conj()}}return a}
   function conj(){let a=un();while(isOp("∧","|")){const op=toks[p++].v;a={t:"bin",op,a,b:un()}}return a}
   function un(){if(isOp("¬")){p++;return {t:"not",a:un()}}return atom()}
@@ -1007,7 +1008,7 @@ function show(n){
     default:{const w=x=>x.t==="bin"?"("+show(x)+")":show(x);return w(n.a)+n.op+w(n.b)}
   }
 }
-const OPS={"∧":(a,b)=>a&&b,"∨":(a,b)=>a||b,"→":(a,b)=>!a||b,"↔":(a,b)=>a===b,"⊻":(a,b)=>a!==b,"|":(a,b)=>!(a&&b),"↓":(a,b)=>!(a||b),"←":(a,b)=>a||!b,"↛":(a,b)=>a&&!b};
+const OPS={"∧":(a,b)=>a&&b,"∨":(a,b)=>a||b,"→":(a,b)=>!a||b,"↔":(a,b)=>a===b,"⊻":(a,b)=>a!==b,"|":(a,b)=>!(a&&b),"↓":(a,b)=>!(a||b),"←":(a,b)=>a||!b,"↛":(a,b)=>a&&!b,"↚":(a,b)=>!a&&b};
 function ev(n,env){
   switch(n.t){
     case "var":return env[n.name];
@@ -1024,11 +1025,11 @@ function liveNorm(str){
     .replace(/\|=/g,"⊨").replace(/<->|<=>/g,"↔").replace(/->|=>/g,"→")
     .replace(/\/\\/g,"∧").replace(/\\\//g,"∨").replace(/\\&/g,"∧")
     .replace(/&&?/g,"∧").replace(/\|\|/g,"∨").replace(/\^/g,"∧")
-    .replace(/-\/>/g,"↛").replace(/<-(?=[^>])/g,"←").replace(/[~!∼]/g,"¬").replace(/-(?=[^>\/])/g,"¬").replace(/\+/g,"⊻")
+    .replace(/<\/-/g,"↚").replace(/-\/>/g,"↛").replace(/<-(?=[^>])/g,"←").replace(/[~!∼]/g,"¬").replace(/-(?=[^>\/])/g,"¬").replace(/\+/g,"⊻")
     .replace(/(\\[A-Za-z]*)|v/g,(m,cmd)=>cmd?m:"∨")
     .replace(/¬\s*∨/g,"↓")
     .replace(/⇒|⊃/g,"→").replace(/⇔|≡/g,"↔").replace(/⊕/g,"⊻").replace(/↑/g,"|")
-    .replace(/\s*([∧∨→←↛↔⊻|↓])\s*/g,"$1").replace(/¬\s+/g,"¬").replace(/\(\s+/g,"(").replace(/\s+\)/g,")").replace(/\s*([,;])(?=\S)/g,"$1 ").replace(/\\([{}])/g,"$1").replace(/\{\s+/g,"{").replace(/\s+\}/g,"}").replace(/\s*⊨\s*/g," ⊨ ").replace(/^ ⊨/,"⊨");
+    .replace(/\s*([∧∨→←↛↚↔⊻|↓])\s*/g,"$1").replace(/¬\s+/g,"¬").replace(/\(\s+/g,"(").replace(/\s+\)/g,")").replace(/\s*([,;])(?=\S)/g,"$1 ").replace(/\\([{}])/g,"$1").replace(/\{\s+/g,"{").replace(/\s+\}/g,"}").replace(/\s*⊨\s*/g," ⊨ ").replace(/^ ⊨/,"⊨");
 }
 
 /* ---------- model ---------- */
@@ -1115,7 +1116,7 @@ function buildKeys(){
   for(const k of KEYS){
     if(!k){const g=document.createElement("span");g.className="gap";box.appendChild(g);continue}
     if(k[2]&&!S.extraOps)continue;
-    const b=document.createElement("button");b.type="button";b.className="key"+(/^[pqrst]$/.test(k[0])?" var":/^[¬∧∨→←↛↔⊻|↓⊤⊥⊨]$/.test(k[0])?" sym":"");
+    const b=document.createElement("button");b.type="button";b.className="key"+(/^[pqrst]$/.test(k[0])?" var":/^[¬∧∨→←↛↚↔⊻|↓⊤⊥⊨]$/.test(k[0])?" sym":"");
     b.textContent=k[0];if(k[1])b.title=k[1];
     b.addEventListener("click",()=>insertAtCaret(k[0]));
     box.appendChild(b);
@@ -1769,6 +1770,7 @@ function peirceItems(n){
     case "|":return [cut(A.concat(B))];
     case "↓":return [cut(A),cut(B)];
     case "↛":return A.concat([cut(B)]);
+    case "↚":return [cut(A)].concat(B);
   }
 }
 // items side by side: a space only between two letters, as in p q, p(q), (p)(q)
@@ -1790,6 +1792,7 @@ function peirceTree(n){
     case "|":return [cut(A.concat(B))];
     case "↓":return [cut(A),cut(B)];
     case "↛":return A.concat([cut(B)]);
+    case "↚":return [cut(A)].concat(B);
   }
 }
 const peirceTreeSize=items=>items.reduce((a,i)=>a+1+(i.cut?peirceTreeSize(i.cut):0),0);
@@ -1838,6 +1841,7 @@ function fregeOf(n){
     case "|":return FC(A,FN(B));
     case "↓":return FN(FC(FN(A),B));
     case "↛":return FN(FC(A,B));
+    case "↚":return FN(FC(B,A));
     case "↔":return FN(FC(FC(A,B),FN(FC(B,A))));
     case "⊻":return FC(FC(A,B),FN(FC(B,A)));
   }
@@ -1989,7 +1993,7 @@ function treeInfo(ast){
 }
 /* gates in IEC/ГОСТ style: a box with its symbol, a small circle for an inverted output */
 const GATE={"∧":["&",0],"∨":["≥1",0],"⊻":["=1",0],"↔":["=",0],"|":["&",1],"↓":["≥1",1],"¬":["1",1]};
-// connectives without a standard gate are built from standard ones: A→B = ¬A∨B, A←B = A∨¬B, A↛B = A∧¬B
+// connectives without a standard gate are built from standard ones: A→B = ¬A∨B, A←B = A∨¬B, A↛B = A∧¬B, A↚B = ¬A∧B
 /* the formula written with the Sheffer stroke only, or with the Peirce arrow only */
 function shefferOnly(n){
   const S_=(a,b)=>({t:"bin",op:"|",a,b}),NOT=a=>a.t==="bin"&&a.op==="|"&&a.a===a.b?a.a:S_(a,a);
@@ -2003,6 +2007,7 @@ function shefferOnly(n){
     case "→":return S_(a,NOT(b));
     case "←":return S_(NOT(a),b);
     case "↛":return NOT(S_(a,NOT(b)));
+    case "↚":return NOT(S_(NOT(a),b));
     case "↓":return NOT(S_(NOT(a),NOT(b)));
     case "↔":return S_(S_(a,b),S_(NOT(a),NOT(b)));
     case "⊻":return S_(S_(a,S_(a,b)),S_(b,S_(a,b)));
@@ -2020,6 +2025,7 @@ function peirceOnly(n){
     case "→":return NOT(P(NOT(a),b));
     case "←":return NOT(P(a,NOT(b)));
     case "↛":return P(NOT(a),b);
+    case "↚":return P(a,NOT(b));
     case "|":return NOT(P(NOT(a),NOT(b)));
     case "↔":return P(P(NOT(a),b),P(a,NOT(b)));
     case "⊻":return NOT(P(P(NOT(a),b),P(a,NOT(b))));
@@ -2041,6 +2047,7 @@ function circuitAst(n){
   if(n.op==="→")return B("∨",N(a),b);
   if(n.op==="←")return B("∨",a,N(b));
   if(n.op==="↛")return B("∧",a,N(b));
+  if(n.op==="↚")return B("∧",N(a),b);
   return B(n.op,a,b);
 }
 function circuitSvg(ast){
@@ -2219,8 +2226,8 @@ function exportGrid(){
   }
   return {head,sep,rows,K};
 }
-const TEX={"¬":"\\neg ","∧":"\\land ","∨":"\\lor ","→":"\\to ","↔":"\\leftrightarrow ","⊻":"\\veebar ","|":"\\mid ","↓":"\\downarrow ","←":"\\leftarrow ","↛":"\\nrightarrow ","⊤":"\\top ","⊥":"\\bot "};
-const texMath=t=>"$"+t.replace(/[₀-₉]+/g,d=>"_{"+fromSub(d)+"}").replace(/[¬∧∨→←↛↔⊻|↓⊤⊥⊨]/g,c=>c==="⊨"?"\\models ":TEX[c]).replace(/ +$/,"").replace(/ ([)}])/g,"$1")+"$";
+const TEX={"¬":"\\neg ","∧":"\\land ","∨":"\\lor ","→":"\\to ","↔":"\\leftrightarrow ","⊻":"\\veebar ","|":"\\mid ","↓":"\\downarrow ","←":"\\leftarrow ","↛":"\\nrightarrow ","↚":"\\nleftarrow ","⊤":"\\top ","⊥":"\\bot "};
+const texMath=t=>"$"+t.replace(/[₀-₉]+/g,d=>"_{"+fromSub(d)+"}").replace(/[¬∧∨→←↛↚↔⊻|↓⊤⊥⊨]/g,c=>c==="⊨"?"\\models ":TEX[c]).replace(/ +$/,"").replace(/ ([)}])/g,"$1")+"$";
 const texText=t=>t.replace(/[\\&%$#_{}~^]/g,c=>"\\"+c);
 function exportText(fmt){
   const G=exportGrid(),{head,sep,rows}=G,n=head.length;
@@ -2343,7 +2350,7 @@ document.querySelectorAll("[data-lang]").forEach(b=>b.addEventListener("click",(
 const REL_COMBOS=[["±","—","—","±"],["—","±","±","—"],["—","±","±","+"],["+","±","±","—"],["±","—","+","±"],["+","+","+","+"]];
 function buildSemantics(){
   const lang=L(),v=b=>"<span class=\"v"+(b?1:0)+"\">"+esc(sym(b))+"</span>";
-  const ops=["∧","∨","→","↔","⊻","|","↓"].concat(S.extraOps?["←","↛"]:[]);
+  const ops=["∧","∨","→","↔","⊻","|","↓"].concat(S.extraOps?["←","↛","↚"]:[]);
   const rows=[[true,true],[true,false],[false,true],[false,false]];
   let h="<h3>"+esc(lang.semConn)+"</h3><p>"+esc(lang.semConnNote)+"</p><div class=\"tw\"><table><thead><tr><th>p</th><th class=\"lt\">q</th><th>¬p</th>"+ops.map(o=>"<th>p"+esc(o)+"q</th>").join("")+"</tr></thead><tbody>";
   rows.forEach(([p,q])=>{h+="<tr><td>"+v(p)+"</td><td class=\"lt\">"+v(q)+"</td><td>"+v(!p)+"</td>"+ops.map(o=>"<td>"+v(OPS[o](p,q))+"</td>").join("")+"</tr>"});
@@ -2469,6 +2476,7 @@ function nnf(n,neg){
     case "↓":return neg?B("∨",nnf(a,false),nnf(b,false)):B("∧",nnf(a,true),nnf(b,true));
     case "←":return neg?B("∧",nnf(b,false),nnf(a,true)):B("∨",nnf(a,false),nnf(b,true));
     case "↛":return neg?B("∨",nnf(a,true),nnf(b,false)):B("∧",nnf(a,false),nnf(b,true));
+    case "↚":return neg?B("∨",nnf(a,false),nnf(b,true)):B("∧",nnf(a,true),nnf(b,false));
   }
 }
 const COMM=new Set(["∧","∨","↔","⊻","|","↓"]);
