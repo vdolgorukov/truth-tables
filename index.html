@@ -269,6 +269,7 @@ span.cell:hover{background:transparent}
 
 .tt td.cur-err{outline:3px solid var(--accent);outline-offset:-3px}
 .explain .btn{margin-left:.4rem;vertical-align:baseline}
+.links{display:flex;flex-wrap:wrap;gap:.5rem;padding-top:.8rem;border-top:1px solid var(--rule)}
 .explain{padding:.6rem .85rem;border-radius:6px;border:1px solid var(--accent);background:var(--tint);font-size:.95rem;max-width:80ch}
 .explain .mono{font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace}
 .explain .v1{color:var(--tv)}
@@ -348,8 +349,6 @@ span.cell:hover{background:transparent}
     <div class="frow">
       <input id="f-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
       <button type="button" class="btn primary" id="build" data-i18n="build"></button>
-      <button type="button" class="btn quiet" id="share" data-i18n="share"></button>
-      <button type="button" class="btn quiet" id="share-test" data-i18n="shareTest"></button>
     </div>
     <div class="keys" id="keys"></div>
     <div class="preview" id="preview" aria-live="polite"></div>
@@ -456,6 +455,10 @@ span.cell:hover{background:transparent}
         <p class="hint" data-i18n="exportNote"></p>
       </div>
     </details>
+    <div class="links">
+      <button type="button" class="btn sm quiet" id="share" data-i18n="share"></button>
+      <button type="button" class="btn sm quiet" id="share-test" data-i18n="shareTest"></button>
+    </div>
   </section>
 </main>
 <a class="report" id="report" href="mailto:vdolgorukov+truthtable@gmail.com" title="vdolgorukov+truthtable@gmail.com" data-i18n="report"></a>
