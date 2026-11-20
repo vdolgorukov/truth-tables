@@ -1547,6 +1547,8 @@ table.addEventListener("focusin",e=>{
   const kids=b.dataset.s==="R"?m.cols[c].kids:m.islots[c].kids;
   const tr=table.tBodies[0].rows[+b.dataset.r];
   for(const id of kids){
+    // under connectives the variable is already marked under the formula; skip its left-side copy
+    if(b.dataset.s==="I"&&id[0]==="L")continue;
     const td=tr.querySelector("[data-td=\""+id+"\"]");if(td)td.classList.add("src");
     const th=table.querySelector("[data-h=\""+id+"\"]");if(th)th.classList.add("src");
   }
