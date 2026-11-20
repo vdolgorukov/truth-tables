@@ -1216,9 +1216,10 @@ function randomFormula(){
 /* ---------- table ---------- */
 /* A slot is one editable right-hand cell per row: a subformula column (s="R")
    or a position under a connective inside the written-out formula (s="I"). */
+const layout=()=>S.cols==="main"?"cols":S.layout;
 function slots(){
   const m=S.model;
-  if(S.layout==="cols")return visCols().map(c=>({s:"R",c,td:"R"+c,node:m.cols[c].node,kids:m.cols[c].kids,label:m.cols[c].key,main:m.mains.has(c),sep:sepCls(m.cols[c].g,S.cols==="main"||m.cols[c].first)}));
+  if(layout()==="cols")return visCols().map(c=>({s:"R",c,td:"R"+c,node:m.cols[c].node,kids:m.cols[c].kids,label:m.cols[c].key,main:m.mains.has(c),sep:sepCls(m.cols[c].g,S.cols==="main"||m.cols[c].first)}));
   const idx=S.cols==="main"?[...m.mainsI]:m.islots.map((_,i)=>i);
   return idx.map(i=>({s:"I",c:i,td:"P"+m.islots[i].piece,node:m.islots[i].node,kids:m.islots[i].kids,label:show(m.islots[i].node),main:m.mainsI.has(i),piece:m.islots[i].piece}))
     .sort((a,b)=>a.piece-b.piece);
@@ -1227,7 +1228,7 @@ function sepCls(g,first){if(!first)return "";const m=S.model;return (g>0?" gsep"
 const store=s=>s==="L"?S.left:s==="R"?S.right:S.rightI;
 function cellBtn(s,r,c,label){return "<button type=\"button\" class=\"cell\" data-s=\""+s+"\" data-r=\""+r+"\" data-c=\""+c+"\" aria-label=\""+esc(L().cellLabel(r+1,label))+"\"></button>"}
 function renderTable(){
-  const m=S.model,K=m.vars.length,sl=slots(),inline=S.layout==="inline";
+  const m=S.model,K=m.vars.length,sl=slots(),inline=layout()==="inline";
   table.classList.toggle("inline",inline);
   let h="<thead><tr><th class=\"rn\" scope=\"col\">#</th>";
   m.vars.forEach((v,j)=>{h+="<th scope=\"col\" class=\"var"+(j===K-1?" lastL":"")+"\" data-h=\"L"+j+"\">"+esc(v)+"</th>"});
@@ -1325,7 +1326,7 @@ function update(){
       paint(td.firstChild,row.vals[j]);
       td.classList.toggle("dup",isDup&&!S.auto);
     });
-    if(S.layout==="inline"){
+    if(layout()==="inline"){
       m.pieces.forEach((p,i)=>{
         const td=S.cells[r]["P"+i];
         if(td.classList.contains("copy"))paint(td.firstChild,p.c==="v"?row.vals[p.vj]:p.t==="⊤");
@@ -1944,7 +1945,7 @@ $("tr-out").addEventListener("click",e=>{
    before each column ("lr" left|right, "g" between formulas, "c" before the conclusion,
    "in" between pieces of one written-out formula). */
 function exportGrid(){
-  const m=S.model,K=m.vars.length,sl=slots(),inline=S.layout==="inline";
+  const m=S.model,K=m.vars.length,sl=slots(),inline=layout()==="inline";
   const head=[...m.vars],sep=m.vars.map(()=>""),rows=[];
   const sepFor=(g,first,i)=>i===0?"lr":first?(g===m.concl?"c":"g"):"";
   let cols=[];
