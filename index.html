@@ -449,6 +449,12 @@ canvas.venn{display:block;max-width:100%;height:auto;border-radius:4px}
         <button type="button" data-val="main" data-i18n="colsMain"></button>
       </div>
     </div>
+    <div class="opt"><span data-i18n="keysOpt"></span>
+      <div class="seg" data-set="keys">
+        <button type="button" data-val="1" data-i18n="keysShow"></button>
+        <button type="button" data-val="0" data-i18n="keysHide"></button>
+      </div>
+    </div>
     <div class="opt"><span data-i18n="extraOps"></span>
       <div class="seg" data-set="extraOps">
         <button type="button" data-val="0" data-i18n="extraOff"></button>
@@ -654,6 +660,7 @@ ru:{
   notation:"Обозначения", left:"Левая часть", manual:"заполняю сам", auto:"автоматически",
   order:"Порядок строк", layout:"Вид таблицы", layoutCols:"подформулы в столбцах", layoutInline:"значения под связками",
   notCustom:"свои", custT:"истина", custF:"ложь",
+  keysOpt:"Кнопки ввода", keysShow:"показывать", keysHide:"скрыть",
   extraOps:"Связки ←, ↛, ↚ (обратная импликация, антиимпликация, обратная антиимпликация)", extraOff:"не использовать", extraOn:"использовать",
   ordRand:"случайный",
   reveal:"Следование и отношения", revealAsk:"спрашивать", revealShow:"показывать сразу",
@@ -823,6 +830,7 @@ en:{
   notation:"Notation", left:"Left side", manual:"I fill it in", auto:"automatic",
   order:"Row order", layout:"Table layout", layoutCols:"subformula columns", layoutInline:"values under connectives",
   notCustom:"custom", custT:"true", custF:"false",
+  keysOpt:"Input buttons", keysShow:"show", keysHide:"hide",
   extraOps:"Connectives ←, ↛, ↚ (converse implication, non-implication, converse non-implication)", extraOff:"off", extraOn:"on",
   ordRand:"random",
   reveal:"Entailment and relations", revealAsk:"ask", revealShow:"show at once",
@@ -919,7 +927,7 @@ function save(k,v){try{localStorage.setItem("tt-"+k,JSON.stringify(v))}catch(e){
 const S={
   custT:load("custT","+"), custF:load("custF","−"),
   lang:load("lang","ru"), notation:load("notation","01"), auto:load("auto",false), order:load("order","asc"),
-  cols:load("cols","all"), layout:load("layout","cols"), reveal:load("reveal",false), extraOps:load("extraOps",false),
+  cols:load("cols","all"), layout:load("layout","cols"), reveal:load("reveal",false), extraOps:load("extraOps",false), keys:load("keys",true),
   model:null, left:[], right:[], checked:false, quiz:{entail:null,rel:{},checked:false}
 };
 
@@ -2341,7 +2349,8 @@ function applyCustom(){
   syncSegs();buildSemantics();if(S.model)update();
 }));
 function syncSegs(){
-  const val={notation:S.notation,auto:S.auto?"1":"0",order:S.order,layout:S.layout,cols:S.cols,reveal:S.reveal?"1":"0",extraOps:S.extraOps?"1":"0"};
+  const val={notation:S.notation,auto:S.auto?"1":"0",order:S.order,layout:S.layout,cols:S.cols,reveal:S.reveal?"1":"0",extraOps:S.extraOps?"1":"0",keys:S.keys?"1":"0"};
+  $("keys").hidden=!S.keys;
   document.querySelectorAll(".seg[data-set]").forEach(g=>{
     g.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.val===val[g.dataset.set])));
   });
@@ -2363,6 +2372,7 @@ document.querySelectorAll(".seg[data-set]").forEach(g=>{
     if(key==="layout")S.layout=v;
     if(key==="reveal")S.reveal=v==="1";
     if(key==="extraOps"){S.extraOps=v==="1";save(key,S[key]);applyLang();return}
+    if(key==="keys"){S.keys=v==="1";save(key,S[key]);syncSegs();return}
     save(key,S[key]);syncSegs();
     if(key==="auto"||key==="cols"||key==="layout")renderTable();else update();
   });
