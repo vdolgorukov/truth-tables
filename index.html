@@ -650,10 +650,11 @@ ru:{
   trPeirceImg:"Графы Пирса (рисунок)", trPeirceImgNote:"пунктир — лист утверждения; овал (разрез) — отрицание того, что внутри; рядом — конъюнкция",
   trPeirce:"Графы Пирса (линейная запись)", trPeirceNote:"запись рядом — конъюнкция, скобки — отрицание; (()) — пустой лист, истина; () — ложь",
   trSheffer:"Только через штрих Шеффера |", trPeirceArrow:"Только через стрелку Пирса ↓", trTooLong:"запись получается слишком длинной (больше 600 символов)",
-  trSingleMin:k=>"кратчайшая ("+k+" "+(k%10===1&&k%100!==11?"связка":k%10>=2&&k%10<=4&&(k%100<12||k%100>14)?"связки":"связок")+"):", trSingleDirect:"прямой перевод:",
+  trSingleMin:k=>"кратчайшая ("+k+" "+(k%10===1&&k%100!==11?"связка":k%10>=2&&k%10<=4&&(k%100<12||k%100>14)?"связки":"связок")+"):", trSingleDirect:"прямой перевод:", trSingleWait:"кратчайшая: идёт перебор…", trSingleGo:"Найти кратчайшую запись",
+  trSingleAsk:"Для 4 переменных перебор может занять несколько секунд, поэтому он запускается кнопкой. Прямой перевод заменяет каждую связку её определением.",
   trSingleNote:"Кратчайшая запись найдена перебором всех формул по числу связок; прямой перевод заменяет каждую связку её определением.",
   trSingleSame:"Прямой перевод здесь уже кратчайший.",
-  trSingleNoMin:"Прямой перевод: каждая связка заменена её определением. Кратчайшая запись не найдена: перебор ведётся только для формул с 1–4 переменными и ограничен по времени.",
+  trSingleNoMin:"Прямой перевод: каждая связка заменена её определением. Кратчайшая запись ищется только для формул с 1–4 переменными.",
   trTree:"Дерево разбора", trTreeInfo:t=>(t.main?"главная связка "+t.main+"; ":"")+"глубина "+t.depth+"; связок "+t.conn+"; разных подформул со связками "+t.distinct,
   trCircuit:"Логическая схема", trCircuitNote:"& — И, ≥1 — ИЛИ, =1 — исключающее ИЛИ, = — эквиваленция, 1 — НЕ; кружок на выходе — отрицание. Импликация собрана как A→B = ¬A∨B",
   trVector:"Вектор значений", trVectorNote:vs=>"значения на наборах ("+vs.join(", ")+") от "+"0".repeat(vs.length)+" до "+"1".repeat(vs.length), trVectorBig:"слишком длинный вектор (больше 8 переменных)",
@@ -828,10 +829,11 @@ en:{
   trPeirceImg:"Peirce’s graphs (drawing)", trPeirceImgNote:"dashed frame: the sheet of assertion; an oval (cut) negates what is inside; side by side means conjunction",
   trPeirce:"Peirce’s graphs (linear form)", trPeirceNote:"juxtaposition is conjunction, brackets are negation; (()) is the blank sheet, true; () is false",
   trSheffer:"Sheffer stroke | only", trPeirceArrow:"Peirce arrow ↓ only", trTooLong:"the formula gets too long (over 600 characters)",
-  trSingleMin:k=>"shortest ("+k+" connective"+(k===1?"":"s")+"):", trSingleDirect:"direct translation:",
+  trSingleMin:k=>"shortest ("+k+" connective"+(k===1?"":"s")+"):", trSingleDirect:"direct translation:", trSingleWait:"shortest: searching…", trSingleGo:"Find the shortest form",
+  trSingleAsk:"With 4 variables the search may take a few seconds, so it is started with the button. The direct translation replaces each connective by its definition.",
   trSingleNote:"The shortest form is found by searching all formulas by the number of connectives; the direct translation replaces each connective by its definition.",
   trSingleSame:"Here the direct translation is already the shortest.",
-  trSingleNoMin:"Direct translation: each connective is replaced by its definition. No shortest form found: the search runs only for formulas with 1–4 variables and is limited in time.",
+  trSingleNoMin:"Direct translation: each connective is replaced by its definition. The shortest form is searched only for formulas with 1–4 variables.",
   trTree:"Parse tree", trTreeInfo:t=>(t.main?"main connective "+t.main+"; ":"")+"depth "+t.depth+"; connectives "+t.conn+"; distinct compound subformulas "+t.distinct,
   trCircuit:"Logic circuit", trCircuitNote:"& AND, ≥1 OR, =1 exclusive OR, = equivalence, 1 NOT; a circle at an output means negation. Implication is built as A→B = ¬A∨B",
   trVector:"Vector of values", trVectorNote:vs=>"values on the assignments to ("+vs.join(", ")+") from "+"0".repeat(vs.length)+" to "+"1".repeat(vs.length), trVectorBig:"the vector is too long (more than 8 variables)",
@@ -2173,35 +2175,65 @@ function peirceOnly(n){
 }
 /* the shortest formula with the same truth function, written with one connective (| or ↓) over the variables
    of the formula: an exhaustive search by the number of connectives; null when it takes too long */
-const MIN_SINGLE={};
-function minimalSingle(ast,op){
-  const vars=formulaVars(ast),K=vars.length;
-  if(K<1||K>4)return null;
-  const R=1<<K,FULL=(1<<R)-1;
-  let target=0;
-  for(let x=0;x<R;x++){const e={};vars.forEach((n,j)=>e[n]=((x>>(K-1-j))&1)===1);if(ev(ast,e))target|=1<<x}
-  const key=op+vars.join(",")+":"+target;
-  if(key in MIN_SINGLE)return MIN_SINGLE[key];
-  const f=op==="|"?(x,y)=>~(x&y)&FULL:(x,y)=>~(x|y)&FULL;
-  const seen=new Set(),levels=[[]];
-  vars.forEach((v,j)=>{let m=0;for(let x=0;x<R;x++)if((x>>(K-1-j))&1)m|=1<<x;
-    if(!seen.has(m)){seen.add(m);levels[0].push({m,n:{t:"var",name:v}})}});
-  let res=levels[0].find(z=>z.m===target);
-  const deadline=performance.now()+300;let steps=0;
-  for(let k=1;!res&&k<=15;k++){
+const MIN_SINGLE={},MIN_JOBS={};
+// breadth-first by size over truth tables (bit masks); parents give the formula back
+function* minSearch(K,target,op){
+  const R=1<<K,FULL=(1<<R)-1,N=FULL+1,LEAF=-1;
+  const pa=new Int32Array(N).fill(-2),pb=new Int32Array(N),levels=[[]];
+  for(let j=0;j<K;j++){let m=0;for(let x=0;x<R;x++)if((x>>(K-1-j))&1)m|=1<<x;if(pa[m]===-2){pa[m]=LEAF;pb[m]=j;levels[0].push(m)}}
+  let found=pa[target]!==-2,steps=0;
+  for(let k=1;!found&&k<=40;k++){
     const cur=[];levels.push(cur);
-    for(let i=0;!res&&i<=k-1-i;i++){
-      const A=levels[i],B=levels[k-1-i];
-      for(let u=0;!res&&u<A.length;u++)for(let w=i===k-1-i?u:0;w<B.length;w++){
-        if(++steps%8192===0&&performance.now()>deadline)return MIN_SINGLE[key]=null;
-        const m=f(A[u].m,B[w].m);
-        if(seen.has(m))continue;
-        seen.add(m);const z={m,n:{t:"bin",op,a:A[u].n,b:B[w].n}};cur.push(z);
-        if(m===target){res=z;break}
+    for(let i=0;!found&&i<=k-1-i;i++){
+      const A=levels[i],B=levels[k-1-i],same=i===k-1-i;
+      for(let u=0;!found&&u<A.length;u++){
+        const a=A[u];
+        for(let w=same?u:0;w<B.length;w++){
+          const b=B[w],m=op==="|"?~(a&b)&FULL:~(a|b)&FULL;
+          if(pa[m]!==-2)continue;
+          pa[m]=a;pb[m]=b;cur.push(m);
+          if(m===target){found=true;break}
+        }
+        if((steps+=B.length)>200000){steps=0;yield}
       }
     }
   }
-  return MIN_SINGLE[key]=res?res.n:null;
+  return found?{pa,pb}:null;
+}
+function minSetup(ast,op){
+  const vars=formulaVars(ast),K=vars.length;
+  if(K<1||K>4)return null;
+  const R=1<<K;let target=0;
+  for(let x=0;x<R;x++){const e={};vars.forEach((n,j)=>e[n]=((x>>(K-1-j))&1)===1);if(ev(ast,e))target|=1<<x}
+  return {vars,K,target,key:op+vars.join(",")+":"+target};
+}
+function minBuild(res,vars,target,op){
+  if(!res)return null;
+  const memo={},node=m=>memo[m]||(memo[m]=res.pa[m]===-1?{t:"var",name:vars[res.pb[m]]}:{t:"bin",op,a:node(res.pa[m]),b:node(res.pb[m])});
+  return node(target);
+}
+/* the shortest formula with one connective (| or ↓) over the variables of the formula, found by an exhaustive
+   search by the number of connectives. Returns the formula, null (no search), "ask" when a search with
+   4 variables has not been started (it may take a few seconds, so the student starts it with a button) or
+   "pending" while it runs in the background; when it ends, the panel is drawn again */
+function minimalSingle(ast,op,start){
+  const st=minSetup(ast,op);if(!st)return null;
+  if(st.key in MIN_SINGLE)return MIN_SINGLE[st.key];
+  const gen=minSearch(st.K,st.target,op);
+  if(st.K<4){let r;do r=gen.next();while(!r.done);return MIN_SINGLE[st.key]=minBuild(r.value,st.vars,st.target,op)}
+  if(!MIN_JOBS[st.key]&&!start)return "ask";
+  if(!MIN_JOBS[st.key]){
+    MIN_JOBS[st.key]=1;const deadline=performance.now()+20000;
+    const tick=()=>{
+      const t=performance.now();let r;
+      do r=gen.next();while(!r.done&&performance.now()-t<25);
+      if(!r.done&&performance.now()<deadline){setTimeout(tick,0);return}
+      MIN_SINGLE[st.key]=r.done?minBuild(r.value,st.vars,st.target,op):null;delete MIN_JOBS[st.key];
+      trKey="";renderTransforms();
+    };
+    setTimeout(tick,0);
+  }
+  return "pending";
 }
 const countOps=n=>n.t==="bin"?1+countOps(n.a)+countOps(n.b):n.t==="not"?1+countOps(n.a):0;
 // length of the written formula without building the string (parts are shared, the text is not)
@@ -2321,15 +2353,6 @@ function renderTransforms(){
       h+=row(lang.trVector,vv.vars.length>8?"<span class=\"none\">"+esc(lang.trVectorBig)+"</span>":"<span class=\"mono vec\">"+esc(vv.vec)+"</span>",lang.trVectorNote(vv.vars));
       if(vv.num!=null)h+=row(lang.trNumber,f(vv.num),lang.trNumberNote);
       h+=row(lang.trVenn,vv.vars.length>=1&&vv.vars.length<=3?"<canvas class=\"venn\" data-g=\""+S.model.groups.indexOf(g)+"\" role=\"img\" aria-label=\"Venn\"></canvas>":"<span class=\"none\">"+esc(lang.trVennOnly)+"</span>",lang.trVennNote);
-      // the same function with a single connective: the Sheffer stroke, the Peirce arrow
-      for(const [name,fn] of [[lang.trSheffer,shefferOnly],[lang.trPeirceArrow,peirceOnly]]){
-        const t=fn(g.ast),op=fn===shefferOnly?"|":"↓",mn=minimalSingle(g.ast,op);
-        const direct=shownLength(t,600)>600?"<span class=\"none\">"+esc(lang.trTooLong)+"</span>":f(show(t));
-        if(!mn){h+=row(name,direct,lang.trSingleNoMin);continue}
-        const same=shownLength(t,600)<=600&&show(t)===show(mn);
-        h+=row(name,"<div class=\"single\"><div><span class=\"lbl\">"+esc(lang.trSingleMin(countOps(mn)))+"</span> "+f(show(mn))+"</div>"+
-          (same?"":"<div><span class=\"lbl\">"+esc(lang.trSingleDirect)+"</span> "+direct+"</div>")+"</div>",same?lang.trSingleSame:lang.trSingleNote);
-      }
       // Polish and Łukasiewicz notations go right before Peirce's graphs
       const lk=lukas(g.ast);
       h+=row(lang.trPolish,f(polish(g.ast)))+row(lang.trRpolish,f(rpolish(g.ast)));
@@ -2349,6 +2372,17 @@ function renderTransforms(){
       h+=row(lang.trSdnf,nf.dnfL?litList(nf.dnfL,true,lang.trNoSdnf):list(nf.dnf,"∨",lang.trNoSdnf))+minRows(g.ast,"dnf");
       h+=row(lang.trSknf,nf.cnfL?litList(nf.cnfL,false,lang.trNoSknf):list(nf.cnf,"∧",lang.trNoSknf))+minRows(g.ast,"cnf");
       h+=row(lang.trZheg,nf.zh.length?list(nf.zh," ⊕ ",""):f("0"));
+      // the same function with a single connective: the Sheffer stroke, the Peirce arrow
+      for(const [name,fn] of [[lang.trSheffer,shefferOnly],[lang.trPeirceArrow,peirceOnly]]){
+        const t=fn(g.ast),op=fn===shefferOnly?"|":"↓",mn=minimalSingle(g.ast,op);
+        const direct=shownLength(t,600)>600?"<span class=\"none\">"+esc(lang.trTooLong)+"</span>":f(show(t));
+        if(mn==="ask"){h+=row(name,"<div class=\"single\"><div><button type=\"button\" class=\"btn sm min-go\" data-g=\""+S.model.groups.indexOf(g)+"\" data-op=\""+op+"\">"+esc(lang.trSingleGo)+"</button></div><div><span class=\"lbl\">"+esc(lang.trSingleDirect)+"</span> "+direct+"</div></div>",lang.trSingleAsk);continue}
+        if(mn==="pending"){h+=row(name,"<div class=\"single\"><div><span class=\"lbl\">"+esc(lang.trSingleWait)+"</span></div><div><span class=\"lbl\">"+esc(lang.trSingleDirect)+"</span> "+direct+"</div></div>",lang.trSingleNote);continue}
+        if(!mn){h+=row(name,direct,lang.trSingleNoMin);continue}
+        const same=shownLength(t,600)<=600&&show(t)===show(mn);
+        h+=row(name,"<div class=\"single\"><div><span class=\"lbl\">"+esc(lang.trSingleMin(countOps(mn)))+"</span> "+f(show(mn))+"</div>"+
+          (same?"":"<div><span class=\"lbl\">"+esc(lang.trSingleDirect)+"</span> "+direct+"</div>")+"</div>",same?lang.trSingleSame:lang.trSingleNote);
+      }
     }else h+=postRow(g.ast);
     h+="</div>";
   });
@@ -2369,6 +2403,8 @@ function postTable(){
 S.trTab=load("trTab","nota");
 $("tr-tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;S.trTab=b.dataset.tab;save("trTab",S.trTab);trKey="";renderTransforms()});
 $("tr-details").addEventListener("toggle",renderTransforms);
+$("tr-out").addEventListener("click",e=>{const b=e.target.closest(".min-go");if(!b)return;
+  minimalSingle(S.model.groups[+b.dataset.g].ast,b.dataset.op,true);trKey="";renderTransforms()});
 $("tr-out").addEventListener("click",e=>{
   const b=e.target.closest(".bg-copy");if(!b)return;
   const done=()=>{b.textContent=L().exportCopied;setTimeout(()=>{b.textContent=L().trBegriffCopy},1500)};
