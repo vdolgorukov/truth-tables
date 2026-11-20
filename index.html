@@ -30,6 +30,7 @@
   --src-bg:#fdf1c9;
   --tint:#f3f5fa;
   --key-bg:#dfe5f0; --key-bg-hover:#cfd8ea; --key-border:#aab5cc;
+  --kc-var:#cfe0fa; --kc-const:#f8e3b0; --kc-conn:#ecd8f6; --kc-punct:#e9eaee; --kc-ent:#d3ecea; --kc-aux:#f4f5f7;
   box-sizing:border-box;
 }
 @media (prefers-color-scheme:dark){
@@ -38,6 +39,7 @@
     --rule:#2d313c; --rule-strong:#565c6e; --accent:#a4b3f2; --on-accent:#141826;
     --ok:#66c48b; --err:#ffb35c; --ok-bg:#1c3326; --err-bg:#4a3313; --src-bg:#3a3321; --tv:#6fd394; --fv:#ff8a7a; --good-bg:#232f48; --prem-bg:#2f3f6e;
     --tint:#1e2129; --key-bg:#2b3244; --key-bg-hover:#353e55; --key-border:#4b5670; color-scheme:dark;
+    --kc-var:#2c4170; --kc-const:#594620; --kc-conn:#4a3570; --kc-punct:#33363f; --kc-ent:#1f4f4a; --kc-aux:#22252d;
   }
 }
 :root[data-theme="dark"]{
@@ -45,6 +47,7 @@
   --rule:#2d313c; --rule-strong:#565c6e; --accent:#a4b3f2; --on-accent:#141826;
   --ok:#66c48b; --err:#ffb35c; --ok-bg:#1c3326; --err-bg:#4a3313; --src-bg:#3a3321; --tv:#6fd394; --fv:#ff8a7a; --good-bg:#232f48; --prem-bg:#2f3f6e;
   --tint:#1e2129; --key-bg:#2b3244; --key-bg-hover:#353e55; --key-border:#4b5670; color-scheme:dark;
+    --kc-var:#2c4170; --kc-const:#594620; --kc-conn:#4a3570; --kc-punct:#33363f; --kc-ent:#1f4f4a; --kc-aux:#22252d;
 }
 *,*::before,*::after{box-sizing:inherit}
 [hidden]{display:none!important}
@@ -98,14 +101,21 @@ h2{font-size:1.05rem;font-weight:700;margin:0}
   padding:.45rem .7rem;border:1.5px solid var(--rule-strong);border-radius:6px;background:var(--paper);color:var(--text);
 }
 #f-input:focus-visible{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
-.keys{display:flex;flex-wrap:wrap;gap:.4rem}
+/* the input keys sit flush in one strip; their kind is shown by colour */
+.keys{display:flex;flex-wrap:wrap;gap:0;padding-left:1.5px}
 .key{
   font-family:"Noto Sans Math","PT Mono",ui-monospace,Menlo,monospace;font-size:1.08rem;min-width:44px;min-height:40px;padding:0 .55rem;
   border:1.5px solid var(--key-border);border-radius:6px;background:var(--key-bg);color:var(--text);cursor:pointer;
 }
 .key:hover{background:var(--key-bg-hover);border-color:var(--accent);color:var(--accent)}
+.keys .key{border-radius:0;margin:0 0 -1.5px -1.5px;position:relative}
+.keys .key:first-child{border-radius:6px 0 0 6px}
+.keys .key:last-child{border-radius:0 6px 6px 0}
+.keys .key:hover,.keys .key:focus-visible{z-index:1}
+.keys .k-var{background:var(--kc-var)} .keys .k-const{background:var(--kc-const)} .keys .k-conn{background:var(--kc-conn)}
+.keys .k-punct{background:var(--kc-punct)} .keys .k-ent{background:var(--kc-ent)} .keys .k-aux{background:var(--kc-aux)}
+.keys .key:hover{filter:brightness(.95)}
 .key.aux{font-family:"PT Serif",Georgia,serif;font-size:.9rem;color:var(--muted)}
-.keys .gap{width:.6rem}
 /* connective and constant glyphs come from one math font, so all keys match in size and weight */
 .key.sym{font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace;font-size:1.2rem;line-height:1}
 .preview{min-height:1.6em;font-size:.97rem;color:var(--muted)}
@@ -1156,18 +1166,19 @@ const L=()=>T[S.lang];
 function buildKeys(){
   const box=$("keys");box.innerHTML="";
   for(const k of KEYS){
-    if(!k){const g=document.createElement("span");g.className="gap";box.appendChild(g);continue}
+    if(!k)continue;
     if(k[2]&&!S.extraOps)continue;
-    const b=document.createElement("button");b.type="button";b.className="key"+(/^[pqrst]$/.test(k[0])?" var":/^[¬∧∨→←↛↚↔⊻|↓⊤⊥⊨]$/.test(k[0])?" sym":"");
+    const b=document.createElement("button");b.type="button";b.className="key"+(/^[pqrst]$/.test(k[0])?" var":/^[¬∧∨→←↛↚↔⊻|↓⊤⊥⊨]$/.test(k[0])?" sym":"")+
+      " k-"+(/^[pqrst]$/.test(k[0])?"var":/^[⊤⊥]$/.test(k[0])?"const":k[0]==="⊨"?"ent":/^[(),{}]$/.test(k[0])?"punct":"conn");
     b.textContent=k[0];if(k[1])b.title=k[1];
     b.addEventListener("click",()=>insertAtCaret(k[0]));
     box.appendChild(b);
   }
-  const bs=document.createElement("button");bs.type="button";bs.className="key";bs.textContent="⌫";bs.setAttribute("aria-label","Backspace");
+  const bs=document.createElement("button");bs.type="button";bs.className="key k-aux";bs.textContent="⌫";bs.setAttribute("aria-label","Backspace");
   bs.addEventListener("click",()=>{const s=inp.selectionStart,e=inp.selectionEnd,v=inp.value;
     if(s!==e){inp.value=v.slice(0,s)+v.slice(e);setCaret(s)}else if(s>0){inp.value=v.slice(0,s-1)+v.slice(s);setCaret(s-1)}else inp.focus();onFormulaInput(true)});
   box.appendChild(bs);
-  const cl=document.createElement("button");cl.type="button";cl.className="key aux";cl.id="key-clear";cl.textContent=L().clearInput;
+  const cl=document.createElement("button");cl.type="button";cl.className="key aux k-aux";cl.id="key-clear";cl.textContent=L().clearInput;
   cl.addEventListener("click",()=>{inp.value="";setCaret(0);onFormulaInput(true)});
   box.appendChild(cl);
 }
