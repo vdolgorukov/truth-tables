@@ -317,10 +317,36 @@ span.cell:hover{background:transparent}
 /* a separate bar over each negated variable, so p̄q̄ never reads as the negation of pq */
 .frege-wrap{overflow-x:auto;max-width:100%}
 .bgtex{display:block;font-family:"PT Mono",ui-monospace,Menlo,monospace;font-size:.84rem;background:var(--tint);border:1px solid var(--rule);border-radius:6px;padding:.35rem .55rem;overflow-wrap:anywhere}
-.tr-row:has(.frege-wrap){align-items:start}
+.tr-row:has(.frege-wrap),.tr-row:has(canvas.venn){align-items:start}
 .tr-row .bg-copy{display:block;margin-top:.4rem;min-height:0;padding:.1rem .55rem;font-size:.75rem;line-height:1.5;border-width:1px}
 .tr-row > span:first-child .bgtex{margin-top:.35rem;font-size:.72rem;color:var(--text)}
 .frege{display:block;color:var(--text)}
+.ptree{display:block;color:var(--text)}
+.ptree .e line{stroke:var(--rule-strong);stroke-width:1.4}
+.ptree circle{fill:var(--paper);stroke:currentColor;stroke-width:1.4}
+.ptree circle.leaf{fill:var(--tint)}
+.ptree circle.root{stroke:var(--accent);stroke-width:2.4}
+.ptree text{fill:currentColor;text-anchor:middle;font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace;font-size:15px}
+.circ{display:block;color:var(--text)}
+.circ .w polyline,.circ .w line{fill:none;stroke:currentColor;stroke-width:1.4}
+.circ .gt rect{fill:var(--paper);stroke:currentColor;stroke-width:1.6}
+.circ .gt circle{fill:var(--paper);stroke:currentColor;stroke-width:1.4}
+.circ text{fill:currentColor;text-anchor:middle;font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace;font-size:13px}
+.circ text.in{text-anchor:end;font-size:15px}
+.circ text.outl{text-anchor:start;font-size:15px;font-style:italic}
+.vec{letter-spacing:.08em;overflow-wrap:anywhere}
+canvas.venn{display:block;max-width:100%;height:auto;border-radius:4px}
+.posttab{border-collapse:collapse;font-size:.95rem}
+.posttab th,.posttab td{border:1px solid var(--rule);padding:.3rem .7rem;text-align:center}
+.posttab thead th{background:var(--tint);font-weight:400}
+.posttab td.txt,.posttab th.txt{text-align:left}
+.posttab td.yes{color:var(--ok)}
+.posttab td.no{color:var(--muted)}
+.posttab td.bad{color:var(--err)}
+.posttab tr.tot td{border-top:2px solid var(--rule-strong);font-weight:700}
+.post-verdict{margin:.6rem 0 0;font-weight:700}
+.post-verdict.ok{color:var(--ok)}
+.post-verdict.bad{color:var(--err)}
 .peirce{display:block;color:var(--text)}
 .peirce .sheet{fill:none;stroke:var(--rule-strong);stroke-width:1;stroke-dasharray:4 3}
 .peirce .cut{fill:none;stroke:currentColor;stroke-width:1.6}
@@ -570,6 +596,13 @@ ru:{
   trBegriffCopy:"Копировать LaTeX (begriff)", trBegriffNote:"код для пакета begriff; в преамбуле: \\usepackage{begriff}",
   trPeirceImg:"Графы Пирса (рисунок)", trPeirceImgNote:"пунктир — лист утверждения; овал (разрез) — отрицание того, что внутри; рядом — конъюнкция",
   trPeirce:"Графы Пирса (линейная запись)", trPeirceNote:"запись рядом — конъюнкция, скобки — отрицание; (()) — пустой лист, истина; () — ложь",
+  trTree:"Дерево разбора", trTreeInfo:t=>(t.main?"главная связка "+t.main+"; ":"")+"глубина "+t.depth+"; связок "+t.conn+"; разных подформул со связками "+t.distinct,
+  trCircuit:"Логическая схема", trCircuitNote:"& — И, ≥1 — ИЛИ, =1 — исключающее ИЛИ, = — эквиваленция, 1 — НЕ; кружок на выходе — отрицание",
+  trVector:"Вектор значений", trVectorNote:vs=>"значения на наборах ("+vs.join(", ")+") от "+"0".repeat(vs.length)+" до "+"1".repeat(vs.length), trVectorBig:"слишком длинный вектор (больше 8 переменных)",
+  trNumber:"Номер функции", trNumberNote:"число, двоичная запись которого — вектор значений",
+  trVenn:"Диаграмма Венна", trVennNote:"закрашены области, где формула истинна; вне кругов все переменные ложны", trVennOnly:"рисуется для формул с 1–3 переменными",
+  postFn:"Функция", postAll:"Есть функция вне класса", postComplete:"Система функционально полна: ни один из пяти классов не содержит её целиком.",
+  postIncomplete:l=>"Система не полна: все функции лежат в "+(l.length>1?"классах ":"классе ")+l.join(", ")+".",
   trPost:"Классы Поста", postSym:{T0:"T₀",T1:"T₁",S:"S",M:"M",L:"L"},
   postName:{T0:"сохраняет 0",T1:"сохраняет 1",S:"самодвойственная",M:"монотонная",L:"линейная"}, postYes:"да", postNo:"нет",
   postSheffer:"Не входит ни в один класс: функция шефферова, она одна образует полную систему.",
@@ -720,6 +753,13 @@ en:{
   trBegriffCopy:"Copy LaTeX (begriff)", trBegriffNote:"code for the begriff package; in the preamble: \\usepackage{begriff}",
   trPeirceImg:"Peirce’s graphs (drawing)", trPeirceImgNote:"dashed frame: the sheet of assertion; an oval (cut) negates what is inside; side by side means conjunction",
   trPeirce:"Peirce’s graphs (linear form)", trPeirceNote:"juxtaposition is conjunction, brackets are negation; (()) is the blank sheet, true; () is false",
+  trTree:"Parse tree", trTreeInfo:t=>(t.main?"main connective "+t.main+"; ":"")+"depth "+t.depth+"; connectives "+t.conn+"; distinct compound subformulas "+t.distinct,
+  trCircuit:"Logic circuit", trCircuitNote:"& AND, ≥1 OR, =1 exclusive OR, = equivalence, 1 NOT; a circle at an output means negation",
+  trVector:"Vector of values", trVectorNote:vs=>"values on the assignments to ("+vs.join(", ")+") from "+"0".repeat(vs.length)+" to "+"1".repeat(vs.length), trVectorBig:"the vector is too long (more than 8 variables)",
+  trNumber:"Function number", trNumberNote:"the number whose binary digits are the vector of values",
+  trVenn:"Venn diagram", trVennNote:"the regions where the formula is true are filled; outside the circles every variable is false", trVennOnly:"drawn for formulas with 1–3 variables",
+  postFn:"Function", postAll:"Some function outside", postComplete:"The set is functionally complete: none of the five classes contains all of it.",
+  postIncomplete:l=>"The set is not complete: all the functions lie in the class"+(l.length>1?"es ":" ")+l.join(", ")+".",
   trPost:"Post’s classes", postSym:{T0:"T₀",T1:"T₁",S:"S",M:"M",L:"L"},
   postName:{T0:"preserves 0",T1:"preserves 1",S:"self-dual",M:"monotone",L:"linear"}, postYes:"yes", postNo:"no",
   postSheffer:"In none of the classes: a Sheffer function, functionally complete on its own.",
@@ -1921,6 +1961,74 @@ function postClasses(ast,vars){
   let lin=true;for(let x=0;x<N;x++)if(a[x]&&popc(x)>1){lin=false;break}
   return {T0:vec[0]===0,T1:vec[N-1]===1,S:self,M:mono,L:lin};
 }
+/* ---------- parse tree, logic circuit, vector of values, Venn diagram ---------- */
+const formulaVars=ast=>S.model.vars.filter(v=>varSet(ast).has(v));
+function treeLayout(ast){ // leaves get consecutive positions, an inner node sits over the middle of its children
+  let leaf=0;const nodes=[];
+  const go=(n,d)=>{const kids=n.t==="not"?[n.a]:n.t==="bin"?[n.a,n.b]:[];const ch=kids.map(k=>go(k,d+1));
+    const me={n,ch,d,h:ch.length?1+Math.max(...ch.map(c=>c.h)):0};
+    me.x=ch.length?ch.reduce((a,c)=>a+c.x,0)/ch.length:leaf++;nodes.push(me);return me};
+  const root=go(ast,0);return {root,nodes,leaves:leaf};
+}
+const nodeLabel=n=>n.t==="var"?n.name:n.t==="const"?(n.v?"⊤":"⊥"):n.t==="not"?"¬":n.op;
+function treeSvg(ast){
+  const {root,nodes,leaves}=treeLayout(ast),DX=42,DY=50,R=15,M=20;
+  const depth=Math.max(...nodes.map(x=>x.d)),W=Math.max(leaves,1)*DX+2*M-DX+2*R,H=depth*DY+2*M+2*R;
+  const X=x=>M+R+x.x*DX,Y=x=>M+R+x.d*DY;let e="",c="";
+  nodes.forEach(x=>x.ch.forEach(k=>{e+="<line x1=\""+X(x)+"\" y1=\""+Y(x)+"\" x2=\""+X(k)+"\" y2=\""+Y(k)+"\"/>"}));
+  nodes.forEach(x=>{const leafy=!x.ch.length;
+    c+="<circle class=\""+(x===root?"root":leafy?"leaf":"op")+"\" cx=\""+X(x)+"\" cy=\""+Y(x)+"\" r=\""+R+"\"/><text x=\""+X(x)+"\" y=\""+(Y(x)+5)+"\">"+esc(nodeLabel(x.n))+"</text>"});
+  return "<svg class=\"ptree\" viewBox=\"0 0 "+W+" "+H+"\" width=\""+W+"\" height=\""+H+"\" role=\"img\" aria-label=\"parse tree\"><g class=\"e\">"+e+"</g>"+c+"</svg>";
+}
+function treeInfo(ast){
+  const {nodes}=treeLayout(ast),inner=nodes.filter(x=>x.ch.length);
+  return {main:inner.length?nodeLabel(ast):null,depth:Math.max(...nodes.map(x=>x.d)),occ:inner.length,
+    distinct:new Set(inner.map(x=>show(x.n))).size,conn:inner.length};
+}
+/* gates in IEC/ГОСТ style: a box with its symbol, a small circle for an inverted output */
+const GATE={"∧":["&",0],"∨":["≥1",0],"⊻":["=1",0],"↔":["=",0],"|":["&",1],"↓":["≥1",1],"→":["→",0],"←":["←",0],"↛":["↛",0],"¬":["1",1]};
+function circuitSvg(ast){
+  const {root,nodes,leaves}=treeLayout(ast),COL=74,ROW=34,GW=36,GH=30,M=14,LW=34;
+  const maxH=root.h,W=LW+maxH*COL+GW+40+M,H=Math.max(leaves,1)*ROW+2*M;
+  const Y=x=>M+ROW/2+x.x*ROW,X=x=>LW+(x.h-1)*COL+20; // left edge of a gate box
+  const out=x=>x.ch.length?{x:X(x)+GW+(GATE[nodeLabel(x.n)][1]?6:0),y:Y(x)}:{x:LW-4,y:Y(x)};
+  let w="",g="";
+  nodes.forEach(x=>{
+    if(!x.ch.length){g+="<text class=\"in\" x=\""+(LW-8)+"\" y=\""+(Y(x)+5)+"\">"+esc(nodeLabel(x.n))+"</text>";return}
+    const [sym,inv]=GATE[nodeLabel(x.n)],gx=X(x),gy=Y(x)-GH/2;
+    x.ch.forEach((k,i)=>{const o=out(k),iy=x.ch.length===1?Y(x):Y(x)+(i?8:-8),mx=gx-10;
+      w+="<polyline points=\""+o.x+","+o.y+" "+mx+","+o.y+" "+mx+","+iy+" "+gx+","+iy+"\"/>"});
+    g+="<rect x=\""+gx+"\" y=\""+gy+"\" width=\""+GW+"\" height=\""+GH+"\"/><text x=\""+(gx+GW/2)+"\" y=\""+(Y(x)+5)+"\">"+esc(sym)+"</text>";
+    if(inv)g+="<circle cx=\""+(gx+GW+3)+"\" cy=\""+Y(x)+"\" r=\"3\"/>";
+  });
+  const o=out(root);
+  w+="<line x1=\""+o.x+"\" y1=\""+o.y+"\" x2=\""+(o.x+22)+"\" y2=\""+o.y+"\"/>";
+  g+="<text class=\"outl\" x=\""+(o.x+26)+"\" y=\""+(o.y+5)+"\">f</text>";
+  return "<svg class=\"circ\" viewBox=\"0 0 "+(W+20)+" "+H+"\" width=\""+(W+20)+"\" height=\""+H+"\" role=\"img\" aria-label=\"logic circuit\"><g class=\"w\">"+w+"</g><g class=\"gt\">"+g+"</g></svg>";
+}
+function valueVector(ast){
+  const vars=formulaVars(ast),K=vars.length,N=1<<K;let v="";
+  for(let x=0;x<N;x++){const e={};vars.forEach((n,j)=>e[n]=((x>>(K-1-j))&1)===1);v+=ev(ast,e)?"1":"0"}
+  return {vars,vec:v,num:v.length<=256?BigInt("0b"+v).toString():null};
+}
+/* Venn diagram: each point of the picture belongs to one region = one assignment; true regions are filled */
+const VENN={1:[[150,100]],2:[[118,100],[182,100]],3:[[122,82],[178,82],[150,132]]},VR={1:64,2:62,3:56};
+function drawVenn(cv,ast){
+  const vars=formulaVars(ast),K=vars.length,ctx=cv.getContext("2d"),dpr=Math.min(2,window.devicePixelRatio||1);
+  const W=300,H=210;cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+"px";cv.style.height=H+"px";ctx.scale(dpr,dpr);
+  const css=getComputedStyle(document.documentElement),col=n=>css.getPropertyValue(n).trim();
+  const C=VENN[K],R=VR[K];
+  const val=(px,py)=>{const e={};vars.forEach((v,j)=>{const [cx,cy]=C[j];e[v]=(px-cx)**2+(py-cy)**2<=R*R});return ev(ast,e)};
+  // fill pixel by pixel (in CSS pixels, 2×2 blocks are enough)
+  ctx.fillStyle=col("--paper");ctx.fillRect(0,0,W,H);
+  ctx.fillStyle=col("--prem-bg")||col("--good-bg");
+  for(let y=8;y<H-8;y+=2)for(let x=8;x<W-8;x+=2)if(val(x+1,y+1))ctx.fillRect(x,y,2,2);
+  ctx.strokeStyle=col("--text");ctx.lineWidth=1.5;ctx.strokeRect(8,8,W-16,H-16);
+  C.forEach(([cx,cy])=>{ctx.beginPath();ctx.arc(cx,cy,R,0,2*Math.PI);ctx.stroke()});
+  ctx.fillStyle=col("--text");ctx.font="16px 'PT Mono', ui-monospace, monospace";ctx.textAlign="center";
+  const LP={1:[[150,28]],2:[[70,40],[230,40]],3:[[62,40],[238,40],[222,190]]}[K];
+  vars.forEach((v,j)=>ctx.fillText(v,LP[j][0],LP[j][1]));
+}
 let trKey="";
 function renderTransforms(){
   if(!S.model||!$("tr-details").open)return;
@@ -1965,12 +2073,20 @@ function renderTransforms(){
   const tab=S.trTab;
   document.querySelectorAll("#tr-tabs [data-tab]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tab===tab)));
   let h="";
+  if(tab==="post"){$("tr-out").innerHTML=postTable()+"<p class=\"hint\">"+esc(lang.trNotes.post)+"</p>";return}
   S.model.groups.forEach(g=>{
     h+="<div class=\"tr-f\"><h3>"+esc(g.text)+"</h3>";
     if(tab==="nota"){
       const lk=lukas(g.ast);
       h+=row(lang.trPolish,f(polish(g.ast)))+row(lang.trRpolish,f(rpolish(g.ast)));
       if(lk!=null&&lk!==polish(g.ast))h+=row(lang.trLukas,f(lk))+row(lang.trRlukas,f(rlukas(g.ast)));
+      const ti=treeInfo(g.ast),tiSize=ti.occ;
+      h+=row(lang.trTree,tiSize>60?"<span class=\"none\">"+esc(lang.trFregeBig)+"</span>":"<div class=\"frege-wrap\">"+treeSvg(g.ast)+"</div>",lang.trTreeInfo(ti));
+      h+=row(lang.trCircuit,tiSize>60?"<span class=\"none\">"+esc(lang.trFregeBig)+"</span>":"<div class=\"frege-wrap\">"+circuitSvg(g.ast)+"</div>",lang.trCircuitNote);
+      const vv=valueVector(g.ast);
+      h+=row(lang.trVector,vv.vars.length>8?"<span class=\"none\">"+esc(lang.trVectorBig)+"</span>":"<span class=\"mono vec\">"+esc(vv.vec)+"</span>",lang.trVectorNote(vv.vars));
+      if(vv.num!=null)h+=row(lang.trNumber,f(vv.num),lang.trNumberNote);
+      h+=row(lang.trVenn,vv.vars.length>=1&&vv.vars.length<=3?"<canvas class=\"venn\" data-g=\""+S.model.groups.indexOf(g)+"\" role=\"img\" aria-label=\"Venn\"></canvas>":"<span class=\"none\">"+esc(lang.trVennOnly)+"</span>",lang.trVennNote);
       h+=row(lang.trPeirce,f(peirce(g.ast)),lang.trPeirceNote);
       const pt=peirceTree(g.ast);
       h+=row(lang.trPeirceImg,peirceTreeSize(pt)>150?"<span class=\"none\">"+esc(lang.trFregeBig)+"</span>":"<div class=\"frege-wrap\">"+peirceSvg(pt)+"</div>",lang.trPeirceImgNote);
@@ -1990,6 +2106,18 @@ function renderTransforms(){
     h+="</div>";
   });
   $("tr-out").innerHTML=h+"<p class=\"hint\">"+esc(lang.trNotes[tab])+"</p>";
+  $("tr-out").querySelectorAll("canvas.venn").forEach(cv=>drawVenn(cv,S.model.groups[+cv.dataset.g].ast));
+}
+/* Post's table: functions × classes, and whether the set of functions is complete */
+function postTable(){
+  const lang=L(),K=["T0","T1","S","M","L"],gs=S.model.groups;
+  const cls=gs.map(g=>postClasses(g.ast,formulaVars(g.ast)));
+  let h="<div class=\"tw\"><table class=\"posttab\"><thead><tr><th class=\"txt\">"+esc(lang.postFn)+"</th>"+K.map(k=>"<th>"+lang.postSym[k]+"</th>").join("")+"</tr></thead><tbody>";
+  gs.forEach((g,i)=>{h+="<tr><td class=\"txt mono\">"+esc(g.text)+"</td>"+K.map(k=>"<td class=\""+(cls[i][k]?"yes":"no")+"\" title=\""+esc(lang.postName[k]+": "+(cls[i][k]?lang.postYes:lang.postNo))+"\">"+(cls[i][k]?"+":"−")+"</td>").join("")+"</tr>"});
+  const all=K.filter(k=>cls.every(c=>c[k]));
+  h+="<tr class=\"tot\"><td class=\"txt\">"+esc(lang.postAll)+"</td>"+K.map(k=>"<td class=\""+(all.includes(k)?"bad":"yes")+"\">"+(all.includes(k)?"✗":"✓")+"</td>").join("")+"</tr></tbody></table></div>";
+  const verdict=!all.length?(gs.length===1?lang.postSheffer:lang.postComplete):lang.postIncomplete(all.map(k=>lang.postSym[k]+" ("+lang.postName[k]+")"));
+  return h+"<p class=\"post-verdict "+(all.length?"bad":"ok")+"\">"+esc(verdict)+"</p>";
 }
 S.trTab=load("trTab","nota");
 $("tr-tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;S.trTab=b.dataset.tab;save("trTab",S.trTab);trKey="";renderTransforms()});
@@ -2210,7 +2338,7 @@ function applyTheme(t){
   document.querySelectorAll("[data-theme-set]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.themeSet===(t||"auto"))));
   save("theme",t||"auto");
 }
-document.querySelectorAll("[data-theme-set]").forEach(b=>b.addEventListener("click",()=>applyTheme(b.dataset.themeSet)));
+document.querySelectorAll("[data-theme-set]").forEach(b=>b.addEventListener("click",()=>{applyTheme(b.dataset.themeSet);trKey="";renderTransforms()}));
 applyTheme(load("theme","auto"));
 
 function copyLink(id,url,done,label){
