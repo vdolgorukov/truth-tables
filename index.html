@@ -585,7 +585,9 @@ ru:{
     "Вторая ось — пары 11 и 00 (совместная истинность и совместная ложность). Нет ни 11, ни 00 — контрадикторность. Нет 11, но есть 00 — контрарность. Нет 00, но есть 11 — субконтрарность. Есть обе пары — по этой оси отношения нет.",
     "Оси независимы, поэтому ответ может состоять из двух отношений — по одному с каждой оси. Если ни одна ось не дала отношения, то есть встречаются все четыре пары, формулы независимы."],
   semAlgoAll:"Все 15 возможных множеств S",
-  semAlgoHead:["S","ось 10/01","ось 11/00"],
+  semAlgoHead:["S","A","B","Отношения"],
+  semAlgoKind:{sat:"случайная",taut:"тавтология",contr:"противоречие"},
+  semAlgoGroups:["Обе формулы случайны: ровно одно отношение","Хотя бы одна формула не случайна: два отношения, по одному с каждой оси"],
   semAlgoNone:"—", semAlgoSub1:"A подчиняет B (A ⊨ B)", semAlgoSub2:"B подчиняет A (B ⊨ A)",
   semAlgoNote:"Два отношения сразу получаются, только если хотя бы одна из формул не случайная, то есть тавтология или противоречие: например, p∧¬p и ⊥ эквивалентны и контрарны, а ⊥ и ⊤ контрадикторны, и при этом ⊥ ⊨ ⊤.",
   semRelHead:["Отношение","Определение"],
@@ -752,7 +754,9 @@ en:{
     "The second axis is the pairs 11 and 00 (true together, false together). Neither 11 nor 00 — contradictoriness. No 11 but 00 occurs — contrariety. No 00 but 11 occurs — subcontrariety. Both occur — no relation on this axis.",
     "The axes are independent, so the answer may consist of two relations, one from each axis. If neither axis gives a relation, that is, all four pairs occur, the formulas are independent."],
   semAlgoAll:"All 15 possible sets S",
-  semAlgoHead:["S","axis 10/01","axis 11/00"],
+  semAlgoHead:["S","A","B","Relations"],
+  semAlgoKind:{sat:"contingent",taut:"tautology",contr:"contradiction"},
+  semAlgoGroups:["Both formulas are contingent: exactly one relation","At least one formula is not contingent: two relations, one from each axis"],
   semAlgoNone:"—", semAlgoSub1:"A is superaltern to B (A ⊨ B)", semAlgoSub2:"B is superaltern to A (B ⊨ A)",
   semAlgoNote:"Two relations at once happen only when at least one formula is not contingent, i.e. a tautology or a contradiction: p∧¬p and ⊥ are equivalent and contrary, while ⊥ and ⊤ are contradictory and also ⊥ ⊨ ⊤.",
   semRelHead:["Relation","Definition"],
@@ -2385,15 +2389,16 @@ function buildSemantics(){
   // the two-axis algorithm and its result for every non-empty set S of pairs
   h+="<h3>"+esc(lang.semAlgo)+"</h3><ol class=\"algo\">"+lang.semAlgoSteps.map(t=>"<li>"+esc(t)+"</li>").join("")+"</ol>";
   h+="<p><b>"+esc(lang.semAlgoAll)+"</b></p><div class=\"tw\"><table><thead><tr>"+lang.semAlgoHead.map(t=>"<th class=\"txt\">"+esc(t)+"</th>").join("")+"</tr></thead><tbody>";
-  const PAIRS=["11","10","01","00"],pair=x=>[...x].map(c=>c==="1"?T:F).join(""),sets=[];
-  for(let m=1;m<16;m++)sets.push(PAIRS.filter((_,i)=>m>>(3-i)&1));
-  sets.sort((x,y)=>x.length-y.length||PAIRS.indexOf(x[0])-PAIRS.indexOf(y[0])||PAIRS.indexOf(x[1])-PAIRS.indexOf(y[1])||PAIRS.indexOf(x[2])-PAIRS.indexOf(y[2]));
-  sets.forEach(S_=>{
-    const rs=relations(S_.map(x=>x[0]).join(""),S_.map(x=>x[1]).join(""));
-    const ax1=rs.find(r=>r.kind==="equiv"||r.kind==="sub"),ax2=rs.find(r=>r.kind==="contradict"||r.kind==="contrary"||r.kind==="subcontrary");
-    const name=r=>r.kind==="sub"?(r.dir>0?lang.semAlgoSub1:lang.semAlgoSub2):lang.rel[r.kind];
-    h+="<tr><td class=\"txt mono\">{"+S_.map(pair).join(", ")+"}</td>"+(rs[0].kind==="indep"?"<td class=\"txt\" colspan=\"2\"><b>"+esc(lang.rel.indep)+"</b></td>":
-      [ax1,ax2].map(r=>"<td class=\"txt\">"+(r?"<b>"+esc(name(r))+"</b>":esc(lang.semAlgoNone))+"</td>").join(""))+"</tr>";
+  const pair=x=>[...x].map(c=>c==="1"?T:F).join("");
+  // all 15 non-empty S: first both formulas contingent, then at least one constant
+  const SETS=[["11","10","01","00"],["10","01","00"],["11","01","00"],["11","10","00"],["11","10","01"],["11","00"],["10","01"],
+    ["11","10"],["11","01"],["10","00"],["01","00"],["11"],["00"],["10"],["01"]];
+  const kindOf=v=>v.every(c=>c==="1")?"taut":v.every(c=>c==="0")?"contr":"sat";
+  const name=r=>r.kind==="sub"?(r.dir>0?lang.semAlgoSub1:lang.semAlgoSub2):lang.rel[r.kind];
+  SETS.forEach((S_,n)=>{
+    if(n===0||n===7)h+="<tr><td class=\"txt\" colspan=\"4\"><i>"+esc(lang.semAlgoGroups[n?1:0])+"</i></td></tr>";
+    const a=S_.map(x=>x[0]),b=S_.map(x=>x[1]),rs=relations(a.join(""),b.join(""));
+    h+="<tr><td class=\"txt mono\">{"+S_.map(pair).join(", ")+"}</td><td class=\"txt\">"+esc(lang.semAlgoKind[kindOf(a)])+"</td><td class=\"txt\">"+esc(lang.semAlgoKind[kindOf(b)])+"</td><td class=\"txt\"><b>"+rs.map(r=>esc(name(r))).join(" + ")+"</b></td></tr>";
   });
   $("sem").innerHTML=h+"</tbody></table></div><p>"+esc(lang.semAlgoNote)+"</p>";
 }
