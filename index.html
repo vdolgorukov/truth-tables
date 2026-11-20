@@ -2061,6 +2061,8 @@ function syncSegs(){
     g.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.val===val[g.dataset.set])));
   });
   document.querySelectorAll("[data-lang]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.lang===S.lang)));
+  // with "formula only" there is a single column, so the choice of layout is not shown
+  document.querySelector("[data-set=layout]").closest(".opt").hidden=S.cols==="main";
   const [f,t]=SYM[S.notation];
   $("ord-asc").textContent=f+f+f+" → "+t+t+t;
   $("ord-desc").textContent=t+t+t+" → "+f+f+f;
