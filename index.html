@@ -667,6 +667,8 @@ ru:{
   postSheffer:"Не входит ни в один класс: функция шефферова, она одна образует полную систему.",
   trMinCount:n=>"наименьшее число букв; таких форм: "+n, trMoreMin:k=>"… и ещё "+k,
   trTooMany:k=>"считается для формул не более чем с "+k+" переменными", trAborted:"перебор слишком велик, показана не вся информация",
+  trAbortedBig:"перебор не закончился за 20 секунд, показана не вся информация", trMinGo:"Найти минимальные формы", trMinMore:"Продолжить перебор (до 20 секунд)",
+  trMinWait:"идёт перебор…", trMinGoNote:k=>"при "+k+" переменных перебор может занять несколько секунд, поэтому он запускается кнопкой",
   trPolish:"Польская (префиксная) запись", trRpolish:"Обратная польская (постфиксная) запись", trLukas:"Польская в обозначениях Лукасевича", trRlukas:"Обратная польская в обозначениях Лукасевича", trSdnf:"СДНФ", trSknf:"СКНФ", trZheg:"Полином Жегалкина",
   trNoSdnf:"не существует: формула — противоречие", trNoSknf:"не существует: формула — тавтология",
   trMore:(k,n)=>" … и ещё "+k+" (всего "+n+")",
@@ -846,6 +848,8 @@ en:{
   postSheffer:"In none of the classes: a Sheffer function, functionally complete on its own.",
   trMinCount:n=>"fewest literals; there are "+n+" such forms", trMoreMin:k=>"… and "+k+" more",
   trTooMany:k=>"computed for formulas with at most "+k+" variables", trAborted:"the search is too large; the result is incomplete",
+  trAbortedBig:"the search did not finish in 20 seconds; the result is incomplete", trMinGo:"Find the minimal forms", trMinMore:"Continue the search (up to 20 seconds)",
+  trMinWait:"searching…", trMinGoNote:k=>"with "+k+" variables the search may take a few seconds, so it is started with the button",
   trPolish:"Polish (prefix) notation", trRpolish:"Reverse Polish (postfix) notation", trLukas:"Polish, Łukasiewicz letters", trRlukas:"Reverse Polish, Łukasiewicz letters", trSdnf:"Full DNF", trSknf:"Full CNF", trZheg:"Zhegalkin polynomial",
   trNoSdnf:"does not exist: the formula is a contradiction", trNoSknf:"does not exist: the formula is a tautology",
   trMore:(k,n)=>" … and "+k+" more ("+n+" in total)",
@@ -2042,7 +2046,7 @@ function normalForms(ast){
 }
 /* Quine–McCluskey. A term is {mask,val} over K variables (bit K-1-j is variable j):
    it covers the rows x with (x&mask)===val. Literals in a term = set bits of mask. */
-const MIN_VARS=6;
+const MIN_VARS=6,MIN_VARS_MAX=10;
 function primeImplicants(on,K){
   const FULL=(1<<K)-1,primes=[];
   let cur=new Map(on.map(x=>[FULL+":"+x,{mask:FULL,val:x}]));
@@ -2060,12 +2064,13 @@ function primeImplicants(on,K){
 }
 const popc=x=>{let c=0;for(;x;x&=x-1)c++;return c};
 /* all covers of `on` by prime implicants with the least number of literals */
-function minimalCovers(primes,on){
+function minimalCovers(primes,on,big){
   const cost=primes.map(p=>popc(p.mask)),opts=new Map(on.map(x=>[x,[]]));
   primes.forEach((p,i)=>on.forEach(x=>{if((x&p.mask)===p.val)opts.get(x).push(i)}));
-  let best=Infinity,nodes=0,aborted=false;const sols=new Map(),chosen=[];
+  let best=Infinity,nodes=0,aborted=false;const sols=new Map(),chosen=[],deadline=performance.now()+20000;
   (function dfs(unc,c){
-    if(aborted)return;if(++nodes>300000){aborted=true;return}
+    if(aborted)return;
+    if(++nodes>(big?Infinity:300000)||big&&nodes%2000===0&&performance.now()>deadline){aborted=true;return}
     if(c>best)return;
     if(!unc.length){
       const key=chosen.slice().sort((a,b)=>a-b).join(",");
@@ -2083,7 +2088,12 @@ function minimalCovers(primes,on){
 }
 /* abbreviated (all primes), Quine (primes used in some minimal form) and minimal forms;
    for CNF the same is done for the false rows and every literal is negated */
-function minimalForms(ast,vars){
+/* "big" is the longer search started with a button: no limit on the number of steps, 20 seconds at most */
+const MIN_FORMS={},MIN_FORMS_BIG=new Set();
+const minFormsKey=(ast,vars)=>{const K=vars.length;let v="";for(let x=0;x<1<<K;x++){const e={};vars.forEach((n,j)=>e[n]=((x>>(K-1-j))&1)===1);v+=ev(ast,e)?1:0}return vars.join(",")+":"+v};
+function minimalForms(ast,vars,big){
+  const ck=minFormsKey(ast,vars)+(big?":big":"");
+  if(MIN_FORMS[ck])return MIN_FORMS[ck];
   const K=vars.length,N=1<<K,on=[],off=[];
   for(let x=0;x<N;x++){const env={};vars.forEach((v,j)=>env[v]=((x>>(K-1-j))&1)===1);(ev(ast,env)?on:off).push(x)}
   const side=(rows,cnf)=>{
@@ -2091,13 +2101,13 @@ function minimalForms(ast,vars){
     const primes=primeImplicants(rows,K);
     const lits=p=>vars.map((v,j)=>({v,j})).filter(o=>(p.mask>>(K-1-o.j))&1).map(o=>({v:o.v,neg:cnf?((p.val>>(K-1-o.j))&1)===1:((p.val>>(K-1-o.j))&1)===0}));
     const order=(a,b)=>popc(a.mask)-popc(b.mask)||b.mask-a.mask||a.val-b.val;
-    const {sols,aborted}=minimalCovers(primes,rows);
+    const {sols,aborted}=minimalCovers(primes,rows,big);
     const used=new Set(sols.flat());
     const toForm=ids=>ids.map(i=>primes[i]).sort(order).map(lits);
     return {abbr:primes.slice().sort(order).map(lits),quine:aborted?null:toForm([...used].sort((a,b)=>a-b)),
       minimal:sols.map(toForm).sort((a,b)=>a.length-b.length),aborted};
   };
-  return {dnf:side(on,false),cnf:side(off,true)};
+  return MIN_FORMS[ck]={dnf:side(on,false),cnf:side(off,true)};
 }
 /* Post's classes of the function a formula defines (over its own variables) */
 function postClasses(ast,vars){
@@ -2322,14 +2332,17 @@ function renderTransforms(){
     const vs=new Set();(function w(n){if(n.t==="var")vs.add(n.name);else if(n.t==="not")w(n.a);else if(n.t==="bin"){w(n.a);w(n.b)}})(ast);
     const vars=S.model.vars.filter(v=>vs.has(v)),dnf=kind==="dnf",T=lang.trMin[kind];
     if(!vars.length)return "";
-    if(vars.length>MIN_VARS)return row(T.min,"<span class=\"none\">"+esc(lang.trTooMany(MIN_VARS))+"</span>");
-    const r=minimalForms(ast,vars)[kind];
+    const fk=minFormsKey(ast,vars),big=MIN_FORMS_BIG.has(fk);
+    const goBtn=label=>"<button type=\"button\" class=\"btn sm minf-go\" data-key=\""+esc(fk)+"\" data-g=\""+S.model.groups.findIndex(g=>g.ast===ast)+"\">"+esc(label)+"</button>";
+    if(vars.length>MIN_VARS_MAX)return row(T.min,"<span class=\"none\">"+esc(lang.trTooMany(MIN_VARS_MAX))+"</span>");
+    if(vars.length>MIN_VARS&&!big)return row(T.min,goBtn(lang.trMinGo),lang.trMinGoNote(vars.length));
+    const r=minimalForms(ast,vars,big)[kind];
     if(!r)return "";
     let h=row(T.abbr,formHtml(r.abbr,dnf),T.abbrNote);
     h+=row(T.quine,r.quine?formHtml(r.quine,dnf):"<span class=\"none\">"+esc(lang.trAborted)+"</span>",T.quineNote);
     const shown=r.minimal.slice(0,3).map(f=>formHtml(f,dnf)).join("<br>");
     const more=r.minimal.length>3?"<br><span class=\"none\">"+esc(lang.trMoreMin(r.minimal.length-3))+"</span>":"";
-    h+=row(T.min,shown+more+(r.aborted?"<br><span class=\"none\">"+esc(lang.trAborted)+"</span>":""),r.minimal.length>1?lang.trMinCount(r.minimal.length):T.minNote);
+    h+=row(T.min,shown+more+(r.aborted?"<br><span class=\"none\">"+esc(big?lang.trAbortedBig:lang.trAborted)+"</span>"+(big?"":"<br>"+goBtn(lang.trMinMore)):""),r.minimal.length>1?lang.trMinCount(r.minimal.length):T.minNote);
     return h;
   }
   function postRow(ast){
@@ -2403,6 +2416,13 @@ function postTable(){
 S.trTab=load("trTab","nota");
 $("tr-tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;S.trTab=b.dataset.tab;save("trTab",S.trTab);trKey="";renderTransforms()});
 $("tr-details").addEventListener("toggle",renderTransforms);
+$("tr-out").addEventListener("click",e=>{const b=e.target.closest(".minf-go");if(!b)return;
+  // let the page show the message before the (synchronous) search starts
+  document.querySelectorAll(".minf-go").forEach(x=>{if(x.dataset.key===b.dataset.key){x.disabled=true;x.textContent=L().trMinWait}});
+  setTimeout(()=>{MIN_FORMS_BIG.add(b.dataset.key);const g=S.model.groups[+b.dataset.g];
+    const vs=new Set();(function w(n){if(n.t==="var")vs.add(n.name);else if(n.t==="not")w(n.a);else if(n.t==="bin"){w(n.a);w(n.b)}})(g.ast);
+    minimalForms(g.ast,S.model.vars.filter(v=>vs.has(v)),true);trKey="";renderTransforms()},50);
+});
 $("tr-out").addEventListener("click",e=>{const b=e.target.closest(".min-go");if(!b)return;
   minimalSingle(S.model.groups[+b.dataset.g].ast,b.dataset.op,true);trKey="";renderTransforms()});
 $("tr-out").addEventListener("click",e=>{
