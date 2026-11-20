@@ -345,7 +345,6 @@ span.cell:hover{background:transparent}
   <header class="top">
     <div>
       <h1 data-i18n="h1"></h1>
-      <p class="lead" data-i18n="lead"></p>
     </div>
     <div class="topctl">
       <div class="seg theme" role="group" id="theme">
@@ -521,7 +520,6 @@ const T={
 ru:{
   h1:"Таблицы истинности", themeAuto:"Авто", themeLight:"Светлая", themeDark:"Тёмная", themeLabel:"Тема оформления", report:"Сообщить об ошибке",
   reportSubject:"Тренажёр таблиц истинности: ошибка", reportBody:f=>"Формула: "+f+"\nАдрес страницы: "+location.href+"\n\nЧто произошло:\n",
-  lead:"Введите формулу и постройте её таблицу истинности сами: слева — наборы значений переменных, справа — значения подформул. Сайт подсвечивает верные и неверные ячейки, повторённые и пропущенные строки.",
   semTitle:"Семантика и термины",
   semConn:"Связки", semConnNote:"Таблица истинности каждой связки: значение формулы при всех наборах значений p и q.",
   semRead:["¬p — «не p», отрицание: меняет значение на противоположное.","p∧q — «p и q», конъюнкция: истинна, только когда истинны обе.","p∨q — «p или q», дизъюнкция (нестрогая): ложна, только когда ложны обе.","p→q — «если p, то q», импликация: ложна, только когда p истинно, а q ложно. p — антецедент, q — консеквент.","p↔q — «p тогда и только тогда, когда q», эквиваленция: истинна, когда значения совпадают.","p⊻q — «либо p, либо q», строгая дизъюнкция: истинна, когда значения различны.","p|q — штрих Шеффера, «не (p и q)»: ложна, только когда истинны обе.","p↓q — стрелка Пирса, «ни p, ни q»: истинна, только когда ложны обе.","p←q — обратная импликация, «p, если q»: то же, что q→p.","p↛q — антиимпликация, «p и не q»: истинна, только когда p истинно, а q ложно."],
@@ -663,7 +661,6 @@ ru:{
 en:{
   h1:"Truth Tables", themeAuto:"Auto", themeLight:"Light", themeDark:"Dark", themeLabel:"Colour theme", report:"Report a bug",
   reportSubject:"Truth table trainer: bug report", reportBody:f=>"Formula: "+f+"\nPage: "+location.href+"\n\nWhat happened:\n",
-  lead:"Enter a formula and build its truth table yourself: variable assignments on the left, values of subformulas on the right. Correct and wrong cells, repeated and missing rows are highlighted.",
   semTitle:"Semantics and terms",
   semConn:"Connectives", semConnNote:"The truth table of every connective: the value for each assignment to p and q.",
   semRead:["¬p — “not p”, negation: flips the value.","p∧q — “p and q”, conjunction: true only when both are true.","p∨q — “p or q”, inclusive disjunction: false only when both are false.","p→q — “if p then q”, implication: false only when p is true and q is false. p is the antecedent, q the consequent.","p↔q — “p if and only if q”, biconditional: true when the values agree.","p⊻q — “either p or q”, exclusive or: true when the values differ.","p|q — Sheffer stroke, “not (p and q)”: false only when both are true.","p↓q — Peirce arrow, “neither p nor q”: true only when both are false.","p←q — converse implication, “p if q”: the same as q→p.","p↛q — non-implication, “p and not q”: true only when p is true and q is false."],
