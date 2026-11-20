@@ -578,7 +578,7 @@ ru:{
     ["⊨ φ, {} ⊨ φ","следование из пустого множества посылок: φ — тавтология."],
     ["Несовместные посылки","если нет строки, где все посылки истинны, из них следует любое заключение."]],
   semRel:"Отношения между формулами A и B",
-  semRelNote:"Отношение определяется тем, какие сочетания значений A и B встречаются в таблице. «+» — встречается, «—» — не встречается, «±» — может встречаться или нет. Одновременно может выполняться несколько отношений: например, ⊥ и ⊤ контрадикторны, и при этом ⊥ ⊨ ⊤.",
+  semRelNote:"Отношение определяется тем, какие пары значений (A, B) встречаются в общей таблице истинности. «+» — встречается, «—» — не встречается, «±» — может встречаться или нет. Пары 10 и 01 дают первую ось (эквивалентность или подчинение), пары 11 и 00 — вторую (контрадикторность, контрарность или субконтрарность); оси независимы. Если ни одна ось не дала отношения, формулы независимы. Два отношения сразу бывают, только если хотя бы одна формула не случайная: например, p∧¬p и ⊥ эквивалентны и контрарны, а ⊥ и ⊤ контрадикторны, и ⊥ ⊨ ⊤.",
   semRelHead:["Отношение","Определение"],
   semRelDefs:[["эквивалентность","значения A и B совпадают в каждой строке; то же, что A ⊨ B и B ⊨ A, или что A↔B — тавтология."],
     ["контрадикторность (противоречие)","значения противоположны в каждой строке: A и B не бывают одновременно истинны и не бывают одновременно ложны."],
@@ -736,7 +736,7 @@ en:{
     ["⊨ φ, {} ⊨ φ","entailment from the empty set of premises: φ is a tautology."],
     ["Inconsistent premises","if no row makes all premises true, they entail any conclusion."]],
   semRel:"Relations between formulas A and B",
-  semRelNote:"A relation is determined by which combinations of the values of A and B occur in the table. “+” occurs, “—” does not occur, “±” may or may not occur. Several relations can hold at once: ⊥ and ⊤ are contradictory, and also ⊥ ⊨ ⊤.",
+  semRelNote:"A relation is determined by which pairs of values (A, B) occur in the common truth table. “+” occurs, “—” does not occur, “±” may or may not occur. The pairs 10 and 01 give the first axis (equivalence or subalternation), the pairs 11 and 00 the second one (contradictoriness, contrariety or subcontrariety); the axes are independent. If neither axis gives a relation, the formulas are independent. Two relations at once happen only when at least one formula is not contingent: p∧¬p and ⊥ are equivalent and contrary, ⊥ and ⊤ are contradictory and ⊥ ⊨ ⊤.",
   semRelHead:["Relation","Definition"],
   semRelDefs:[["equivalence","A and B have the same value in every row; the same as A ⊨ B and B ⊨ A, or A↔B being a tautology."],
     ["contradictoriness","the values are opposite in every row: A and B are never true together and never false together."],
@@ -1563,16 +1563,18 @@ resultEl.addEventListener("click",e=>{
 /* Relations between two formulas, from which value pairs (TT, TF, FT, FF) occur.
    Several can hold at once: ⊤ and ⊥ are contradictory and ⊥ ⊨ ⊤ (subordination). */
 function relations(a,b){
+  // S = the pairs (A, B) that occur in the table; each missing pair is one entailment.
+  // Axis 1 looks at 10 and 01, axis 2 at 11 and 00; the two axes are independent.
   let tt=0,tf=0,ft=0,ff=0;
   for(let i=0;i<a.length;i++){const x=a[i]==="1",y=b[i]==="1";if(x&&y)tt++;else if(x)tf++;else if(y)ft++;else ff++}
-  if(!tf&&!ft)return [{kind:"equiv"}];
   const out=[];
-  if(!tt&&!ff)out.push({kind:"contradict"});
-  if(!tt&&ff)out.push({kind:"contrary"});
-  if(!ff&&tt)out.push({kind:"subcontrary"});
-  if(!tf&&ft)out.push({kind:"sub",dir:1});
-  if(!ft&&tf)out.push({kind:"sub",dir:-1});
-  if(tt&&tf&&ft&&ff)out.push({kind:"indep"});
+  if(!tf&&!ft)out.push({kind:"equiv"});          // no 10, no 01
+  else if(!tf)out.push({kind:"sub",dir:1});      // no 10: A ⊨ B, but not B ⊨ A
+  else if(!ft)out.push({kind:"sub",dir:-1});     // no 01: B ⊨ A, but not A ⊨ B
+  if(!tt&&!ff)out.push({kind:"contradict"});     // no 11, no 00
+  else if(!tt)out.push({kind:"contrary"});       // no 11, but 00 occurs
+  else if(!ff)out.push({kind:"subcontrary"});    // no 00, but 11 occurs
+  if(!out.length)out.push({kind:"indep"});       // all four pairs occur
   return out;
 }
 
