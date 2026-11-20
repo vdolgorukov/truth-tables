@@ -392,7 +392,6 @@ canvas.venn{display:block;max-width:100%;height:auto;border-radius:4px}
 
   <section class="entry">
     <div class="test-note" id="test-note" hidden data-i18n="testNote"></div>
-    <label for="f-input" data-i18n="flabel"></label>
     <div class="frow">
       <input id="f-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
       <button type="button" class="btn primary" id="build" data-i18n="build"></button>
@@ -2370,6 +2369,7 @@ function applyLang(){
   document.title=S.lang==="ru"?"Тренажёр таблиц истинности":"Truth Table Trainer";
   document.querySelectorAll("[data-i18n]").forEach(el=>{el.textContent=lang[el.dataset.i18n]});
   $("theme").setAttribute("aria-label",lang.themeLabel);
+  inp.setAttribute("aria-label",lang.flabel);
   fillWantOptions();
   if(typeof GEN!=="undefined"&&GEN.length)renderGen(false);
   let h="<p>"+lang.helpIntro+"</p><div class=\"help-wrap\"><table><thead><tr>"+lang.helpHead.map(x=>"<th>"+esc(x)+"</th>").join("")+"</tr></thead><tbody>";
