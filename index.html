@@ -269,6 +269,22 @@ span.cell:hover{background:transparent}
 
 .tt td.cur-err{outline:3px solid var(--accent);outline-offset:-3px}
 .explain .btn{margin-left:.4rem;vertical-align:baseline}
+.gen{display:grid;gap:.75rem;margin-top:.6rem}
+.gen-opts{display:flex;flex-wrap:wrap;gap:.5rem 1.2rem;font-size:.92rem}
+.gen-opts label{display:inline-flex;align-items:center;gap:.4rem;color:var(--muted)}
+.gen-opts select,.gen-opts input[type=number]{font:inherit;font-size:.92rem;color:var(--text);background:var(--paper);border:1.5px solid var(--rule-strong);border-radius:5px;padding:.15rem .3rem}
+.gen-opts input[type=number]{width:4.5em}
+.gen-opts .chk{color:var(--text)}
+.gen-btns{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .7rem}
+.btn:disabled{opacity:.45;cursor:default}
+.gen-list{margin:0;padding-left:1.6rem;display:grid;gap:.35rem}
+.gen-list li{line-height:1.5}
+.gen-list .mono{font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace}
+.gen-list a{margin-left:.6rem;font-size:.88rem;color:var(--accent)}
+.gen-list .ans{display:block;font-size:.88rem;color:var(--muted)}
+.gen-list.noans .ans{display:none}
+#gen-out{width:100%;min-height:8rem;font-family:"PT Mono",ui-monospace,monospace;font-size:.82rem;background:var(--tint);color:var(--text);border:1.5px solid var(--rule-strong);border-radius:6px;padding:.4rem .6rem}
+.test-mode #gen-details{display:none!important}
 .links{display:flex;flex-wrap:wrap;gap:.5rem;padding-top:.8rem;border-top:1px solid var(--rule)}
 .explain{padding:.6rem .85rem;border-radius:6px;border:1px solid var(--accent);background:var(--tint);font-size:.95rem;max-width:80ch}
 .explain .mono{font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace}
@@ -455,6 +471,35 @@ span.cell:hover{background:transparent}
         <p class="hint" data-i18n="exportNote"></p>
       </div>
     </details>
+    <details id="gen-details" data-remember="gen">
+      <summary data-i18n="genTitle"></summary>
+      <div class="gen">
+        <div class="gen-opts">
+          <label><span data-i18n="genType"></span>
+            <select id="gen-type"><option value="kind" data-i18n="genTypeKind"></option><option value="entail" data-i18n="genTypeEntail"></option><option value="rel" data-i18n="genTypeRel"></option></select></label>
+          <label><span data-i18n="genWant"></span> <select id="gen-want"></select></label>
+          <label><span data-i18n="genVars"></span>
+            <select id="gen-vars"><option>2</option><option selected>3</option><option>4</option></select></label>
+          <label><span data-i18n="genSize"></span>
+            <select id="gen-size"><option value="easy" data-i18n="genEasy"></option><option value="mid" selected data-i18n="genMid"></option><option value="hard" data-i18n="genHard"></option></select></label>
+          <label><span data-i18n="genOps"></span>
+            <select id="gen-ops"><option value="basic" data-i18n="genOpsBasic"></option><option value="all" data-i18n="genOpsAll"></option></select></label>
+          <label><span data-i18n="genCount"></span> <input id="gen-count" type="number" min="1" max="50" value="10"></label>
+          <label class="chk"><input id="gen-test" type="checkbox" checked> <span data-i18n="genTest"></span></label>
+          <label class="chk"><input id="gen-show" type="checkbox" checked> <span data-i18n="genShow"></span></label>
+        </div>
+        <div class="gen-btns">
+          <button type="button" class="btn sm primary" id="gen-go" data-i18n="genGo"></button>
+          <button type="button" class="btn sm" id="gen-copy-links" data-i18n="genCopyLinks" disabled></button>
+          <button type="button" class="btn sm" id="gen-copy-key" data-i18n="genCopyKey" disabled></button>
+          <button type="button" class="btn sm" id="gen-copy-tex" data-i18n="genCopyTex" disabled></button>
+          <span class="exp-msg" id="gen-msg" aria-live="polite"></span>
+        </div>
+        <ol class="gen-list" id="gen-list"></ol>
+        <textarea id="gen-out" readonly hidden aria-label="Generated variants"></textarea>
+        <p class="hint" data-i18n="genNote"></p>
+      </div>
+    </details>
     <div class="links">
       <button type="button" class="btn sm quiet" id="share" data-i18n="share"></button>
       <button type="button" class="btn sm quiet" id="share-test" data-i18n="shareTest"></button>
@@ -534,6 +579,16 @@ ru:{
     hintLeft:r=>"Строка "+r+": подставлен пропущенный набор значений переменных.",
     nothing:"Подсказывать нечего: все заполненные ячейки верны, пустых нет.",
     next:(i,n)=>"Следующая ошибка ("+i+" из "+n+")"},
+  genTitle:"Генератор вариантов", genType:"Задание", genTypeKind:"таблица формулы", genTypeEntail:"следование", genTypeRel:"отношения двух формул",
+  genWant:"Ответы", genVars:"Переменных", genSize:"Сложность", genEasy:"лёгкая (2–3 связки)", genMid:"средняя (4–5)", genHard:"трудная (6–8)",
+  genOps:"Связки", genOpsBasic:"¬ ∧ ∨ → ↔", genOpsAll:"все (+ ⊻ | ↓)", genCount:"Вариантов", genTest:"ссылки для контрольной", genShow:"показывать ответы",
+  genGo:"Сгенерировать", genCopyLinks:"Копировать ссылки", genCopyKey:"Копировать ключ", genCopyTex:"Копировать LaTeX", genCopied:"Скопировано",
+  genOpen:"открыть", genFailed:"Не удалось подобрать нужное число разных вариантов — показаны найденные.",
+  genWants:{kind:[["mix","вперемешку"],["taut","только законы"],["contr","только противоречия"],["sat","только случайные"]],
+    entail:[["mix","вперемешку"],["yes","только «следует»"],["no","только «не следует»"]],
+    rel:[["mix","все отношения по кругу"],["any","любые"]]},
+  genAnsYes:"следует", genAnsNo:"не следует; контрпримеры", genVariant:"Вариант", genKey:"Ключ",
+  genNote:"Ссылки используют текущие настройки таблицы, а режим ответа — всегда «спрашивать». Ключ строится по полной таблице истинности.",
   flabel:"Формула", build:"Построить таблицу", share:"Ссылка на задание", shareDone:"Ссылка скопирована", shareFail:"Скопируйте адрес страницы", examplesTitle:"Примеры", settingsTitle:"Настройки", random:"Случайная формула",
   help:"Как вводить формулы",
   notation:"Обозначения", left:"Левая часть", manual:"заполняю сам", auto:"автоматически",
@@ -666,6 +721,16 @@ en:{
     hintLeft:r=>"Row "+r+": a missing assignment has been filled in.",
     nothing:"Nothing to hint: every filled cell is right and none is empty.",
     next:(i,n)=>"Next mistake ("+i+" of "+n+")"},
+  genTitle:"Variant generator", genType:"Task", genTypeKind:"truth table of a formula", genTypeEntail:"entailment", genTypeRel:"relation of two formulas",
+  genWant:"Answers", genVars:"Variables", genSize:"Difficulty", genEasy:"easy (2–3 connectives)", genMid:"medium (4–5)", genHard:"hard (6–8)",
+  genOps:"Connectives", genOpsBasic:"¬ ∧ ∨ → ↔", genOpsAll:"all (+ ⊻ | ↓)", genCount:"Variants", genTest:"test links", genShow:"show answers",
+  genGo:"Generate", genCopyLinks:"Copy links", genCopyKey:"Copy answer key", genCopyTex:"Copy LaTeX", genCopied:"Copied",
+  genOpen:"open", genFailed:"Could not find enough different variants; showing those found.",
+  genWants:{kind:[["mix","mixed"],["taut","tautologies only"],["contr","contradictions only"],["sat","contingent only"]],
+    entail:[["mix","mixed"],["yes","“follows” only"],["no","“does not follow” only"]],
+    rel:[["mix","all relations in turn"],["any","any"]]},
+  genAnsYes:"follows", genAnsNo:"does not follow; counterexamples", genVariant:"Variant", genKey:"Answer key",
+  genNote:"Links use the current table settings and always ask the student for the answer. The key is computed from the full truth table.",
   flabel:"Formula", build:"Build table", share:"Link to this task", shareDone:"Link copied", shareFail:"Copy the page address", examplesTitle:"Examples", settingsTitle:"Settings", random:"Random formula",
   help:"How to type formulas",
   notation:"Notation", left:"Left side", manual:"I fill it in", auto:"automatic",
@@ -1065,13 +1130,14 @@ function build(force){
 }
 /* the task lives in the address: …/truth-tables/?f=<formula> */
 const PAGES_URL="https://vdolgorukov.github.io/truth-tables/";
-function taskUrl(text,withSettings,test){
+function taskUrl(text,withSettings,test,over){
   const here=/github\.io$|^localhost$|^127\.0\.0\.1$/.test(location.hostname)?location.origin+location.pathname:PAGES_URL;
   let q="?f="+encodeURIComponent(text);
   if(withSettings){
     const p={n:S.notation,lay:S.layout,c:S.cols,l:S.auto?"auto":"manual",o:S.order,r:S.reveal?"show":"ask",x:S.extraOps?"1":"0",lang:S.lang};
     if(S.notation==="custom"){p.tv=S.custT;p.fv=S.custF}
     if(test)p.mode="test";
+    Object.assign(p,over||{});
     for(const k in p)q+="&"+k+"="+encodeURIComponent(p[k]);
   }
   return here+q;
@@ -1895,7 +1961,7 @@ function exportGrid(){
   return {head,sep,rows,K};
 }
 const TEX={"¬":"\\neg ","∧":"\\land ","∨":"\\lor ","→":"\\to ","↔":"\\leftrightarrow ","⊻":"\\veebar ","|":"\\mid ","↓":"\\downarrow ","←":"\\leftarrow ","↛":"\\nrightarrow ","⊤":"\\top ","⊥":"\\bot "};
-const texMath=t=>"$"+t.replace(/[₀-₉]+/g,d=>"_{"+fromSub(d)+"}").replace(/[¬∧∨→←↛↔⊻|↓⊤⊥]/g,c=>TEX[c]).replace(/ +$/,"").replace(/ ([)}])/g,"$1")+"$";
+const texMath=t=>"$"+t.replace(/[₀-₉]+/g,d=>"_{"+fromSub(d)+"}").replace(/[¬∧∨→←↛↔⊻|↓⊤⊥⊨]/g,c=>c==="⊨"?"\\models ":TEX[c]).replace(/ +$/,"").replace(/ ([)}])/g,"$1")+"$";
 const texText=t=>t.replace(/[\\&%$#_{}~^]/g,c=>"\\"+c);
 function exportText(fmt){
   const G=exportGrid(),{head,sep,rows}=G,n=head.length;
@@ -2036,6 +2102,8 @@ function applyLang(){
   document.title=S.lang==="ru"?"Тренажёр таблиц истинности":"Truth Table Trainer";
   document.querySelectorAll("[data-i18n]").forEach(el=>{el.textContent=lang[el.dataset.i18n]});
   $("theme").setAttribute("aria-label",lang.themeLabel);
+  fillWantOptions();
+  if(typeof GEN!=="undefined"&&GEN.length)renderGen(false);
   let h="<p>"+lang.helpIntro+"</p><div class=\"help-wrap\"><table><thead><tr>"+lang.helpHead.map(x=>"<th>"+esc(x)+"</th>").join("")+"</tr></thead><tbody>";
   HELP_ROWS.forEach((row,i)=>{
     if(row[3]&&!S.extraOps)return;
@@ -2080,6 +2148,156 @@ function copyLink(id,url,done,label){
 }
 $("share").addEventListener("click",()=>copyLink("share",taskUrl(S.model.text,true,false),L().shareDone,"share"));
 $("share-test").addEventListener("click",()=>copyLink("share-test",taskUrl(S.model.text,true,true),L().shareTestDone,"shareTest"));
+
+/* ---------- variant generator ---------- */
+const GEN_SIZE={easy:[2,3],mid:[4,5],hard:[6,8]};
+const GEN_OPS={basic:["∧","∨","→","↔"],all:["∧","∨","→","↔","⊻","|","↓"]};
+const rnd=n=>Math.floor(Math.random()*n),pickOne=a=>a[rnd(a.length)];
+const varSet=(n,s=new Set())=>{if(n.t==="var")s.add(n.name);else if(n.t==="not")varSet(n.a,s);else if(n.t==="bin"){varSet(n.a,s);varSet(n.b,s)}return s};
+function genFormula(vars,conn,ops){ // a random formula with exactly `conn` connectives
+  const b=n=>{if(n===0)return {t:"var",name:pickOne(vars)};
+    if(Math.random()<.2&&!(n===1))return {t:"not",a:b(n-1)};
+    if(Math.random()<.12)return {t:"not",a:b(n-1)};
+    const l=rnd(n);return {t:"bin",op:pickOne(ops),a:b(l),b:b(n-1-l)}};
+  return b(conn);
+}
+// no connective with two identical sides (p∧p, q↔q, (p→q)∨(p→q)) — they make trivial tasks
+const noSameSides=n=>n.t==="not"?noSameSides(n.a):n.t==="bin"?show(n.a)!==show(n.b)&&noSameSides(n.a)&&noSameSides(n.b):true;
+// and no hidden constants: every proper subformula with a connective must be contingent (no ¬q∨q inside)
+const noConstSub=n=>{const kids=n.t==="not"?[n.a]:n.t==="bin"?[n.a,n.b]:[];
+  return kids.every(k=>(k.t!=="not"&&k.t!=="bin")||(formulaKind(k)==="sat"&&noConstSub(k)))};
+// and nothing to simplify: no part with a connective equivalent to a single literal (r∧(r∨p) ≡ r),
+// and no connective that adds nothing (A∨B ≡ A or ≡ B, as in p∨(p∧q) or (p→q)∧q)
+function noRedundant(f){
+  const vars=[...varSet(f)].sort(),K=vars.length,N=1<<K,envs=[];
+  for(let x=0;x<N;x++){const e={};vars.forEach((v,j)=>e[v]=((x>>(K-1-j))&1)===1);envs.push(e)}
+  const vec=n=>envs.map(e=>ev(n,e)?1:0).join("");
+  const lits=new Set();vars.forEach(v=>{const t=vec({t:"var",name:v});lits.add(t);lits.add(t.replace(/./g,c=>c==="1"?"0":"1"))});
+  const ok=n=>{
+    if(n.t==="var"||n.t==="const")return true;
+    if(n.t==="not")return (n.a.t==="var"||!lits.has(vec(n)))&&ok(n.a);
+    const v=vec(n);
+    return !lits.has(v)&&v!==vec(n.a)&&v!==vec(n.b)&&ok(n.a)&&ok(n.b);
+  };
+  return ok(f);
+}
+const fine=n=>noDoubleNeg(n)&&noSameSides(n)&&noConstSub(n)&&noRedundant(n);
+const noDoubleNeg=n=>n.t==="not"?(n.a.t!=="not"&&noDoubleNeg(n.a)):n.t==="bin"?noDoubleNeg(n.a)&&noDoubleNeg(n.b):true;
+function truthOf(asts,vars){ // vectors of all formulas over the given variables (order of `vars`)
+  const K=vars.length,N=1<<K,vecs=asts.map(()=>[]),envs=[];
+  for(let x=0;x<N;x++){const e={};vars.forEach((v,j)=>e[v]=((x>>(K-1-j))&1)===1);envs.push(e);asts.forEach((a,i)=>vecs[i].push(ev(a,e)))}
+  return {vecs,envs};
+}
+/* the same formula (neg=false) or its negation (neg=true) with negations pushed down to the
+   variables: De Morgan, ¬(A→B) = A∧¬B, A→B = ¬A∨B and so on. Used to build equivalent and
+   contradictory pairs, which random search finds too rarely. */
+function nnf(n,neg){
+  const N=x=>({t:"not",a:x}),B=(op,a,b)=>({t:"bin",op,a,b});
+  if(n.t==="var")return neg?N(n):n;
+  if(n.t==="const")return {t:"const",v:neg?!n.v:n.v};
+  if(n.t==="not")return nnf(n.a,!neg);
+  const a=n.a,b=n.b;
+  switch(n.op){
+    case "∧":return neg?B("∨",nnf(a,true),nnf(b,true)):B("∧",nnf(a,false),nnf(b,false));
+    case "∨":return neg?B("∧",nnf(a,true),nnf(b,true)):B("∨",nnf(a,false),nnf(b,false));
+    case "→":return neg?B("∧",nnf(a,false),nnf(b,true)):B("∨",nnf(a,true),nnf(b,false));
+    case "↔":return B("↔",nnf(a,false),nnf(b,neg));
+    case "⊻":return B("↔",nnf(a,false),nnf(b,!neg));
+    case "|":return neg?B("∧",nnf(a,false),nnf(b,false)):B("∨",nnf(a,true),nnf(b,true));
+    case "↓":return neg?B("∨",nnf(a,false),nnf(b,false)):B("∧",nnf(a,true),nnf(b,true));
+    case "←":return neg?B("∧",nnf(b,false),nnf(a,true)):B("∨",nnf(a,false),nnf(b,true));
+    case "↛":return neg?B("∨",nnf(a,true),nnf(b,false)):B("∧",nnf(a,false),nnf(b,true));
+  }
+}
+function genOne(type,want,k,size,ops){
+  const vars=["p","q","r","s"].slice(0,k),[lo,hi]=GEN_SIZE[size],sz=()=>lo+rnd(hi-lo+1);
+  for(let t=0;t<4000;t++){
+    if(type==="kind"){
+      const f=genFormula(vars,sz(),ops);
+      if(varSet(f).size!==k||!fine(f))continue;
+      const kind=formulaKind(f);
+      if(want!=="mix"&&kind!==want)continue;
+      return {asts:[f],entail:false};
+    }
+    if(type==="entail"){
+      const half=Math.max(1,Math.round(sz()/2)),p1=genFormula(vars,half,ops),p2=genFormula(vars,Math.max(1,sz()-half),ops),c=genFormula(vars,1+rnd(2),ops);
+      const all=new Set([...varSet(p1),...varSet(p2),...varSet(c)]);
+      if(all.size!==k||![p1,p2,c].every(fine)||![p1,p2,c].every(x=>formulaKind(x)==="sat"))continue;
+      if(new Set([show(p1),show(p2),show(c)]).size<3)continue;
+      const {vecs}=truthOf([p1,p2,c],vars);
+      if(!vecs[0].some((v,x)=>v&&vecs[1][x]))continue; // premises must be consistent
+      const holds=!vecs[0].some((v,x)=>v&&vecs[1][x]&&!vecs[2][x]);
+      if(want==="yes"&&!holds||want==="no"&&holds)continue;
+      return {asts:Object.assign([p1,p2,c],{entail:true}),entail:true};
+    }
+    // rel; equivalent / contradictory pairs are built from the first formula after a few random tries
+    const a=genFormula(vars,Math.max(1,sz()-2),ops);
+    const built=(want==="equiv"||want==="contradict")&&t>200;
+    const b=built?nnf(a,want==="contradict"):genFormula(vars,Math.max(1,sz()-2),ops);
+    if(new Set([...varSet(a),...varSet(b)]).size!==k||!fine(a)||!fine(b)||show(a)===show(b))continue;
+    if(formulaKind(a)!=="sat"||formulaKind(b)!=="sat")continue;
+    const {vecs}=truthOf([a,b],vars),rs=relations(vecs[0].map(v=>v?"1":"0").join(""),vecs[1].map(v=>v?"1":"0").join("")).map(r=>r.kind);
+    if(want!=="any"&&want!=="mix"&&!rs.includes(want))continue;
+    return {asts:[a,b],entail:false};
+  }
+  return null;
+}
+function answerText(task){
+  const lang=L(),m=buildModel(task.asts),vars=m.vars,{vecs,envs}=truthOf(m.asts,vars);
+  if(task.type==="kind"){const t=vecs[0].filter(Boolean).length;return lang.clsShort(t,1<<vars.length)}
+  if(task.type==="entail"){
+    const bad=envs.filter((e,x)=>vecs[0][x]&&vecs[1][x]&&!vecs[2][x]);
+    if(!bad.length)return lang.genAnsYes;
+    return lang.genAnsNo+" ("+vars.join(", ")+"): "+bad.map(e=>"("+vars.map(v=>sym(e[v])).join(", ")+")").join(" ");
+  }
+  const A_=m.groups[0].text,B_=m.groups[1].text;
+  return relations(vecs[0].map(v=>v?"1":"0").join(""),vecs[1].map(v=>v?"1":"0").join("")).map(r=>r.kind==="sub"?lang.rel.sub+" "+(r.dir>0?A_+" ⊨ "+B_:B_+" ⊨ "+A_):lang.rel[r.kind]).join("; ");
+}
+let GEN=[];
+function fillWantOptions(){
+  const sel=$("gen-want"),cur=sel.value,type=$("gen-type").value;
+  sel.innerHTML=L().genWants[type].map(([v,t])=>"<option value=\""+v+"\">"+esc(t)+"</option>").join("");
+  if([...sel.options].some(o=>o.value===cur))sel.value=cur;
+}
+$("gen-type").addEventListener("change",fillWantOptions);
+$("gen-go").addEventListener("click",()=>{
+  const type=$("gen-type").value,want=$("gen-want").value,k=+$("gen-vars").value,size=$("gen-size").value,ops=GEN_OPS[$("gen-ops").value];
+  const n=Math.min(50,Math.max(1,+$("gen-count").value||10)),seen=new Set();GEN=[];
+  // "mixed" spreads the answers: laws, contingent, contradictions / follows, does not / each relation in turn
+  const cycle={kind:["taut","sat","contr","sat"],entail:["yes","no"],rel:["equiv","contradict","contrary","subcontrary","sub","indep"]}[type];
+  for(let i=0,tries=0;GEN.length<n&&tries<n*6;tries++){
+    const w=want==="mix"?cycle[GEN.length%cycle.length]:want;
+    const g=genOne(type,w,k,size,ops)||genOne(type,want==="mix"?"mix":w,k,size,ops);
+    if(!g)continue;
+    const text=buildModel(g.asts).text;if(seen.has(text))continue;
+    seen.add(text);GEN.push({type,asts:g.asts,text});
+  }
+  if(want==="mix")GEN.sort(()=>Math.random()-.5);
+  renderGen(GEN.length<n);
+});
+function renderGen(short){
+  const lang=L(),test=$("gen-test").checked;
+  $("gen-list").innerHTML=GEN.map(t=>{
+    const url=taskUrl(t.text,true,test,{r:"ask"});
+    return "<li><span class=\"mono\">"+esc(t.text)+"</span><a href=\""+esc(url)+"\" target=\"_blank\" rel=\"noopener\">"+esc(lang.genOpen)+"</a><span class=\"ans\">"+esc(answerText(t))+"</span></li>";
+  }).join("");
+  $("gen-list").classList.toggle("noans",!$("gen-show").checked);
+  ["gen-copy-links","gen-copy-key","gen-copy-tex"].forEach(id=>$(id).disabled=!GEN.length);
+  $("gen-msg").textContent=short?lang.genFailed:"";
+}
+$("gen-show").addEventListener("change",()=>$("gen-list").classList.toggle("noans",!$("gen-show").checked));
+$("gen-test").addEventListener("change",()=>{if(GEN.length)renderGen(false)});
+function genCopy(text){
+  const out=$("gen-out"),msg=$("gen-msg");out.value=text;
+  const fail=()=>{out.hidden=false;out.focus();out.select();msg.textContent=L().exportSelected};
+  try{navigator.clipboard.writeText(text).then(()=>{out.hidden=true;msg.textContent=L().genCopied},fail)}catch(e){fail()}
+}
+$("gen-copy-links").addEventListener("click",()=>{const test=$("gen-test").checked;genCopy(GEN.map((t,i)=>(i+1)+". "+t.text+"\n"+taskUrl(t.text,true,test,{r:"ask"})).join("\n\n"))});
+$("gen-copy-key").addEventListener("click",()=>genCopy(GEN.map((t,i)=>(i+1)+". "+t.text+" — "+answerText(t)).join("\n")));
+$("gen-copy-tex").addEventListener("click",()=>{
+  const lang=L(),item=t=>"  \\item "+texMath(t.text.replace(/^\{(.*)\}( ⊨.*)$/,"$1$2"));
+  genCopy("% "+lang.genTitle+"\n\\begin{enumerate}\n"+GEN.map(item).join("\n")+"\n\\end{enumerate}\n\n% "+lang.genKey+"\n\\begin{enumerate}\n"+GEN.map(t=>"  \\item "+texText(answerText(t))).join("\n")+"\n\\end{enumerate}");
+});
 
 /* ---------- start ---------- */
 // a formula in the address (?f=…) wins over the one remembered in this browser
