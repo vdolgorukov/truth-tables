@@ -597,7 +597,7 @@ ru:{
   trPeirceImg:"Графы Пирса (рисунок)", trPeirceImgNote:"пунктир — лист утверждения; овал (разрез) — отрицание того, что внутри; рядом — конъюнкция",
   trPeirce:"Графы Пирса (линейная запись)", trPeirceNote:"запись рядом — конъюнкция, скобки — отрицание; (()) — пустой лист, истина; () — ложь",
   trTree:"Дерево разбора", trTreeInfo:t=>(t.main?"главная связка "+t.main+"; ":"")+"глубина "+t.depth+"; связок "+t.conn+"; разных подформул со связками "+t.distinct,
-  trCircuit:"Логическая схема", trCircuitNote:"& — И, ≥1 — ИЛИ, =1 — исключающее ИЛИ, = — эквиваленция, 1 — НЕ; кружок на выходе — отрицание",
+  trCircuit:"Логическая схема", trCircuitNote:"& — И, ≥1 — ИЛИ, =1 — исключающее ИЛИ, = — эквиваленция, 1 — НЕ; кружок на выходе — отрицание. Импликация собрана как A→B = ¬A∨B",
   trVector:"Вектор значений", trVectorNote:vs=>"значения на наборах ("+vs.join(", ")+") от "+"0".repeat(vs.length)+" до "+"1".repeat(vs.length), trVectorBig:"слишком длинный вектор (больше 8 переменных)",
   trNumber:"Номер функции", trNumberNote:"число, двоичная запись которого — вектор значений",
   trVenn:"Диаграмма Венна", trVennNote:"закрашены области, где формула истинна; вне кругов все переменные ложны", trVennOnly:"рисуется для формул с 1–3 переменными",
@@ -754,7 +754,7 @@ en:{
   trPeirceImg:"Peirce’s graphs (drawing)", trPeirceImgNote:"dashed frame: the sheet of assertion; an oval (cut) negates what is inside; side by side means conjunction",
   trPeirce:"Peirce’s graphs (linear form)", trPeirceNote:"juxtaposition is conjunction, brackets are negation; (()) is the blank sheet, true; () is false",
   trTree:"Parse tree", trTreeInfo:t=>(t.main?"main connective "+t.main+"; ":"")+"depth "+t.depth+"; connectives "+t.conn+"; distinct compound subformulas "+t.distinct,
-  trCircuit:"Logic circuit", trCircuitNote:"& AND, ≥1 OR, =1 exclusive OR, = equivalence, 1 NOT; a circle at an output means negation",
+  trCircuit:"Logic circuit", trCircuitNote:"& AND, ≥1 OR, =1 exclusive OR, = equivalence, 1 NOT; a circle at an output means negation. Implication is built as A→B = ¬A∨B",
   trVector:"Vector of values", trVectorNote:vs=>"values on the assignments to ("+vs.join(", ")+") from "+"0".repeat(vs.length)+" to "+"1".repeat(vs.length), trVectorBig:"the vector is too long (more than 8 variables)",
   trNumber:"Function number", trNumberNote:"the number whose binary digits are the vector of values",
   trVenn:"Venn diagram", trVennNote:"the regions where the formula is true are filled; outside the circles every variable is false", trVennOnly:"drawn for formulas with 1–3 variables",
@@ -1986,8 +1986,19 @@ function treeInfo(ast){
     distinct:new Set(inner.map(x=>show(x.n))).size,conn:inner.length};
 }
 /* gates in IEC/ГОСТ style: a box with its symbol, a small circle for an inverted output */
-const GATE={"∧":["&",0],"∨":["≥1",0],"⊻":["=1",0],"↔":["=",0],"|":["&",1],"↓":["≥1",1],"→":["→",0],"←":["←",0],"↛":["↛",0],"¬":["1",1]};
+const GATE={"∧":["&",0],"∨":["≥1",0],"⊻":["=1",0],"↔":["=",0],"|":["&",1],"↓":["≥1",1],"¬":["1",1]};
+// connectives without a standard gate are built from standard ones: A→B = ¬A∨B, A←B = A∨¬B, A↛B = A∧¬B
+function circuitAst(n){
+  if(n.t==="var"||n.t==="const")return n;
+  if(n.t==="not")return {t:"not",a:circuitAst(n.a)};
+  const a=circuitAst(n.a),b=circuitAst(n.b),N=x=>({t:"not",a:x}),B=(op,x,y)=>({t:"bin",op,a:x,b:y});
+  if(n.op==="→")return B("∨",N(a),b);
+  if(n.op==="←")return B("∨",a,N(b));
+  if(n.op==="↛")return B("∧",a,N(b));
+  return B(n.op,a,b);
+}
 function circuitSvg(ast){
+  ast=circuitAst(ast);
   const {root,nodes,leaves}=treeLayout(ast),COL=74,ROW=34,GW=36,GH=30,M=14,LW=34;
   const maxH=root.h,W=LW+maxH*COL+GW+40+M,H=Math.max(leaves,1)*ROW+2*M;
   const Y=x=>M+ROW/2+x.x*ROW,X=x=>LW+(x.h-1)*COL+20; // left edge of a gate box
@@ -2077,9 +2088,6 @@ function renderTransforms(){
   S.model.groups.forEach(g=>{
     h+="<div class=\"tr-f\"><h3>"+esc(g.text)+"</h3>";
     if(tab==="nota"){
-      const lk=lukas(g.ast);
-      h+=row(lang.trPolish,f(polish(g.ast)))+row(lang.trRpolish,f(rpolish(g.ast)));
-      if(lk!=null&&lk!==polish(g.ast))h+=row(lang.trLukas,f(lk))+row(lang.trRlukas,f(rlukas(g.ast)));
       const ti=treeInfo(g.ast),tiSize=ti.occ;
       h+=row(lang.trTree,tiSize>60?"<span class=\"none\">"+esc(lang.trFregeBig)+"</span>":"<div class=\"frege-wrap\">"+treeSvg(g.ast)+"</div>",lang.trTreeInfo(ti));
       h+=row(lang.trCircuit,tiSize>60?"<span class=\"none\">"+esc(lang.trFregeBig)+"</span>":"<div class=\"frege-wrap\">"+circuitSvg(g.ast)+"</div>",lang.trCircuitNote);
@@ -2087,6 +2095,10 @@ function renderTransforms(){
       h+=row(lang.trVector,vv.vars.length>8?"<span class=\"none\">"+esc(lang.trVectorBig)+"</span>":"<span class=\"mono vec\">"+esc(vv.vec)+"</span>",lang.trVectorNote(vv.vars));
       if(vv.num!=null)h+=row(lang.trNumber,f(vv.num),lang.trNumberNote);
       h+=row(lang.trVenn,vv.vars.length>=1&&vv.vars.length<=3?"<canvas class=\"venn\" data-g=\""+S.model.groups.indexOf(g)+"\" role=\"img\" aria-label=\"Venn\"></canvas>":"<span class=\"none\">"+esc(lang.trVennOnly)+"</span>",lang.trVennNote);
+      // Polish and Łukasiewicz notations go right before Peirce's graphs
+      const lk=lukas(g.ast);
+      h+=row(lang.trPolish,f(polish(g.ast)))+row(lang.trRpolish,f(rpolish(g.ast)));
+      if(lk!=null&&lk!==polish(g.ast))h+=row(lang.trLukas,f(lk))+row(lang.trRlukas,f(rlukas(g.ast)));
       h+=row(lang.trPeirce,f(peirce(g.ast)),lang.trPeirceNote);
       const pt=peirceTree(g.ast);
       h+=row(lang.trPeirceImg,peirceTreeSize(pt)>150?"<span class=\"none\">"+esc(lang.trFregeBig)+"</span>":"<div class=\"frege-wrap\">"+peirceSvg(pt)+"</div>",lang.trPeirceImgNote);
