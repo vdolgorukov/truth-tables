@@ -563,8 +563,8 @@ ru:{
     ["Для преподавателя",["ссылка на задание вместе с настройками; ссылка для контрольной, где формулу нельзя изменить, а подсказки, ответы и справка скрыты","генератор вариантов: таблицы, следования или отношения заданной сложности, со ссылками, ключом ответов и LaTeX","экспорт таблицы в LaTeX, HTML, Markdown, CSV и текст"]],
     ["Прочее",["светлая, тёмная или системная тема; русский и английский язык","настройки и заполненная таблица сохраняются в этом браузере","кнопка «Сообщить об ошибке» внизу справа"]]],
   semTitle:"Семантика и термины",
-  semConn:"Связки", semConnNote:"Таблица истинности каждой связки: значение формулы при всех наборах значений p и q.",
-  semRead:["¬p — «не p», отрицание: меняет значение на противоположное.","p∧q — «p и q», конъюнкция: истинна, только когда истинны обе.","p∨q — «p или q», дизъюнкция (нестрогая): ложна, только когда ложны обе.","p→q — «если p, то q», импликация: ложна, только когда p истинно, а q ложно. p — антецедент, q — консеквент.","p↔q — «p тогда и только тогда, когда q», эквиваленция: истинна, когда значения совпадают.","p⊻q — «либо p, либо q», строгая дизъюнкция: истинна, когда значения различны.","p|q — штрих Шеффера, «не (p и q)»: ложна, только когда истинны обе.","p↓q — стрелка Пирса, «ни p, ни q»: истинна, только когда ложны обе.","p←q — обратная импликация, «p, если q»: то же, что q→p.","p↛q — антиимпликация, «p и не q»: истинна, только когда p истинно, а q ложно.","p↚q — обратная антиимпликация, «не p, но q»: истинна, только когда p ложно, а q истинно."],
+  semConn:"Связки", semConnNote:"Таблица истинности каждой связки и констант: значение формулы при всех наборах значений p и q. Связки ←, ↛, ↚ можно включить в настройках, тогда они появятся на кнопках и в случайных формулах.",
+  semRead:["¬p — «не p», отрицание: меняет значение на противоположное.","p∧q — «p и q», конъюнкция: истинна, только когда истинны обе.","p∨q — «p или q», дизъюнкция (нестрогая): ложна, только когда ложны обе.","p→q — «если p, то q», импликация: ложна, только когда p истинно, а q ложно. p — антецедент, q — консеквент.","p↔q — «p тогда и только тогда, когда q», эквиваленция: истинна, когда значения совпадают.","p⊻q — «либо p, либо q», строгая дизъюнкция: истинна, когда значения различны.","p|q — штрих Шеффера, «не (p и q)»: ложна, только когда истинны обе.","p↓q — стрелка Пирса, «ни p, ни q»: истинна, только когда ложны обе.","p←q — обратная импликация, «p, если q»: то же, что q→p.","p↛q — антиимпликация, «p и не q»: истинна, только когда p истинно, а q ложно.","p↚q — обратная антиимпликация, «не p, но q»: истинна, только когда p ложно, а q истинно.","⊤ — «истина», верум: константа, истинная в каждой строке.","⊥ — «ложь», фальсум: константа, ложная в каждой строке."],
   semTerms:"Свойства формул",
   semDefs:[["Тавтология (общезначимая формула, закон логики)","истинна во всех строках таблицы, то есть при любых значениях переменных."],
     ["Противоречие (невыполнимая, тождественно ложная формула)","ложна во всех строках."],
@@ -578,7 +578,16 @@ ru:{
     ["⊨ φ, {} ⊨ φ","следование из пустого множества посылок: φ — тавтология."],
     ["Несовместные посылки","если нет строки, где все посылки истинны, из них следует любое заключение."]],
   semRel:"Отношения между формулами A и B",
-  semRelNote:"Отношение определяется тем, какие пары значений (A, B) встречаются в общей таблице истинности. «+» — встречается, «—» — не встречается, «±» — может встречаться или нет. Пары 10 и 01 дают первую ось (эквивалентность или подчинение), пары 11 и 00 — вторую (контрадикторность, контрарность или субконтрарность); оси независимы. Если ни одна ось не дала отношения, формулы независимы. Два отношения сразу бывают, только если хотя бы одна формула не случайная: например, p∧¬p и ⊥ эквивалентны и контрарны, а ⊥ и ⊤ контрадикторны, и ⊥ ⊨ ⊤.",
+  semRelNote:"Отношение определяется тем, какие пары значений (A, B) встречаются в общей таблице истинности. «+» — встречается, «—» — не встречается, «±» — может встречаться или нет.",
+  semAlgo:"Как определить отношение",
+  semAlgoSteps:["Выпишите множество S — пары значений (A, B), которые встречаются в строках общей таблицы истинности. Всего пар четыре: 11, 10, 01, 00 (первая цифра — значение A, вторая — B).",
+    "Первая ось — пары 10 и 01 (следование). Нет ни 10, ни 01 — эквивалентность. Нет 10, но есть 01 — A подчиняет B (A ⊨ B, но не B ⊨ A). Нет 01, но есть 10 — B подчиняет A. Есть обе пары — по этой оси отношения нет.",
+    "Вторая ось — пары 11 и 00 (совместная истинность и совместная ложность). Нет ни 11, ни 00 — контрадикторность. Нет 11, но есть 00 — контрарность. Нет 00, но есть 11 — субконтрарность. Есть обе пары — по этой оси отношения нет.",
+    "Оси независимы, поэтому ответ может состоять из двух отношений — по одному с каждой оси. Если ни одна ось не дала отношения, то есть встречаются все четыре пары, формулы независимы."],
+  semAlgoAll:"Все 15 возможных множеств S",
+  semAlgoHead:["S","ось 10/01","ось 11/00"],
+  semAlgoNone:"—", semAlgoSub1:"A подчиняет B (A ⊨ B)", semAlgoSub2:"B подчиняет A (B ⊨ A)",
+  semAlgoNote:"Два отношения сразу получаются, только если хотя бы одна из формул не случайная, то есть тавтология или противоречие: например, p∧¬p и ⊥ эквивалентны и контрарны, а ⊥ и ⊤ контрадикторны, и при этом ⊥ ⊨ ⊤.",
   semRelHead:["Отношение","Определение"],
   semRelDefs:[["эквивалентность","значения A и B совпадают в каждой строке; то же, что A ⊨ B и B ⊨ A, или что A↔B — тавтология."],
     ["контрадикторность (противоречие)","значения противоположны в каждой строке: A и B не бывают одновременно истинны и не бывают одновременно ложны."],
@@ -721,8 +730,8 @@ en:{
     ["For teachers",["a link to the task with its settings; a test link where the formula is fixed and hints, answers and help are hidden","a variant generator: tables, entailments or relations of a chosen difficulty, with links, an answer key and LaTeX","table export to LaTeX, HTML, Markdown, CSV and plain text"]],
     ["Other",["light, dark or system theme; Russian and English","settings and the filled table are kept in this browser","a “Report a bug” button at the bottom right"]]],
   semTitle:"Semantics and terms",
-  semConn:"Connectives", semConnNote:"The truth table of every connective: the value for each assignment to p and q.",
-  semRead:["¬p — “not p”, negation: flips the value.","p∧q — “p and q”, conjunction: true only when both are true.","p∨q — “p or q”, inclusive disjunction: false only when both are false.","p→q — “if p then q”, implication: false only when p is true and q is false. p is the antecedent, q the consequent.","p↔q — “p if and only if q”, biconditional: true when the values agree.","p⊻q — “either p or q”, exclusive or: true when the values differ.","p|q — Sheffer stroke, “not (p and q)”: false only when both are true.","p↓q — Peirce arrow, “neither p nor q”: true only when both are false.","p←q — converse implication, “p if q”: the same as q→p.","p↛q — non-implication, “p and not q”: true only when p is true and q is false.","p↚q — converse non-implication, “not p but q”: true only when p is false and q is true."],
+  semConn:"Connectives", semConnNote:"The truth table of every connective and constant: the value for each assignment to p and q. The connectives ←, ↛, ↚ can be turned on in the settings; then they appear on the buttons and in random formulas.",
+  semRead:["¬p — “not p”, negation: flips the value.","p∧q — “p and q”, conjunction: true only when both are true.","p∨q — “p or q”, inclusive disjunction: false only when both are false.","p→q — “if p then q”, implication: false only when p is true and q is false. p is the antecedent, q the consequent.","p↔q — “p if and only if q”, biconditional: true when the values agree.","p⊻q — “either p or q”, exclusive or: true when the values differ.","p|q — Sheffer stroke, “not (p and q)”: false only when both are true.","p↓q — Peirce arrow, “neither p nor q”: true only when both are false.","p←q — converse implication, “p if q”: the same as q→p.","p↛q — non-implication, “p and not q”: true only when p is true and q is false.","p↚q — converse non-implication, “not p but q”: true only when p is false and q is true.","⊤ — “true”, verum: a constant true in every row.","⊥ — “false”, falsum: a constant false in every row."],
   semTerms:"Properties of formulas",
   semDefs:[["Tautology (valid formula, law of logic)","true in every row, i.e. for every assignment of values to the variables."],
     ["Contradiction (unsatisfiable formula)","false in every row."],
@@ -736,7 +745,16 @@ en:{
     ["⊨ φ, {} ⊨ φ","entailment from the empty set of premises: φ is a tautology."],
     ["Inconsistent premises","if no row makes all premises true, they entail any conclusion."]],
   semRel:"Relations between formulas A and B",
-  semRelNote:"A relation is determined by which pairs of values (A, B) occur in the common truth table. “+” occurs, “—” does not occur, “±” may or may not occur. The pairs 10 and 01 give the first axis (equivalence or subalternation), the pairs 11 and 00 the second one (contradictoriness, contrariety or subcontrariety); the axes are independent. If neither axis gives a relation, the formulas are independent. Two relations at once happen only when at least one formula is not contingent: p∧¬p and ⊥ are equivalent and contrary, ⊥ and ⊤ are contradictory and ⊥ ⊨ ⊤.",
+  semRelNote:"A relation is determined by which pairs of values (A, B) occur in the common truth table. “+” occurs, “—” does not occur, “±” may or may not occur.",
+  semAlgo:"How to find the relation",
+  semAlgoSteps:["Write down the set S of pairs of values (A, B) that occur in the rows of the common truth table. There are four pairs: 11, 10, 01, 00 (the first digit is the value of A, the second of B).",
+    "The first axis is the pairs 10 and 01 (entailment). Neither 10 nor 01 — equivalence. No 10 but 01 occurs — A is superaltern to B (A ⊨ B but not B ⊨ A). No 01 but 10 occurs — B is superaltern to A. Both occur — no relation on this axis.",
+    "The second axis is the pairs 11 and 00 (true together, false together). Neither 11 nor 00 — contradictoriness. No 11 but 00 occurs — contrariety. No 00 but 11 occurs — subcontrariety. Both occur — no relation on this axis.",
+    "The axes are independent, so the answer may consist of two relations, one from each axis. If neither axis gives a relation, that is, all four pairs occur, the formulas are independent."],
+  semAlgoAll:"All 15 possible sets S",
+  semAlgoHead:["S","axis 10/01","axis 11/00"],
+  semAlgoNone:"—", semAlgoSub1:"A is superaltern to B (A ⊨ B)", semAlgoSub2:"B is superaltern to A (B ⊨ A)",
+  semAlgoNote:"Two relations at once happen only when at least one formula is not contingent, i.e. a tautology or a contradiction: p∧¬p and ⊥ are equivalent and contrary, while ⊥ and ⊤ are contradictory and also ⊥ ⊨ ⊤.",
   semRelHead:["Relation","Definition"],
   semRelDefs:[["equivalence","A and B have the same value in every row; the same as A ⊨ B and B ⊨ A, or A↔B being a tautology."],
     ["contradictoriness","the values are opposite in every row: A and B are never true together and never false together."],
@@ -2351,11 +2369,11 @@ document.querySelectorAll("[data-lang]").forEach(b=>b.addEventListener("click",(
 const REL_COMBOS=[["±","—","—","±"],["—","±","±","—"],["—","±","±","+"],["+","±","±","—"],["±","—","+","±"],["+","+","+","+"]];
 function buildSemantics(){
   const lang=L(),v=b=>"<span class=\"v"+(b?1:0)+"\">"+esc(sym(b))+"</span>";
-  const ops=["∧","∨","→","↔","⊻","|","↓"].concat(S.extraOps?["←","↛","↚"]:[]);
+  const ops=["∧","∨","→","↔","⊻","|","↓","←","↛","↚"];
   const rows=[[true,true],[true,false],[false,true],[false,false]];
-  let h="<h3>"+esc(lang.semConn)+"</h3><p>"+esc(lang.semConnNote)+"</p><div class=\"tw\"><table><thead><tr><th>p</th><th class=\"lt\">q</th><th>¬p</th>"+ops.map(o=>"<th>p"+esc(o)+"q</th>").join("")+"</tr></thead><tbody>";
-  rows.forEach(([p,q])=>{h+="<tr><td>"+v(p)+"</td><td class=\"lt\">"+v(q)+"</td><td>"+v(!p)+"</td>"+ops.map(o=>"<td>"+v(OPS[o](p,q))+"</td>").join("")+"</tr>"});
-  h+="</tbody></table></div><dl>"+lang.semRead.filter((_,i)=>i<8||S.extraOps).map(t=>{const k=t.indexOf(" — ");return "<div><dt class=\"mono\">"+esc(t.slice(0,k))+"</dt><dd> — "+esc(t.slice(k+3))+"</dd></div>"}).join("")+"</dl>";
+  let h="<h3>"+esc(lang.semConn)+"</h3><p>"+esc(lang.semConnNote)+"</p><div class=\"tw\"><table><thead><tr><th>p</th><th class=\"lt\">q</th><th>¬p</th>"+ops.map(o=>"<th>p"+esc(o)+"q</th>").join("")+"<th class=\"lt\">⊤</th><th>⊥</th></tr></thead><tbody>";
+  rows.forEach(([p,q])=>{h+="<tr><td>"+v(p)+"</td><td class=\"lt\">"+v(q)+"</td><td>"+v(!p)+"</td>"+ops.map(o=>"<td>"+v(OPS[o](p,q))+"</td>").join("")+"<td class=\"lt\">"+v(true)+"</td><td>"+v(false)+"</td></tr>"});
+  h+="</tbody></table></div><dl>"+lang.semRead.map(t=>{const k=t.indexOf(" — ");return "<div><dt class=\"mono\">"+esc(t.slice(0,k))+"</dt><dd> — "+esc(t.slice(k+3))+"</dd></div>"}).join("")+"</dl>";
   const dl=list=>"<dl>"+list.map(([t,d])=>"<div><dt>"+esc(t)+"</dt><dd> — "+esc(d)+"</dd></div>").join("")+"</dl>";
   h+="<h3>"+esc(lang.semTerms)+"</h3>"+dl(lang.semDefs);
   h+="<h3>"+esc(lang.semEnt)+"</h3>"+dl(lang.semEntDefs);
@@ -2363,7 +2381,21 @@ function buildSemantics(){
   h+="<h3>"+esc(lang.semRel)+"</h3><p>"+esc(lang.semRelNote)+"</p><div class=\"tw\"><table><thead><tr><th class=\"txt\">"+esc(lang.semRelHead[0])+"</th>"+
     [[T,T],[T,F],[F,T],[F,F]].map(([a,b])=>"<th>A="+esc(a)+", B="+esc(b)+"</th>").join("")+"<th class=\"txt\">"+esc(lang.semRelHead[1])+"</th></tr></thead><tbody>";
   lang.semRelDefs.forEach(([n,d],i)=>{h+="<tr><td class=\"txt\"><b>"+esc(n)+"</b></td>"+REL_COMBOS[i].map(c=>"<td>"+c+"</td>").join("")+"<td class=\"txt\">"+esc(d)+"</td></tr>"});
-  $("sem").innerHTML=h+"</tbody></table></div>";
+  h+="</tbody></table></div>";
+  // the two-axis algorithm and its result for every non-empty set S of pairs
+  h+="<h3>"+esc(lang.semAlgo)+"</h3><ol class=\"algo\">"+lang.semAlgoSteps.map(t=>"<li>"+esc(t)+"</li>").join("")+"</ol>";
+  h+="<p><b>"+esc(lang.semAlgoAll)+"</b></p><div class=\"tw\"><table><thead><tr>"+lang.semAlgoHead.map(t=>"<th class=\"txt\">"+esc(t)+"</th>").join("")+"</tr></thead><tbody>";
+  const PAIRS=["11","10","01","00"],pair=x=>[...x].map(c=>c==="1"?T:F).join(""),sets=[];
+  for(let m=1;m<16;m++)sets.push(PAIRS.filter((_,i)=>m>>(3-i)&1));
+  sets.sort((x,y)=>x.length-y.length||PAIRS.indexOf(x[0])-PAIRS.indexOf(y[0])||PAIRS.indexOf(x[1])-PAIRS.indexOf(y[1])||PAIRS.indexOf(x[2])-PAIRS.indexOf(y[2]));
+  sets.forEach(S_=>{
+    const rs=relations(S_.map(x=>x[0]).join(""),S_.map(x=>x[1]).join(""));
+    const ax1=rs.find(r=>r.kind==="equiv"||r.kind==="sub"),ax2=rs.find(r=>r.kind==="contradict"||r.kind==="contrary"||r.kind==="subcontrary");
+    const name=r=>r.kind==="sub"?(r.dir>0?lang.semAlgoSub1:lang.semAlgoSub2):lang.rel[r.kind];
+    h+="<tr><td class=\"txt mono\">{"+S_.map(pair).join(", ")+"}</td>"+(rs[0].kind==="indep"?"<td class=\"txt\" colspan=\"2\"><b>"+esc(lang.rel.indep)+"</b></td>":
+      [ax1,ax2].map(r=>"<td class=\"txt\">"+(r?"<b>"+esc(name(r))+"</b>":esc(lang.semAlgoNone))+"</td>").join(""))+"</tr>";
+  });
+  $("sem").innerHTML=h+"</tbody></table></div><p>"+esc(lang.semAlgoNote)+"</p>";
 }
 function applyLang(){
   const lang=L();
