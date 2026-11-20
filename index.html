@@ -469,6 +469,12 @@ canvas.venn{display:block;max-width:100%;height:auto;border-radius:4px}
         <button type="button" data-val="1" data-i18n="extraOn"></button>
       </div>
     </div>
+    <div class="opt"><span data-i18n="askKind"></span>
+      <div class="seg" data-set="askKind">
+        <button type="button" data-val="0" data-i18n="revealShow"></button>
+        <button type="button" data-val="1" data-i18n="revealAsk"></button>
+      </div>
+    </div>
     <div class="opt"><span data-i18n="reveal"></span>
       <div class="seg" data-set="reveal">
         <button type="button" data-val="1" data-i18n="revealShow"></button>
@@ -594,7 +600,7 @@ ru:{
   about:[
     ["Ввод формул",["кнопками, с клавиатуры (<code>-&gt;</code>, <code>&lt;-&gt;</code>, <code>&amp;</code>, <code>v</code>, <code>~</code>, <code>+</code>, <code>|</code>, <code>~v</code>, <code>|=</code>) или командами LaTeX (<code>\\to</code>, <code>\\land</code>, <code>\\neg</code>…) — сокращения сразу превращаются в символы","связки ¬ ∧ ∨ → ↔ ⊻ | ↓, по желанию ←, ↛ и ↚, константы ⊤ и ⊥, переменные с индексами (p₁)","несколько формул через запятую и логическое следование: <code>p, p→q ⊨ q</code> или <code>{p, p→q} ⊨ q</code>","«Случайное задание» рядом с «Построить таблицу»: одна формула, несколько формул или следование; примеры и случайная формула"]],
     ["Таблица истинности",["студент сам заполняет левую часть (наборы значений) и значения подформул; левую часть можно строить автоматически в порядке 000→111, 111→000 или в случайном порядке","два вида: подформулы в столбцах или значения прямо под связками формулы, с номерами порядка действий; можно вычислять все подформулы или только формулу","в записи «под связками» значения переменных копируются под формулу, а использованные значения зачёркиваются, когда студент переходит к следующей ячейке","обозначения 1/0, И/Л, T/F или свои; истина зелёная, ложь красная; первый клик выбирает ячейку, следующие перебирают значения","после «Проверить» — неверные ячейки, повторённые и пропущенные строки и объяснение каждой ошибки; «Подсказать» объясняет правило для выбранной ячейки, не называя ответ; кнопка «Заполнить всю таблицу автоматически» заполняет её целиком"]],
-    ["Что сайт определяет",["для формулы: тавтология, противоречие или случайная формула","для следования: есть ли оно и какие строки — контрпримеры; строки, где все посылки истинны, подсвечиваются","для нескольких формул: эквивалентность, контрадикторность, контрарность, субконтрарность, подчинение, независимость, а также совместность","ответ на следование и отношения можно сначала спросить у студента (с проверкой и «частично верно») или показать сразу"]],
+    ["Что сайт определяет",["для формулы: тавтология, противоречие или случайная формула","для следования: есть ли оно и какие строки — контрпримеры; строки, где все посылки истинны, подсвечиваются","для нескольких формул: эквивалентность, контрадикторность, контрарность, субконтрарность, подчинение, независимость, а также совместность","тип формулы, ответ на следование и отношения можно сначала спросить у студента (с проверкой и «частично верно») или показать сразу"]],
     ["Другие записи и формы",["дерево разбора, логическая схема из стандартных вентилей, диаграмма Венна для 1–3 переменных","вектор значений функции и её номер","запись только через штрих Шеффера и только через стрелку Пирса","польская и обратная польская запись, в символах и буквами Лукасевича","графы Пирса: линейная запись и рисунок; Begriffsschrift Фреге: запись через ¬ и →, чертёж и LaTeX для пакета begriff","СДНФ, СКНФ, сокращённые, куайновские и минимальные ДНФ и КНФ, полином Жегалкина","классы Поста T₀, T₁, S, M, L, таблица Поста для нескольких формул и проверка функциональной полноты системы"]],
     ["Для преподавателя",["ссылка на задание вместе с настройками; ссылка для контрольной, где формулу нельзя изменить, а подсказки, ответы и справка скрыты","генератор вариантов: таблицы, следования или отношения заданной сложности, со ссылками, ключом ответов и LaTeX","экспорт таблицы в LaTeX, HTML, Markdown, CSV и текст"]],
     ["Прочее",["светлая, тёмная или системная тема; русский и английский язык","настройки и заполненная таблица сохраняются в этом браузере","кнопка «Сообщить об ошибке» внизу справа"]]],
@@ -694,6 +700,10 @@ ru:{
   extraOps:"Связки ←, ↛, ↚ (обратная импликация, антиимпликация, обратная антиимпликация)", extraOff:"не использовать", extraOn:"использовать",
   ordRand:"случайный",
   reveal:"Следование и отношения", revealAsk:"спрашивать", revealShow:"показывать сразу",
+  askKind:"Тип формулы (тавтология, противоречие, случайная)",
+  kindName:{taut:"тавтология",contr:"противоречие",sat:"случайная (выполнима и опровержима)"},
+  qKind1:"Какой является формула?", qKindN:"Определите тип каждой формулы.",
+  qKindScore:(r,n)=>"Верно определено типов формул: "+r+" из "+n+".",
   cols:"Что вычислять", colsAll:"все подформулы", colsMain:"только формулу",
   checkBtn:"Проверить", solve:"Заполнить всю таблицу автоматически", clear:"Очистить",
   clearInput:"стереть",
@@ -725,7 +735,7 @@ ru:{
   qEntail:"Следует ли заключение из посылок?", qValid:"Общезначимо ли заключение, то есть следует ли оно из пустого множества посылок?",
   ansYes:"Да, следует", ansNo:"Нет, не следует",
   qRelHead:"Определите отношения между формулами. Отметьте все подходящие варианты — их может быть несколько.",
-  qNeed:"Сначала отметьте хотя бы один вариант для каждой пары.", qNeedOne:"Сначала выберите ответ.",
+  qNeed:"Сначала ответьте на все вопросы: выберите тип каждой формулы и отметьте хотя бы одно отношение для каждой пары.", qNeedOne:"Сначала выберите ответ.",
   qCheck:"Проверить ответ", qRetry:"Изменить ответ", qRight:"Верно.", qWrong:"Неверно.", qAnswer:"Правильный ответ:",
   qScore:(r,n)=>"Верно определено пар: "+r+" из "+n+".",
   qPartial:"Частично верно.", qMissing:"Отмечено верно, но не хватает:", qPartScore:k=>"Частично верно: "+k+".",
@@ -764,7 +774,7 @@ en:{
   about:[
     ["Typing formulas",["with buttons, the keyboard (<code>-&gt;</code>, <code>&lt;-&gt;</code>, <code>&amp;</code>, <code>v</code>, <code>~</code>, <code>+</code>, <code>|</code>, <code>~v</code>, <code>|=</code>) or LaTeX commands (<code>\\to</code>, <code>\\land</code>, <code>\\neg</code>…); shortcuts turn into symbols as you type","connectives ¬ ∧ ∨ → ↔ ⊻ | ↓, optionally ←, ↛ and ↚, constants ⊤ and ⊥, indexed variables (p₁)","several formulas separated by commas, and entailment: <code>p, p→q ⊨ q</code> or <code>{p, p→q} ⊨ q</code>","“Random task” next to “Build table”: one formula, several formulas or an entailment; examples and a random formula"]],
     ["The truth table",["the student fills in the left side (assignments) and the values of subformulas; the left side can be generated in the order 000→111, 111→000 or at random","two layouts: subformula columns, or values right under the connectives with order-of-operations numbers; compute all subformulas or the formula only","under connectives the values of variables are copied under the formula and used values are struck out once the student moves on","notation 1/0, И/Л, T/F or your own; true is green, false red; the first click selects a cell, the next ones cycle its value","after “Check”: wrong cells, repeated and missing rows, and an explanation of every mistake; “Hint” explains the rule for the selected cell without giving the answer; the “Fill the whole table automatically” button fills it completely"]],
-    ["What the site determines",["for a formula: tautology, contradiction or contingent","for an entailment: whether it holds and which rows are counterexamples; rows where all premises are true are highlighted","for several formulas: equivalence, contradictoriness, contrariety, subcontrariety, subalternation, independence, and consistency","the student can be asked first (with checking and “partly correct”), or the answer shown at once"]],
+    ["What the site determines",["for a formula: tautology, contradiction or contingent","for an entailment: whether it holds and which rows are counterexamples; rows where all premises are true are highlighted","for several formulas: equivalence, contradictoriness, contrariety, subcontrariety, subalternation, independence, and consistency","the kind of formula, the entailment and the relations: the student can be asked first (with checking and “partly correct”), or the answer shown at once"]],
     ["Other notations and forms",["parse tree, logic circuit of standard gates, Venn diagram for 1–3 variables","the vector of values of the function and its number","the formula with the Sheffer stroke only and with the Peirce arrow only","Polish and reverse Polish notation, in symbols and Łukasiewicz letters","Peirce’s graphs: linear form and drawing; Frege’s Begriffsschrift: ¬/→ form, drawing and LaTeX for the begriff package","full, abbreviated, Quine and minimal DNF and CNF, Zhegalkin polynomial","Post’s classes T₀, T₁, S, M, L, Post’s table for several formulas and a check of functional completeness"]],
     ["For teachers",["a link to the task with its settings; a test link where the formula is fixed and hints, answers and help are hidden","a variant generator: tables, entailments or relations of a chosen difficulty, with links, an answer key and LaTeX","table export to LaTeX, HTML, Markdown, CSV and plain text"]],
     ["Other",["light, dark or system theme; Russian and English","settings and the filled table are kept in this browser","a “Report a bug” button at the bottom right"]]],
@@ -864,6 +874,10 @@ en:{
   extraOps:"Connectives ←, ↛, ↚ (converse implication, non-implication, converse non-implication)", extraOff:"off", extraOn:"on",
   ordRand:"random",
   reveal:"Entailment and relations", revealAsk:"ask", revealShow:"show at once",
+  askKind:"Kind of formula (tautology, contradiction, contingent)",
+  kindName:{taut:"tautology",contr:"contradiction",sat:"contingent (satisfiable and falsifiable)"},
+  qKind1:"What kind of formula is it?", qKindN:"Name the kind of each formula.",
+  qKindScore:(r,n)=>"Kinds named correctly: "+r+" of "+n+".",
   cols:"What to compute", colsAll:"all subformulas", colsMain:"formula only",
   checkBtn:"Check", solve:"Fill the whole table automatically", clear:"Clear",
   clearInput:"clear",
@@ -895,7 +909,7 @@ en:{
   qEntail:"Does the conclusion follow from the premises?", qValid:"Is the conclusion valid, i.e. does it follow from the empty set of premises?",
   ansYes:"Yes, it follows", ansNo:"No, it does not",
   qRelHead:"Name the relations between the formulas. Tick every option that applies; more than one may be correct.",
-  qNeed:"Tick at least one option for every pair first.", qNeedOne:"Choose an answer first.",
+  qNeed:"Answer every question first: choose the kind of each formula and tick at least one relation for every pair.", qNeedOne:"Choose an answer first.",
   qCheck:"Check answer", qRetry:"Change answer", qRight:"Correct.", qWrong:"Wrong.", qAnswer:"Correct answer:",
   qScore:(r,n)=>"Pairs answered correctly: "+r+" of "+n+".",
   qPartial:"Partly correct.", qMissing:"What you ticked is right, but this is missing:", qPartScore:k=>"Partly correct: "+k+".",
@@ -970,8 +984,8 @@ function save(k,v){try{localStorage.setItem("tt-"+k,JSON.stringify(v))}catch(e){
 const S={
   custT:load("custT","+"), custF:load("custF","−"),
   lang:load("lang","ru"), notation:load("notation","01"), auto:load("auto",false), order:load("order","asc"),
-  cols:load("cols","all"), layout:load("layout","cols"), reveal:load("reveal",false), extraOps:load("extraOps",false), keys:load("keys",true),
-  model:null, left:[], right:[], checked:false, quiz:{entail:null,rel:{},checked:false}
+  cols:load("cols","all"), layout:load("layout","cols"), reveal:load("reveal",false), askKind:load("askKind",true), extraOps:load("extraOps",false), keys:load("keys",true),
+  model:null, left:[], right:[], checked:false, quiz:{entail:null,rel:{},kind:{},checked:false}
 };
 
 /* ---------- lexer / parser ---------- */
@@ -1275,7 +1289,7 @@ function taskUrl(text,withSettings,test,over){
   const here=/github\.io$|^localhost$|^127\.0\.0\.1$/.test(location.hostname)?location.origin+location.pathname:PAGES_URL;
   let q="?f="+encodeURIComponent(text);
   if(withSettings){
-    const p={n:S.notation,lay:S.layout,c:S.cols,l:S.auto?"auto":"manual",o:S.order,r:S.reveal?"show":"ask",x:S.extraOps?"1":"0",lang:S.lang};
+    const p={n:S.notation,lay:S.layout,c:S.cols,l:S.auto?"auto":"manual",o:S.order,r:S.reveal?"show":"ask",k:S.askKind?"ask":"show",x:S.extraOps?"1":"0",lang:S.lang};
     if(S.notation==="custom"){p.tv=S.custT;p.fv=S.custF}
     if(test)p.mode="test";
     Object.assign(p,over||{});
@@ -1295,6 +1309,7 @@ function applyUrlSettings(P){
   if((v=g("l",["auto","manual"])))S.auto=v==="auto";
   if((v=g("o",["asc","desc","rand"])))S.order=v;
   if((v=g("r",["show","ask"])))S.reveal=v==="show";
+  if((v=g("k",["ask","show"])))S.askKind=v==="ask";
   if((v=g("x",["1","0"])))S.extraOps=v==="1";
   if((v=g("lang",["ru","en"])))S.lang=v;
   S.test=P.get("mode")==="test";
@@ -1544,9 +1559,10 @@ function update(){
    question; the answer and the counterexample rows appear only after "Check answer". */
 const REL_OPTS=["equiv","contradict","contrary","subcontrary","sub1","sub-1","indep"];
 const relKey=r=>r.kind==="sub"?(r.dir>0?"sub1":"sub-1"):r.kind;
-function newQuiz(){return {entail:null,rel:{},checked:false,warn:false}}
+function newQuiz(){return {entail:null,rel:{},kind:{},checked:false,warn:false}}
 function verdictHtml(A){
-  if(S.reveal)return answerHtml(A);
+  // the kind of formula has its own setting; entailment and relations share "reveal"
+  if(S.model.entail?S.reveal:S.reveal&&!S.askKind)return answerHtml(A);
   const m=S.model,lang=L(),Q=S.quiz,f=x=>"<span class=\"mono\">"+esc(x)+"</span>";
   const optCls=(chosen,correct)=>"qopt"+(!Q.checked?"":chosen&&correct?" right":chosen?" wrong":correct?" missed":"");
   const btn=Q.checked?"<button type=\"button\" class=\"btn sm\" id=\"q-retry\">"+esc(lang.qRetry)+"</button>"
@@ -1566,13 +1582,40 @@ function verdictHtml(A){
     }
     return "<div class=\"banner\">"+b+btnRow(btn)+"</div></div>";
   }
+  // kind of each formula: tautology, contradiction or contingent
+  const kindOf=i=>{const t=A.trues[i];return t===m.n?"taut":t===0?"contr":"sat"};
+  const kindText=i=>{const t=A.trues[i];return t===m.n?lang.taut:t===0?lang.contr:lang.sat(t,m.n)};
+  let kindRight=0;
+  const kindQuiz=()=>{
+    let h="<div class=\"quiz\"><div class=\"q\">"+esc(m.groups.length===1?lang.qKind1:lang.qKindN)+"</div>";
+    m.groups.forEach((g,i)=>{
+      const want=kindOf(i),got=Q.kind[i],ok=got===want;if(ok)kindRight++;
+      h+="<fieldset class=\"pair"+(Q.checked?(ok?" ok":" bad"):"")+"\"><legend>"+f(g.text)+"</legend><div class=\"opts\">";
+      ["taut","contr","sat"].forEach(o=>{
+        h+="<label class=\""+optCls(got===o,want===o)+"\"><input type=\"radio\" name=\"q-kind-"+i+"\" value=\""+o+"\""+(got===o?" checked":"")+(Q.checked?" disabled":"")+"> "+esc(lang.kindName[o])+"</label>";
+      });
+      h+="</div>";
+      if(Q.checked)h+="<div class=\"qres "+(ok?"ok":"bad")+"\"><b>"+esc(ok?lang.qRight:lang.qWrong)+"</b> "+esc(kindText(i))+"</div>";
+      h+="</fieldset>";
+    });
+    return h+"</div>";
+  };
   if(m.groups.length===1){
-    const t=A.trues[0];
-    return "<div class=\"banner\">"+b+" "+esc(t===m.n?lang.taut:t===0?lang.contr:lang.sat(t,m.n))+"</div>";
+    if(!S.askKind)return "<div class=\"banner\">"+b+" "+esc(kindText(0))+"</div>";
+    return "<div class=\"banner\">"+b+kindQuiz()+btnRow(btn)+"</div>";
   }
-  b+="<ul>";
-  m.groups.forEach((g,i)=>{b+="<li>"+f(g.text)+": "+esc(lang.clsShort(A.trues[i],m.n))+"</li>"});
-  b+="</ul><div class=\"quiz\"><div class=\"q\">"+esc(lang.qRelHead)+"</div>";
+  if(S.askKind)b+=kindQuiz();
+  else{
+    b+="<ul>";
+    m.groups.forEach((g,i)=>{b+="<li>"+f(g.text)+": "+esc(lang.clsShort(A.trues[i],m.n))+"</li>"});
+    b+="</ul>";
+  }
+  // relations shown at once, only the kinds are asked
+  if(S.reveal){
+    if(Q.checked)b+="<div class=\"qscore\">"+esc(lang.qKindScore(kindRight,m.groups.length))+"</div>";
+    return "<div class=\"banner\">"+b+btnRow(btn)+relList(A)+"</div>";
+  }
+  b+="<div class=\"quiz\"><div class=\"q\">"+esc(lang.qRelHead)+"</div>";
   let right=0,total=0,partial=0;
   for(let i=0;i<m.groups.length;i++)for(let j=i+1;j<m.groups.length;j++){
     const key=i+"-"+j,A_=m.groups[i].text,B_=m.groups[j].text;
@@ -1597,7 +1640,7 @@ function verdictHtml(A){
     }
     b+="</fieldset>";
   }
-  if(Q.checked)b+="<div class=\"qscore\">"+esc(lang.qScore(right,total)+(partial?" "+lang.qPartScore(partial):""))+"</div><div>"+esc(A.jointRows.length?lang.joint(A.jointRows):lang.noJoint)+"</div>";
+  if(Q.checked)b+="<div class=\"qscore\">"+(S.askKind?esc(lang.qKindScore(kindRight,m.groups.length))+" ":"")+esc(lang.qScore(right,total)+(partial?" "+lang.qPartScore(partial):""))+"</div><div>"+esc(A.jointRows.length?lang.joint(A.jointRows):lang.noJoint)+"</div>";
   return "<div class=\"banner\">"+b+btnRow(btn)+"</div></div>";
 }
 /* the same verdict with the answers shown at once (setting "show at once") */
@@ -1612,18 +1655,24 @@ function answerHtml(A){
   if(m.groups.length===1){const t=A.trues[0];return "<div class=\"banner\">"+b+esc(t===m.n?lang.taut:t===0?lang.contr:lang.sat(t,m.n))+"</div>"}
   b+="<ul>";
   m.groups.forEach((g,i)=>{b+="<li>"+f(g.text)+": "+esc(lang.clsShort(A.trues[i],m.n))+"</li>"});
-  b+="</ul><div>"+esc(lang.relHead)+"</div><ul class=\"rel\">";
+  return "<div class=\"banner\">"+b+"</ul>"+relList(A)+"</div>";
+}
+function relList(A){
+  const m=S.model,lang=L(),f=x=>"<span class=\"mono\">"+esc(x)+"</span>";
+  let b="<div>"+esc(lang.relHead)+"</div><ul class=\"rel\">";
   for(let i=0;i<m.groups.length;i++)for(let j=i+1;j<m.groups.length;j++){
     const A_=m.groups[i].text,B_=m.groups[j].text;
     b+="<li>"+f(A_)+" "+esc(lang.and)+" "+f(B_)+": "+relations(A.vecs[i],A.vecs[j]).map(r=>
       "<b>"+esc(lang.rel[r.kind])+"</b> — "+(r.kind==="sub"?f(r.dir>0?A_:B_)+" ⊨ "+f(r.dir>0?B_:A_)+", "+esc(lang.notBack):esc(lang.relWhy[r.kind]))).join("; ")+"</li>";
   }
-  return "<div class=\"banner\">"+b+"</ul>"+esc(A.jointRows.length?lang.joint(A.jointRows):lang.noJoint)+"</div>";
+  return b+"</ul>"+esc(A.jointRows.length?lang.joint(A.jointRows):lang.noJoint);
 }
-const btnRow=btn=>"<div class=\"qbtns\">"+btn+(S.quiz.warn?"<span class=\"qwarn\">"+esc(S.model.entail?L().qNeedOne:L().qNeed)+"</span>":"")+"</div>";
+const btnRow=btn=>"<div class=\"qbtns\">"+btn+(S.quiz.warn?"<span class=\"qwarn\">"+esc(S.model.entail||S.model.groups.length===1?L().qNeedOne:L().qNeed)+"</span>":"")+"</div>";
 function quizAnswered(){
   const m=S.model,Q=S.quiz;
   if(m.entail)return Q.entail!==null;
+  if(S.askKind&&m.groups.some((_,i)=>!Q.kind[i]))return false;
+  if(S.reveal)return true;
   for(let i=0;i<m.groups.length;i++)for(let j=i+1;j<m.groups.length;j++){const g=Q.rel[i+"-"+j];if(!g||!g.size)return false}
   return true;
 }
@@ -1631,6 +1680,7 @@ resultEl.addEventListener("change",e=>{
   const t=e.target,Q=S.quiz;
   if(Q.warn){Q.warn=false;const w=resultEl.querySelector(".qwarn");if(w)w.remove()}
   if(t.name==="q-entail")Q.entail=t.value==="1";
+  else if(t.name&&t.name.startsWith("q-kind-"))Q.kind[+t.name.slice(7)]=t.value;
   else if(t.dataset.pair){const set=Q.rel[t.dataset.pair]||(Q.rel[t.dataset.pair]=new Set());t.checked?set.add(t.value):set.delete(t.value)}
 });
 resultEl.addEventListener("click",e=>{
@@ -2399,7 +2449,7 @@ function applyCustom(){
   syncSegs();buildSemantics();if(S.model)update();
 }));
 function syncSegs(){
-  const val={notation:S.notation,auto:S.auto?"1":"0",order:S.order,layout:S.layout,cols:S.cols,reveal:S.reveal?"1":"0",extraOps:S.extraOps?"1":"0",keys:S.keys?"1":"0"};
+  const val={notation:S.notation,auto:S.auto?"1":"0",order:S.order,layout:S.layout,cols:S.cols,reveal:S.reveal?"1":"0",askKind:S.askKind?"1":"0",extraOps:S.extraOps?"1":"0",keys:S.keys?"1":"0"};
   $("keys").hidden=!S.keys;
   document.querySelectorAll(".seg[data-set]").forEach(g=>{
     g.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.val===val[g.dataset.set])));
@@ -2421,6 +2471,7 @@ document.querySelectorAll(".seg[data-set]").forEach(g=>{
     if(key==="cols")S.cols=v;
     if(key==="layout")S.layout=v;
     if(key==="reveal")S.reveal=v==="1";
+    if(key==="askKind")S.askKind=v==="1";
     if(key==="extraOps"){S.extraOps=v==="1";save(key,S[key]);applyLang();return}
     if(key==="keys"){S.keys=v==="1";save(key,S[key]);syncSegs();return}
     save(key,S[key]);syncSegs();
