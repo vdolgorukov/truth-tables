@@ -337,6 +337,18 @@ span.cell:hover{background:transparent}
 .tr-tabs{margin-top:.6rem}
 .tr-f{display:grid;gap:.35rem}
 .tr-f h3{margin:0;font-size:1rem;font-family:"Noto Sans Math","PT Mono",ui-monospace,monospace;font-weight:700}
+.kmap-wrap{display:flex;flex-direction:column;gap:.5rem;align-items:flex-start}
+.kmap{border-collapse:collapse;font-variant-numeric:tabular-nums}
+.kmap th,.kmap td{border:1px solid var(--rule-strong);min-width:2.4em;height:2.2em;text-align:center;padding:0 .4em;font-family:"Noto Sans Math","PT Mono",ui-monospace,Menlo,Consolas,monospace}
+.kmap th{font-weight:500;color:var(--muted);background:color-mix(in srgb,var(--rule) 40%,transparent)}
+.kmap th.kcorner{font-size:.85em;white-space:nowrap}
+.kmap td.v1{color:var(--tv)}.kmap td.v0{color:var(--fv)}
+.kmap td.hl{background:var(--good-bg);box-shadow:inset 0 0 0 2px var(--accent);font-weight:700}
+.kmap td.hl.cnf{background:var(--err-bg)}
+.kterms{line-height:2}
+.kchip{font:inherit;font-family:"Noto Sans Math","PT Mono",ui-monospace,Menlo,Consolas,monospace;background:none;border:1px solid var(--rule-strong);border-radius:4px;padding:0 .35em;color:var(--text);cursor:pointer}
+.kchip:hover,.kchip:focus-visible,.kchip.on{border-color:var(--accent);background:var(--good-bg)}
+.kchip.cnf:hover,.kchip.cnf:focus-visible,.kchip.cnf.on{background:var(--err-bg)}
 .single>div+div{margin-top:.3rem}.single .lbl{color:var(--muted);font-size:.85em;margin-right:.3rem}
 .tr-row{display:grid;grid-template-columns:minmax(10rem,16rem) minmax(0,1fr);gap:.2rem 1rem;align-items:baseline}
 @media (max-width:640px){.tr-row{grid-template-columns:minmax(0,1fr)}}
@@ -462,6 +474,18 @@ canvas.venn{display:block;max-width:100%;height:auto;border-radius:4px}
       <div class="seg" data-set="keys">
         <button type="button" data-val="1" data-i18n="keysShow"></button>
         <button type="button" data-val="0" data-i18n="keysHide"></button>
+      </div>
+    </div>
+    <div class="opt"><span data-i18n="omitAnd"></span>
+      <div class="seg" data-set="omitAnd">
+        <button type="button" data-val="0" data-i18n="omitAndOff"></button>
+        <button type="button" data-val="1" data-i18n="omitAndOn"></button>
+      </div>
+    </div>
+    <div class="opt"><span data-i18n="negBar"></span>
+      <div class="seg" data-set="negBar">
+        <button type="button" data-val="0" data-i18n="negBarOff"></button>
+        <button type="button" data-val="1" data-i18n="negBarOn"></button>
       </div>
     </div>
     <div class="opt"><span data-i18n="extraOps"></span>
@@ -602,7 +626,7 @@ ru:{
     ["Ввод формул",["кнопками, с клавиатуры (<code>-&gt;</code>, <code>&lt;-&gt;</code>, <code>&amp;</code>, <code>v</code>, <code>~</code>, <code>+</code>, <code>|</code>, <code>~v</code>, <code>|=</code>) или командами LaTeX (<code>\\to</code>, <code>\\land</code>, <code>\\neg</code>…) — сокращения сразу превращаются в символы","связки ¬ ∧ ∨ → ↔ ⊻ | ↓, по желанию ←, ↛ и ↚, константы ⊤ и ⊥, переменные с индексами (p₁)","несколько формул через запятую и логическое следование: <code>p, p→q ⊨ q</code> или <code>{p, p→q} ⊨ q</code>","«Случайное задание» рядом с «Построить таблицу»: одна формула, несколько формул или следование; примеры и случайная формула"]],
     ["Таблица истинности",["студент сам заполняет левую часть (наборы значений) и значения подформул; левую часть можно строить автоматически в порядке 000→111, 111→000 или в случайном порядке","два вида: подформулы в столбцах или значения прямо под связками формулы, с номерами порядка действий; можно вычислять все подформулы или только формулу","в записи «под связками» значения переменных копируются под формулу, а использованные значения зачёркиваются, когда студент переходит к следующей ячейке","обозначения 1/0, И/Л, T/F или свои; истина зелёная, ложь красная; первый клик выбирает ячейку, следующие перебирают значения","после «Проверить» — неверные ячейки, повторённые и пропущенные строки и объяснение каждой ошибки; «Подсказать» объясняет правило для выбранной ячейки, не называя ответ; кнопка «Заполнить всю таблицу автоматически» заполняет её целиком"]],
     ["Что сайт определяет",["для формулы: тавтология, противоречие или случайная формула","для следования: есть ли оно и какие строки — контрпримеры; строки, где все посылки истинны, подсвечиваются","для нескольких формул: эквивалентность, контрадикторность, контрарность, субконтрарность, подчинение, независимость, а также совместность","тип формулы, ответ на следование и отношения можно сначала спросить у студента (с проверкой и «частично верно») или показать сразу"]],
-    ["Другие записи и формы",["дерево разбора, логическая схема из стандартных вентилей, диаграмма Венна для 1–3 переменных","вектор значений функции и её номер","запись только через штрих Шеффера и только через стрелку Пирса: кратчайшая (перебором) и прямой перевод","польская и обратная польская запись, в символах и буквами Лукасевича","графы Пирса: линейная запись и рисунок; Begriffsschrift Фреге: запись через ¬ и →, чертёж и LaTeX для пакета begriff","СДНФ, СКНФ, сокращённые, куайновские и минимальные ДНФ и КНФ, полином Жегалкина","классы Поста T₀, T₁, S, M, L, таблица Поста для нескольких формул и проверка функциональной полноты системы"]],
+    ["Другие записи и формы",["дерево разбора, логическая схема из стандартных вентилей, диаграмма Венна для 1–3 переменных","вектор значений функции и её номер","запись только через штрих Шеффера и только через стрелку Пирса: кратчайшая (перебором) и прямой перевод","польская и обратная польская запись, в символах и буквами Лукасевича","графы Пирса: линейная запись и рисунок; Begriffsschrift Фреге: запись через ¬ и →, чертёж и LaTeX для пакета begriff","СДНФ, СКНФ, сокращённые, куайновские и минимальные ДНФ и КНФ, карта Карно для 1–4 переменных, полином Жегалкина, фиктивные переменные","классы Поста T₀, T₁, S, M, L, таблица Поста для нескольких формул и проверка функциональной полноты системы"]],
     ["Для преподавателя",["ссылка на задание вместе с настройками; ссылка для контрольной, где формулу нельзя изменить, а подсказки, ответы и справка скрыты","генератор вариантов: таблицы, следования или отношения заданной сложности, со ссылками, ключом ответов и LaTeX","экспорт таблицы в LaTeX, HTML, Markdown, CSV и текст"]],
     ["Прочее",["светлая, тёмная или системная тема; русский и английский язык","настройки и заполненная таблица сохраняются в этом браузере","кнопка «Сообщить об ошибке» внизу справа"]]],
   semTitle:"Семантика и термины",
@@ -649,7 +673,12 @@ ru:{
   trBegriffCopy:"Копировать LaTeX (begriff)", trBegriffNote:"код для пакета begriff; в преамбуле: \\usepackage{begriff}",
   trPeirceImg:"Графы Пирса (рисунок)", trPeirceImgNote:"пунктир — лист утверждения; овал (разрез) — отрицание того, что внутри; рядом — конъюнкция",
   trPeirce:"Графы Пирса (линейная запись)", trPeirceNote:"запись рядом — конъюнкция, скобки — отрицание; (()) — пустой лист, истина; () — ложь",
-  trSheffer:"Только через штрих Шеффера |", trPeirceArrow:"Только через стрелку Пирса ↓", trTooLong:"запись получается слишком длинной (больше 600 символов)",
+  trSheffer:"Только через штрих Шеффера |", trPeirceArrow:"Только через стрелку Пирса ↓", trTooLong:"запись получается слишком длинной (больше 600 символов)", trShowLong:"Показать",
+  trDummy:"Фиктивные переменные", trDummyNone:"нет: формула существенно зависит от каждой своей переменной", trDummyNoVars:"в формуле нет переменных",
+  trDummyEss:e=>e.length?"(существенные: "+e.join(", ")+")":"(существенных нет: формула — константа)",
+  trDummyNote:"переменная фиктивна, если изменение только её значения никогда не меняет значение формулы; фиктивных переменных нет в минимальных формах и в полиноме Жегалкина",
+  trKarnaugh:"Карта Карно", trKarnaughOnly:"строится для формул с 1–4 переменными", trKDnf:"минимальная ДНФ:", trKCnf:"минимальная КНФ:",
+  trKarnaughNote:"строки и столбцы идут в коде Грея: соседние клетки (и крайние в строке или столбце) отличаются значением одной переменной. Наведите на член минимальной ДНФ или КНФ — подсветятся клетки, которые он покрывает", trTooLongMax:"(больше 100 000 символов, не показывается)",
   trSingleMin:k=>"кратчайшая ("+k+" "+(k%10===1&&k%100!==11?"связка":k%10>=2&&k%10<=4&&(k%100<12||k%100>14)?"связки":"связок")+"):", trSingleDirect:"прямой перевод:", trSingleWait:"кратчайшая: идёт перебор…", trSingleGo:"Найти кратчайшую запись",
   trSingleAsk:"Для 4 переменных перебор может занять несколько секунд, поэтому он запускается кнопкой. Прямой перевод заменяет каждую связку её определением.",
   trSingleNote:"Кратчайшая запись найдена перебором всех формул по числу связок; прямой перевод заменяет каждую связку её определением.",
@@ -705,6 +734,8 @@ ru:{
   order:"Порядок строк", layout:"Вид таблицы", layoutCols:"подформулы в столбцах", layoutInline:"значения под связками",
   notCustom:"свои", custT:"истина", custF:"ложь",
   keysOpt:"Кнопки ввода", keysShow:"показывать", keysHide:"скрыть",
+  omitAnd:"Знак конъюнкции ∧ в записи формул", omitAndOff:"писать: p∧q", omitAndOn:"опускать: pq",
+  negBar:"Отрицание в записи формул", negBarOff:"знаком: ¬p", negBarOn:"чертой сверху",
   extraOps:"Связки ←, ↛, ↚ (обратная импликация, антиимпликация, обратная антиимпликация)", extraOff:"не использовать", extraOn:"использовать",
   ordRand:"случайный",
   reveal:"Следование и отношения", revealAsk:"спрашивать", revealShow:"показывать сразу",
@@ -783,7 +814,7 @@ en:{
     ["Typing formulas",["with buttons, the keyboard (<code>-&gt;</code>, <code>&lt;-&gt;</code>, <code>&amp;</code>, <code>v</code>, <code>~</code>, <code>+</code>, <code>|</code>, <code>~v</code>, <code>|=</code>) or LaTeX commands (<code>\\to</code>, <code>\\land</code>, <code>\\neg</code>…); shortcuts turn into symbols as you type","connectives ¬ ∧ ∨ → ↔ ⊻ | ↓, optionally ←, ↛ and ↚, constants ⊤ and ⊥, indexed variables (p₁)","several formulas separated by commas, and entailment: <code>p, p→q ⊨ q</code> or <code>{p, p→q} ⊨ q</code>","“Random task” next to “Build table”: one formula, several formulas or an entailment; examples and a random formula"]],
     ["The truth table",["the student fills in the left side (assignments) and the values of subformulas; the left side can be generated in the order 000→111, 111→000 or at random","two layouts: subformula columns, or values right under the connectives with order-of-operations numbers; compute all subformulas or the formula only","under connectives the values of variables are copied under the formula and used values are struck out once the student moves on","notation 1/0, И/Л, T/F or your own; true is green, false red; the first click selects a cell, the next ones cycle its value","after “Check”: wrong cells, repeated and missing rows, and an explanation of every mistake; “Hint” explains the rule for the selected cell without giving the answer; the “Fill the whole table automatically” button fills it completely"]],
     ["What the site determines",["for a formula: tautology, contradiction or contingent","for an entailment: whether it holds and which rows are counterexamples; rows where all premises are true are highlighted","for several formulas: equivalence, contradictoriness, contrariety, subcontrariety, subalternation, independence, and consistency","the kind of formula, the entailment and the relations: the student can be asked first (with checking and “partly correct”), or the answer shown at once"]],
-    ["Other notations and forms",["parse tree, logic circuit of standard gates, Venn diagram for 1–3 variables","the vector of values of the function and its number","the formula with the Sheffer stroke only and with the Peirce arrow only: the shortest one (by search) and the direct translation","Polish and reverse Polish notation, in symbols and Łukasiewicz letters","Peirce’s graphs: linear form and drawing; Frege’s Begriffsschrift: ¬/→ form, drawing and LaTeX for the begriff package","full, abbreviated, Quine and minimal DNF and CNF, Zhegalkin polynomial","Post’s classes T₀, T₁, S, M, L, Post’s table for several formulas and a check of functional completeness"]],
+    ["Other notations and forms",["parse tree, logic circuit of standard gates, Venn diagram for 1–3 variables","the vector of values of the function and its number","the formula with the Sheffer stroke only and with the Peirce arrow only: the shortest one (by search) and the direct translation","Polish and reverse Polish notation, in symbols and Łukasiewicz letters","Peirce’s graphs: linear form and drawing; Frege’s Begriffsschrift: ¬/→ form, drawing and LaTeX for the begriff package","full, abbreviated, Quine and minimal DNF and CNF, Karnaugh map for 1–4 variables, Zhegalkin polynomial, dummy variables","Post’s classes T₀, T₁, S, M, L, Post’s table for several formulas and a check of functional completeness"]],
     ["For teachers",["a link to the task with its settings; a test link where the formula is fixed and hints, answers and help are hidden","a variant generator: tables, entailments or relations of a chosen difficulty, with links, an answer key and LaTeX","table export to LaTeX, HTML, Markdown, CSV and plain text"]],
     ["Other",["light, dark or system theme; Russian and English","settings and the filled table are kept in this browser","a “Report a bug” button at the bottom right"]]],
   semTitle:"Semantics and terms",
@@ -830,7 +861,12 @@ en:{
   trBegriffCopy:"Copy LaTeX (begriff)", trBegriffNote:"code for the begriff package; in the preamble: \\usepackage{begriff}",
   trPeirceImg:"Peirce’s graphs (drawing)", trPeirceImgNote:"dashed frame: the sheet of assertion; an oval (cut) negates what is inside; side by side means conjunction",
   trPeirce:"Peirce’s graphs (linear form)", trPeirceNote:"juxtaposition is conjunction, brackets are negation; (()) is the blank sheet, true; () is false",
-  trSheffer:"Sheffer stroke | only", trPeirceArrow:"Peirce arrow ↓ only", trTooLong:"the formula gets too long (over 600 characters)",
+  trSheffer:"Sheffer stroke | only", trPeirceArrow:"Peirce arrow ↓ only", trTooLong:"the formula gets too long (over 600 characters)", trShowLong:"Show",
+  trDummy:"Dummy variables", trDummyNone:"none: the formula essentially depends on each of its variables", trDummyNoVars:"the formula has no variables",
+  trDummyEss:e=>e.length?"(essential: "+e.join(", ")+")":"(no essential ones: the formula is a constant)",
+  trDummyNote:"a variable is dummy when changing only its value never changes the value of the formula; dummy variables do not occur in the minimal forms or in the Zhegalkin polynomial",
+  trKarnaugh:"Karnaugh map", trKarnaughOnly:"drawn for formulas with 1–4 variables", trKDnf:"minimal DNF:", trKCnf:"minimal CNF:",
+  trKarnaughNote:"rows and columns follow the Gray code: neighbouring cells (and the edge cells of a row or column) differ in one variable. Point at a term of the minimal DNF or CNF to mark the cells it covers", trTooLongMax:"(over 100,000 characters, not shown)",
   trSingleMin:k=>"shortest ("+k+" connective"+(k===1?"":"s")+"):", trSingleDirect:"direct translation:", trSingleWait:"shortest: searching…", trSingleGo:"Find the shortest form",
   trSingleAsk:"With 4 variables the search may take a few seconds, so it is started with the button. The direct translation replaces each connective by its definition.",
   trSingleNote:"The shortest form is found by searching all formulas by the number of connectives; the direct translation replaces each connective by its definition.",
@@ -886,6 +922,8 @@ en:{
   order:"Row order", layout:"Table layout", layoutCols:"subformula columns", layoutInline:"values under connectives",
   notCustom:"custom", custT:"true", custF:"false",
   keysOpt:"Input buttons", keysShow:"show", keysHide:"hide",
+  omitAnd:"Conjunction sign ∧ in formulas", omitAndOff:"write: p∧q", omitAndOn:"omit: pq",
+  negBar:"Negation in formulas", negBarOff:"sign: ¬p", negBarOn:"bar above",
   extraOps:"Connectives ←, ↛, ↚ (converse implication, non-implication, converse non-implication)", extraOff:"off", extraOn:"on",
   ordRand:"random",
   reveal:"Entailment and relations", revealAsk:"ask", revealShow:"show at once",
@@ -999,7 +1037,7 @@ function save(k,v){try{localStorage.setItem("tt-"+k,JSON.stringify(v))}catch(e){
 const S={
   custT:load("custT","+"), custF:load("custF","−"),
   lang:load("lang","ru"), notation:load("notation","01"), auto:load("auto",false), order:load("order","asc"),
-  cols:load("cols","all"), layout:load("layout","cols"), reveal:load("reveal",false), askKind:load("askKind",true), extraOps:load("extraOps",false), keys:load("keys",true),
+  cols:load("cols","all"), layout:load("layout","cols"), reveal:load("reveal",false), askKind:load("askKind",true), extraOps:load("extraOps",false), keys:load("keys",true), omitAnd:load("omitAnd",false), negBar:load("negBar",false),
   model:null, left:[], right:[], checked:false, quiz:{entail:null,rel:{},kind:{},checked:false}
 };
 
@@ -1109,6 +1147,25 @@ function show(n){
     default:{const w=x=>x.t==="bin"?"("+show(x)+")":show(x);return w(n.a)+n.op+w(n.b)}
   }
 }
+/* the formula as HTML for display, following the settings: ∧ may be omitted (pq), negation may be a bar over
+   the negated part (then it needs no brackets). show() stays the plain text used for keys and links */
+function showH(n){
+  const omit=S.omitAnd,bar=S.negBar;
+  const w=(x,op)=>x.t!=="bin"||omit&&op==="∧"&&x.op==="∧"?showH(x):"("+showH(x)+")";
+  switch(n.t){
+    case "var":return esc(n.name);
+    case "const":return n.v?"⊤":"⊥";
+    case "not":return bar?"<span class=\"ovl\">"+showH(n.a)+"</span>":"¬"+(n.a.t==="bin"?"("+showH(n.a)+")":showH(n.a));
+    default:return w(n.a,n.op)+(omit&&n.op==="∧"?"":esc(n.op))+w(n.b,n.op);
+  }
+}
+const fH=n=>"<span class=\"mono\">"+showH(n)+"</span>";
+// the whole task (several formulas or an entailment) for display
+function modelH(m){
+  const gs=m.groups.map(g=>showH(g.ast)),prem=gs.slice(0,m.entail?-1:gs.length).join(", ");
+  const pt=m.braces?"{"+prem+"}":prem;
+  return "<span class=\"mono\">"+(m.entail?(pt?pt+" ":"")+"⊨ "+gs[gs.length-1]:pt)+"</span>";
+}
 const OPS={"∧":(a,b)=>a&&b,"∨":(a,b)=>a||b,"→":(a,b)=>!a||b,"↔":(a,b)=>a===b,"⊻":(a,b)=>a!==b,"|":(a,b)=>!(a&&b),"↓":(a,b)=>!(a||b),"←":(a,b)=>a||!b,"↛":(a,b)=>a&&!b,"↚":(a,b)=>!a&&b};
 function ev(n,env){
   switch(n.t){
@@ -1188,7 +1245,7 @@ function buildModel(input){
   const entail=!!input.entail,prem=groups.slice(0,entail?-1:groups.length).map(x=>x.text).join(", ");
   const premTxt=input.braces?"{"+prem+"}":prem;
   const text=entail?(premTxt?premTxt+" ":"")+"⊨ "+groups[groups.length-1].text:premTxt;
-  return {asts,groups,text,entail,concl:entail?groups.length-1:-1,vars,cols,n:1<<vars.length,pieces,islots,
+  return {asts,groups,text,entail,braces:!!input.braces,concl:entail?groups.length-1:-1,vars,cols,n:1<<vars.length,pieces,islots,
     mains:new Set(groups.map(x=>x.main)),mainsI:new Set(groups.map(x=>x.mainI))};
 }
 const k=()=>S.model.vars.length;
@@ -1431,7 +1488,7 @@ function renderTable(){
       h+="<td class=\"note\"></td></tr>";
     }
   }else{
-    sl.forEach(x=>{h+="<th scope=\"col\" class=\""+(x.main?"main":"")+x.sep+"\" data-h=\""+x.td+"\"><span class=\"ord\">"+(S.cols==="main"?"":m.cols[x.c].ord||"")+"</span>"+esc(x.label)+"</th>"});
+    sl.forEach(x=>{h+="<th scope=\"col\" class=\""+(x.main?"main":"")+x.sep+"\" data-h=\""+x.td+"\"><span class=\"ord\">"+(S.cols==="main"?"":m.cols[x.c].ord||"")+"</span>"+showH(x.node)+"</th>"});
     h+="<th class=\"note\" aria-hidden=\"true\"></th></tr></thead><tbody>";
     for(let r=0;r<m.n;r++){
       h+=rowStart(r);
@@ -1585,7 +1642,7 @@ function verdictHtml(A){
   let b="<b class=\"done\"><span aria-hidden=\"true\">✓</span> "+esc(lang.done)+"</b>";
   if(m.entail){
     const holds=!A.counter.length,noPrem=m.groups.length===1;
-    b+="<div class=\"quiz\"><div class=\"q\">"+esc(noPrem?lang.qValid:lang.qEntail)+" "+f(m.text)+"</div><div class=\"opts\">";
+    b+="<div class=\"quiz\"><div class=\"q\">"+esc(noPrem?lang.qValid:lang.qEntail)+" "+modelH(m)+"</div><div class=\"opts\">";
     [[true,lang.ansYes],[false,lang.ansNo]].forEach(([v,t])=>{
       b+="<label class=\""+optCls(Q.entail===v,v===holds)+"\"><input type=\"radio\" name=\"q-entail\" value=\""+(v?1:0)+"\""+(Q.entail===v?" checked":"")+(Q.checked?" disabled":"")+"> "+esc(t)+"</label>";
     });
@@ -1605,7 +1662,7 @@ function verdictHtml(A){
     let h="<div class=\"quiz\"><div class=\"q\">"+esc(m.groups.length===1?lang.qKind1:lang.qKindN)+"</div>";
     m.groups.forEach((g,i)=>{
       const want=kindOf(i),got=Q.kind[i],ok=got===want;if(ok)kindRight++;
-      h+="<fieldset class=\"pair"+(Q.checked?(ok?" ok":" bad"):"")+"\"><legend>"+f(g.text)+"</legend><div class=\"opts\">";
+      h+="<fieldset class=\"pair"+(Q.checked?(ok?" ok":" bad"):"")+"\"><legend>"+fH(g.ast)+"</legend><div class=\"opts\">";
       ["taut","contr","sat"].forEach(o=>{
         h+="<label class=\""+optCls(got===o,want===o)+"\"><input type=\"radio\" name=\"q-kind-"+i+"\" value=\""+o+"\""+(got===o?" checked":"")+(Q.checked?" disabled":"")+"> "+esc(lang.kindName[o])+"</label>";
       });
@@ -1622,7 +1679,7 @@ function verdictHtml(A){
   if(S.askKind)b+=kindQuiz();
   else{
     b+="<ul>";
-    m.groups.forEach((g,i)=>{b+="<li>"+f(g.text)+": "+esc(lang.clsShort(A.trues[i],m.n))+"</li>"});
+    m.groups.forEach((g,i)=>{b+="<li>"+fH(g.ast)+": "+esc(lang.clsShort(A.trues[i],m.n))+"</li>"});
     b+="</ul>";
   }
   // relations shown at once, only the kinds are asked
@@ -1669,7 +1726,7 @@ function answerHtml(A){
   }
   if(m.groups.length===1){const t=A.trues[0];return "<div class=\"banner\">"+b+esc(t===m.n?lang.taut:t===0?lang.contr:lang.sat(t,m.n))+"</div>"}
   b+="<ul>";
-  m.groups.forEach((g,i)=>{b+="<li>"+f(g.text)+": "+esc(lang.clsShort(A.trues[i],m.n))+"</li>"});
+  m.groups.forEach((g,i)=>{b+="<li>"+fH(g.ast)+": "+esc(lang.clsShort(A.trues[i],m.n))+"</li>"});
   return "<div class=\"banner\">"+b+"</ul>"+relList(A)+"</div>";
 }
 function relList(A){
@@ -1789,11 +1846,11 @@ function explainHtml(s,r,c,hint){ // hint: explain the rule only, without the re
   let parts="",rule;
   if(n.t==="var")rule=lang.ex.var;
   else if(n.t==="const")rule=lang.ex["const"];
-  else if(n.t==="not"){const a=ev(n.a,env);parts=f(show(n.a))+" = "+V(a)+". ";rule=lang.ex.not}
-  else{const a=ev(n.a,env),b=ev(n.b,env);parts=f(show(n.a))+" = "+V(a)+", "+f(show(n.b))+" = "+V(b)+". ";rule=lang.ex.op[n.op](a,b)}
+  else if(n.t==="not"){const a=ev(n.a,env);parts=fH(n.a)+" = "+V(a)+". ";rule=lang.ex.not}
+  else{const a=ev(n.a,env),b=ev(n.b,env);parts=fH(n.a)+" = "+V(a)+", "+fH(n.b)+" = "+V(b)+". ";rule=lang.ex.op[n.op](a,b)}
   const st=store(s)[r][c];
-  if(hint)return "<b>"+esc(lang.ex.row(r+1))+", "+"</b>"+f(show(n))+" ("+m.vars.map(v=>f(v)+" = "+V(env[v])).join(", ")+"). "+(st!=null&&st!==val?esc(lang.ex.wrongHere)+" ":"")+parts+esc(rule)+".";
-  return "<b>"+esc(lang.ex.row(r+1))+"</b> ("+m.vars.map(v=>f(v)+" = "+V(env[v])).join(", ")+"). "+parts+esc(rule)+". "+esc(lang.ex.so)+" "+f(show(n))+" = "+V(val)+"."+
+  if(hint)return "<b>"+esc(lang.ex.row(r+1))+", "+"</b>"+fH(n)+" ("+m.vars.map(v=>f(v)+" = "+V(env[v])).join(", ")+"). "+(st!=null&&st!==val?esc(lang.ex.wrongHere)+" ":"")+parts+esc(rule)+".";
+  return "<b>"+esc(lang.ex.row(r+1))+"</b> ("+m.vars.map(v=>f(v)+" = "+V(env[v])).join(", ")+"). "+parts+esc(rule)+". "+esc(lang.ex.so)+" "+fH(n)+" = "+V(val)+"."+
     (st!=null&&st!==val?" "+esc(lang.ex.yours)+" "+V(st)+".":"");
 }
 function showExplain(html){const e=$("explain");e.innerHTML=html||"";e.hidden=!html||S.test}
@@ -2064,50 +2121,81 @@ function primeImplicants(on,K){
 }
 const popc=x=>{let c=0;for(;x;x&=x-1)c++;return c};
 /* all covers of `on` by prime implicants with the least number of literals */
-function minimalCovers(primes,on,big){
+/* the search is a generator, so that the long ("big") search can run in the background in small steps:
+   the depth-first search keeps its own stack; ctl.stop asks it to finish early with what it has found */
+function* coversGen(primes,on,big,ctl){
   const cost=primes.map(p=>popc(p.mask)),opts=new Map(on.map(x=>[x,[]]));
   primes.forEach((p,i)=>on.forEach(x=>{if((x&p.mask)===p.val)opts.get(x).push(i)}));
-  let best=Infinity,nodes=0,aborted=false;const sols=new Map(),chosen=[],deadline=performance.now()+20000;
-  (function dfs(unc,c){
-    if(aborted)return;
-    if(++nodes>(big?Infinity:300000)||big&&nodes%2000===0&&performance.now()>deadline){aborted=true;return}
-    if(c>best)return;
+  let best=Infinity,nodes=0,aborted=false;const sols=new Map(),chosen=[],limit=big?Infinity:300000;
+  const enter=(unc,c)=>{
+    if(++nodes>limit){aborted=true;return null}
+    if(c>best)return null;
     if(!unc.length){
       const key=chosen.slice().sort((a,b)=>a-b).join(",");
       if(c<best){best=c;sols.clear()}
-      sols.set(key,key.split(",").map(Number));return;
+      sols.set(key,key.split(",").map(Number));return null;
     }
     let pick=unc[0];for(const x of unc)if(opts.get(x).length<opts.get(pick).length)pick=x;
-    for(const i of opts.get(pick)){
-      chosen.push(i);
-      dfs(unc.filter(x=>(x&primes[i].mask)!==primes[i].val),c+cost[i]);
-      chosen.pop();
-    }
-  })(on,0);
+    return {unc,c,cand:opts.get(pick),k:0};
+  };
+  const st=[],f0=enter(on,0);if(f0)st.push(f0);
+  while(st.length&&!aborted){
+    if(ctl&&ctl.stop){aborted=true;break}
+    const top=st[st.length-1];
+    if(top.k>0)chosen.pop();
+    if(top.k>=top.cand.length){st.pop();continue}
+    const i=top.cand[top.k++];chosen.push(i);
+    const nf=enter(top.unc.filter(x=>(x&primes[i].mask)!==primes[i].val),top.c+cost[i]);
+    if(nf)st.push(nf);
+    if(big&&nodes%1000===0)yield;
+  }
   return {sols:[...sols.values()],aborted};
 }
 /* abbreviated (all primes), Quine (primes used in some minimal form) and minimal forms;
-   for CNF the same is done for the false rows and every literal is negated */
-/* "big" is the longer search started with a button: no limit on the number of steps, 20 seconds at most */
-const MIN_FORMS={},MIN_FORMS_BIG=new Set();
+   for CNF the same is done for the false rows and every literal is negated.
+   "big" is the longer search started with a button: no limit on the number of steps, 20 seconds at most,
+   in the background */
+const MIN_FORMS={},MIN_FORMS_BIG=new Set(),MIN_FORMS_RUN=new Set();
 const minFormsKey=(ast,vars)=>{const K=vars.length;let v="";for(let x=0;x<1<<K;x++){const e={};vars.forEach((n,j)=>e[n]=((x>>(K-1-j))&1)===1);v+=ev(ast,e)?1:0}return vars.join(",")+":"+v};
-function minimalForms(ast,vars,big){
-  const ck=minFormsKey(ast,vars)+(big?":big":"");
-  if(MIN_FORMS[ck])return MIN_FORMS[ck];
+function* minimalFormsGen(ast,vars,big,ctl){
   const K=vars.length,N=1<<K,on=[],off=[];
   for(let x=0;x<N;x++){const env={};vars.forEach((v,j)=>env[v]=((x>>(K-1-j))&1)===1);(ev(ast,env)?on:off).push(x)}
-  const side=(rows,cnf)=>{
+  function* side(rows,cnf){
     if(!rows.length)return null;
     const primes=primeImplicants(rows,K);
+    if(big)yield;
     const lits=p=>vars.map((v,j)=>({v,j})).filter(o=>(p.mask>>(K-1-o.j))&1).map(o=>({v:o.v,neg:cnf?((p.val>>(K-1-o.j))&1)===1:((p.val>>(K-1-o.j))&1)===0}));
     const order=(a,b)=>popc(a.mask)-popc(b.mask)||b.mask-a.mask||a.val-b.val;
-    const {sols,aborted}=minimalCovers(primes,rows,big);
+    const {sols,aborted}=yield* coversGen(primes,rows,big,ctl);
     const used=new Set(sols.flat());
     const toForm=ids=>ids.map(i=>primes[i]).sort(order).map(lits);
     return {abbr:primes.slice().sort(order).map(lits),quine:aborted?null:toForm([...used].sort((a,b)=>a-b)),
       minimal:sols.map(toForm).sort((a,b)=>a.length-b.length),aborted};
+  }
+  const dnf=yield* side(on,false),cnf=yield* side(off,true);
+  return {dnf,cnf};
+}
+// the usual search, at once
+function minimalForms(ast,vars){
+  const ck=minFormsKey(ast,vars);
+  if(MIN_FORMS[ck])return MIN_FORMS[ck];
+  const g=minimalFormsGen(ast,vars,false);let r;do r=g.next();while(!r.done);
+  return MIN_FORMS[ck]=r.value;
+}
+// the long search in the background; when it ends the panel is drawn again
+function minimalFormsBig(ast,vars){
+  const ck=minFormsKey(ast,vars);
+  if(MIN_FORMS[ck+":big"]||MIN_FORMS_RUN.has(ck))return;
+  MIN_FORMS_RUN.add(ck);MIN_FORMS_BIG.add(ck);
+  const ctl={stop:false},g=minimalFormsGen(ast,vars,true,ctl),deadline=performance.now()+20000;
+  const tick=()=>{
+    const t=performance.now();let r;
+    do{if(performance.now()>deadline)ctl.stop=true;r=g.next()}while(!r.done&&performance.now()-t<25);
+    if(!r.done){setTimeout(tick,0);return}
+    MIN_FORMS[ck+":big"]=r.value;MIN_FORMS_RUN.delete(ck);
+    trKey="";renderTransforms();
   };
-  return MIN_FORMS[ck]={dnf:side(on,false),cnf:side(off,true)};
+  setTimeout(tick,0);
 }
 /* Post's classes of the function a formula defines (over its own variables) */
 function postClasses(ast,vars){
@@ -2245,6 +2333,7 @@ function minimalSingle(ast,op,start){
   }
   return "pending";
 }
+const SHOW_LONG=new Set(),LONG_MAX=100000;
 const countOps=n=>n.t==="bin"?1+countOps(n.a)+countOps(n.b):n.t==="not"?1+countOps(n.a):0;
 // length of the written formula without building the string (parts are shared, the text is not)
 function shownLength(n,limit){
@@ -2332,18 +2421,61 @@ function renderTransforms(){
     const vs=new Set();(function w(n){if(n.t==="var")vs.add(n.name);else if(n.t==="not")w(n.a);else if(n.t==="bin"){w(n.a);w(n.b)}})(ast);
     const vars=S.model.vars.filter(v=>vs.has(v)),dnf=kind==="dnf",T=lang.trMin[kind];
     if(!vars.length)return "";
-    const fk=minFormsKey(ast,vars),big=MIN_FORMS_BIG.has(fk);
+    const fk=minFormsKey(ast,vars),big=!!MIN_FORMS[fk+":big"],running=MIN_FORMS_RUN.has(fk);
+    const wait="<button type=\"button\" class=\"btn sm\" disabled>"+esc(lang.trMinWait)+"</button>";
     const goBtn=label=>"<button type=\"button\" class=\"btn sm minf-go\" data-key=\""+esc(fk)+"\" data-g=\""+S.model.groups.findIndex(g=>g.ast===ast)+"\">"+esc(label)+"</button>";
     if(vars.length>MIN_VARS_MAX)return row(T.min,"<span class=\"none\">"+esc(lang.trTooMany(MIN_VARS_MAX))+"</span>");
-    if(vars.length>MIN_VARS&&!big)return row(T.min,goBtn(lang.trMinGo),lang.trMinGoNote(vars.length));
-    const r=minimalForms(ast,vars,big)[kind];
+    if(vars.length>MIN_VARS&&!big)return row(T.min,running?wait:goBtn(lang.trMinGo),lang.trMinGoNote(vars.length));
+    const r=(big?MIN_FORMS[fk+":big"]:minimalForms(ast,vars))[kind];
     if(!r)return "";
     let h=row(T.abbr,formHtml(r.abbr,dnf),T.abbrNote);
     h+=row(T.quine,r.quine?formHtml(r.quine,dnf):"<span class=\"none\">"+esc(lang.trAborted)+"</span>",T.quineNote);
     const shown=r.minimal.slice(0,3).map(f=>formHtml(f,dnf)).join("<br>");
     const more=r.minimal.length>3?"<br><span class=\"none\">"+esc(lang.trMoreMin(r.minimal.length-3))+"</span>":"";
-    h+=row(T.min,shown+more+(r.aborted?"<br><span class=\"none\">"+esc(big?lang.trAbortedBig:lang.trAborted)+"</span>"+(big?"":"<br>"+goBtn(lang.trMinMore)):""),r.minimal.length>1?lang.trMinCount(r.minimal.length):T.minNote);
+    h+=row(T.min,shown+more+(r.aborted?"<br><span class=\"none\">"+esc(big?lang.trAbortedBig:lang.trAborted)+"</span>"+(big?"":"<br>"+(running?wait:goBtn(lang.trMinMore))):""),r.minimal.length>1?lang.trMinCount(r.minimal.length):T.minNote);
     return h;
+  }
+  /* Karnaugh map: rows and columns in Gray code; hovering a term of the minimal DNF (a clause of the minimal CNF)
+     marks the cells it covers */
+  function karnaughRow(ast){
+    const vs=new Set();(function w(n){if(n.t==="var")vs.add(n.name);else if(n.t==="not")w(n.a);else if(n.t==="bin"){w(n.a);w(n.b)}})(ast);
+    const vars=S.model.vars.filter(v=>vs.has(v)),K=vars.length;
+    if(!K)return "";
+    if(K>4)return row(lang.trKarnaugh,"<span class=\"none\">"+esc(lang.trKarnaughOnly)+"</span>");
+    const rv=vars.slice(0,K>>1),cv=vars.slice(K>>1);
+    const gray=n=>n===0?[""]:n===1?["0","1"]:["00","01","11","10"];
+    const R=gray(rv.length),C=gray(cv.length),num=(r,c)=>parseInt(r+c,2);
+    const val=x=>{const e={};vars.forEach((v,j)=>e[v]=((x>>(K-1-j))&1)===1);return ev(ast,e)};
+    const bits=b=>[...b].map(c=>esc(sym(c==="1"))).join("");
+    let h="<div class=\"kmap-wrap\"><table class=\"kmap\"><thead><tr><th class=\"kcorner\">"+esc(rv.join(""))+(rv.length?" \\ ":"")+esc(cv.join(""))+"</th>"+
+      C.map(c=>"<th>"+bits(c)+"</th>").join("")+"</tr></thead><tbody>";
+    R.forEach(r=>{h+="<tr><th>"+(r?bits(r):"")+"</th>"+C.map(c=>{const x=num(r,c),b=val(x);return "<td class=\"v"+(b?1:0)+"\" data-x=\""+x+"\">"+esc(sym(b))+"</td>"}).join("")+"</tr>"});
+    h+="</tbody></table>";
+    // the first minimal DNF and CNF, each term with the rows it covers
+    if(K<=MIN_VARS){
+      const mf=minimalForms(ast,vars);
+      const covers=(lits,dnf)=>{const out=[];for(let x=0;x<1<<K;x++){const e={};vars.forEach((v,j)=>e[v]=((x>>(K-1-j))&1)===1);
+        if(lits.every(l=>dnf?e[l.v]!==l.neg:e[l.v]===l.neg))out.push(x)}return out.join(" ")};
+      const chips=(side,dnf,label)=>{
+        const r=mf[side];if(!r||!r.minimal.length)return "";
+        const f=r.minimal[0];if(f.length===1&&f[0].length===0)return "";
+        return "<div class=\"kterms\"><span class=\"lbl\">"+esc(label)+"</span> "+f.map(t=>"<button type=\"button\" class=\"kchip"+(dnf?"":" cnf")+"\" data-rows=\""+covers(t,dnf)+"\">"+
+          (dnf?t.map(litH).join(""):(t.length>1?"("+t.map(litH).join("∨")+")":t.map(litH).join("")))+"</button>").join(dnf?" ∨ ":" ")+"</div>";
+      };
+      h+=chips("dnf",true,lang.trKDnf)+chips("cnf",false,lang.trKCnf);
+    }
+    return row(lang.trKarnaugh,h+"</div>",lang.trKarnaughNote);
+  }
+  // a variable is dummy when changing only its value never changes the value of the formula
+  function dummyRow(ast){
+    const vs=new Set();(function w(n){if(n.t==="var")vs.add(n.name);else if(n.t==="not")w(n.a);else if(n.t==="bin"){w(n.a);w(n.b)}})(ast);
+    const vars=S.model.vars.filter(v=>vs.has(v)),K=vars.length;
+    if(!K)return row(lang.trDummy,"<span class=\"none\">"+esc(lang.trDummyNoVars)+"</span>",lang.trDummyNote);
+    if(K>16)return row(lang.trDummy,"<span class=\"none\">"+esc(lang.trTooMany(16))+"</span>",lang.trDummyNote);
+    const vec=[];for(let x=0;x<1<<K;x++){const e={};vars.forEach((v,j)=>e[v]=((x>>(K-1-j))&1)===1);vec.push(ev(ast,e))}
+    const dummy=vars.filter((_,j)=>{const b=1<<(K-1-j);for(let x=0;x<vec.length;x++)if(!(x&b)&&vec[x]!==vec[x|b])return false;return true});
+    const ess=vars.filter(v=>!dummy.includes(v));
+    return row(lang.trDummy,dummy.length?"<span>"+f(dummy.join(", "))+" <span class=\"none\">"+esc(lang.trDummyEss(ess))+"</span></span>":"<span class=\"none\">"+esc(lang.trDummyNone)+"</span>",lang.trDummyNote);
   }
   function postRow(ast){
     const vs=new Set();(function w(n){if(n.t==="var")vs.add(n.name);else if(n.t==="not")w(n.a);else if(n.t==="bin"){w(n.a);w(n.b)}})(ast);
@@ -2357,7 +2489,7 @@ function renderTransforms(){
   let h="";
   if(tab==="post"){$("tr-out").innerHTML=postTable()+"<p class=\"hint\">"+esc(lang.trNotes.post)+"</p>";return}
   S.model.groups.forEach(g=>{
-    h+="<div class=\"tr-f\"><h3>"+esc(g.text)+"</h3>";
+    h+="<div class=\"tr-f\"><h3>"+showH(g.ast)+"</h3>";
     if(tab==="nota"){
       const ti=treeInfo(g.ast),tiSize=ti.occ;
       h+=row(lang.trTree,tiSize>60?"<span class=\"none\">"+esc(lang.trFregeBig)+"</span>":"<div class=\"frege-wrap\">"+treeSvg(g.ast)+"</div>",lang.trTreeInfo(ti));
@@ -2374,7 +2506,7 @@ function renderTransforms(){
       const pt=peirceTree(g.ast);
       h+=row(lang.trPeirceImg,peirceTreeSize(pt)>150?"<span class=\"none\">"+esc(lang.trFregeBig)+"</span>":"<div class=\"frege-wrap\">"+peirceSvg(pt)+"</div>",lang.trPeirceImgNote);
       const fr=fregeOf(g.ast);
-      h+=row(lang.trFregeLin,f(show(fr)),lang.trFregeLinNote);
+      h+=row(lang.trFregeLin,fH(fr),lang.trFregeLinNote);
       const tex=begriffCode(fr);
       const copyBtn="<button type=\"button\" class=\"btn sm bg-copy\" data-tex=\""+esc(tex)+"\" title=\""+esc(lang.trBegriffNote)+"\">"+esc(lang.trBegriffCopy)+"</button>";
       // the copy button sits in the label column, under the name of the notation
@@ -2384,11 +2516,15 @@ function renderTransforms(){
       const nf=normalForms(g.ast);
       h+=row(lang.trSdnf,nf.dnfL?litList(nf.dnfL,true,lang.trNoSdnf):list(nf.dnf,"∨",lang.trNoSdnf))+minRows(g.ast,"dnf");
       h+=row(lang.trSknf,nf.cnfL?litList(nf.cnfL,false,lang.trNoSknf):list(nf.cnf,"∧",lang.trNoSknf))+minRows(g.ast,"cnf");
+      h+=karnaughRow(g.ast);
       h+=row(lang.trZheg,nf.zh.length?list(nf.zh," ⊕ ",""):f("0"));
+      h+=dummyRow(g.ast);
       // the same function with a single connective: the Sheffer stroke, the Peirce arrow
       for(const [name,fn] of [[lang.trSheffer,shefferOnly],[lang.trPeirceArrow,peirceOnly]]){
         const t=fn(g.ast),op=fn===shefferOnly?"|":"↓",mn=minimalSingle(g.ast,op);
-        const direct=shownLength(t,600)>600?"<span class=\"none\">"+esc(lang.trTooLong)+"</span>":f(show(t));
+        const dl=shownLength(t,LONG_MAX),lk=op+"|"+g.text;
+        const direct=dl<=600||SHOW_LONG.has(lk)&&dl<=LONG_MAX?f(show(t)):"<span><span class=\"none\">"+esc(lang.trTooLong)+"</span>"+
+          (dl<=LONG_MAX?" <button type=\"button\" class=\"btn sm long-go\" data-k=\""+esc(lk)+"\">"+esc(lang.trShowLong)+"</button>":" <span class=\"none\">"+esc(lang.trTooLongMax)+"</span>")+"</span>";
         if(mn==="ask"){h+=row(name,"<div class=\"single\"><div><button type=\"button\" class=\"btn sm min-go\" data-g=\""+S.model.groups.indexOf(g)+"\" data-op=\""+op+"\">"+esc(lang.trSingleGo)+"</button></div><div><span class=\"lbl\">"+esc(lang.trSingleDirect)+"</span> "+direct+"</div></div>",lang.trSingleAsk);continue}
         if(mn==="pending"){h+=row(name,"<div class=\"single\"><div><span class=\"lbl\">"+esc(lang.trSingleWait)+"</span></div><div><span class=\"lbl\">"+esc(lang.trSingleDirect)+"</span> "+direct+"</div></div>",lang.trSingleNote);continue}
         if(!mn){h+=row(name,direct,lang.trSingleNoMin);continue}
@@ -2407,7 +2543,7 @@ function postTable(){
   const lang=L(),K=["T0","T1","S","M","L"],gs=S.model.groups;
   const cls=gs.map(g=>postClasses(g.ast,formulaVars(g.ast)));
   let h="<div class=\"tw\"><table class=\"posttab\"><thead><tr><th class=\"txt\">"+esc(lang.postFn)+"</th>"+K.map(k=>"<th>"+lang.postSym[k]+"</th>").join("")+"</tr></thead><tbody>";
-  gs.forEach((g,i)=>{h+="<tr><td class=\"txt mono\">"+esc(g.text)+"</td>"+K.map(k=>"<td class=\""+(cls[i][k]?"yes":"no")+"\" title=\""+esc(lang.postName[k]+": "+(cls[i][k]?lang.postYes:lang.postNo))+"\">"+(cls[i][k]?"+":"−")+"</td>").join("")+"</tr>"});
+  gs.forEach((g,i)=>{h+="<tr><td class=\"txt mono\">"+showH(g.ast)+"</td>"+K.map(k=>"<td class=\""+(cls[i][k]?"yes":"no")+"\" title=\""+esc(lang.postName[k]+": "+(cls[i][k]?lang.postYes:lang.postNo))+"\">"+(cls[i][k]?"+":"−")+"</td>").join("")+"</tr>"});
   const all=K.filter(k=>cls.every(c=>c[k]));
   h+="<tr class=\"tot\"><td class=\"txt\">"+esc(lang.postAll)+"</td>"+K.map(k=>"<td class=\""+(all.includes(k)?"bad":"yes")+"\">"+(all.includes(k)?"✗":"✓")+"</td>").join("")+"</tr></tbody></table></div>";
   const verdict=!all.length?(gs.length===1?lang.postSheffer:lang.postComplete):lang.postIncomplete(all.map(k=>lang.postSym[k]+" ("+lang.postName[k]+")"));
@@ -2417,12 +2553,21 @@ S.trTab=load("trTab","nota");
 $("tr-tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;S.trTab=b.dataset.tab;save("trTab",S.trTab);trKey="";renderTransforms()});
 $("tr-details").addEventListener("toggle",renderTransforms);
 $("tr-out").addEventListener("click",e=>{const b=e.target.closest(".minf-go");if(!b)return;
-  // let the page show the message before the (synchronous) search starts
-  document.querySelectorAll(".minf-go").forEach(x=>{if(x.dataset.key===b.dataset.key){x.disabled=true;x.textContent=L().trMinWait}});
-  setTimeout(()=>{MIN_FORMS_BIG.add(b.dataset.key);const g=S.model.groups[+b.dataset.g];
-    const vs=new Set();(function w(n){if(n.t==="var")vs.add(n.name);else if(n.t==="not")w(n.a);else if(n.t==="bin"){w(n.a);w(n.b)}})(g.ast);
-    minimalForms(g.ast,S.model.vars.filter(v=>vs.has(v)),true);trKey="";renderTransforms()},50);
+  const g=S.model.groups[+b.dataset.g];
+  const vs=new Set();(function w(n){if(n.t==="var")vs.add(n.name);else if(n.t==="not")w(n.a);else if(n.t==="bin"){w(n.a);w(n.b)}})(g.ast);
+  minimalFormsBig(g.ast,S.model.vars.filter(v=>vs.has(v)));trKey="";renderTransforms();
 });
+// Karnaugh map: mark the cells of a term while the pointer (or focus) is on it; a click keeps the mark
+const kmark=(chip,on)=>{const w=chip.closest(".kmap-wrap"),rows=new Set(chip.dataset.rows.split(" "));
+  w.querySelectorAll(".kmap td").forEach(td=>{const hit=on&&rows.has(td.dataset.x);td.classList.toggle("hl",hit);td.classList.toggle("cnf",hit&&chip.classList.contains("cnf"))})};
+const kreset=w=>{const on=w.querySelector(".kchip.on");if(on)kmark(on,true);else w.querySelectorAll(".kmap td").forEach(td=>td.classList.remove("hl","cnf"))};
+$("tr-out").addEventListener("mouseover",e=>{const c=e.target.closest(".kchip");if(c)kmark(c,true)});
+$("tr-out").addEventListener("mouseout",e=>{const c=e.target.closest(".kchip");if(c)kreset(c.closest(".kmap-wrap"))});
+$("tr-out").addEventListener("focusin",e=>{const c=e.target.closest(".kchip");if(c)kmark(c,true)});
+$("tr-out").addEventListener("focusout",e=>{const c=e.target.closest(".kchip");if(c)kreset(c.closest(".kmap-wrap"))});
+$("tr-out").addEventListener("click",e=>{const c=e.target.closest(".kchip");if(!c)return;const w=c.closest(".kmap-wrap"),was=c.classList.contains("on");
+  w.querySelectorAll(".kchip.on").forEach(x=>x.classList.remove("on"));if(!was)c.classList.add("on");kreset(w)});
+$("tr-out").addEventListener("click",e=>{const b=e.target.closest(".long-go");if(!b)return;SHOW_LONG.add(b.dataset.k);trKey="";renderTransforms()});
 $("tr-out").addEventListener("click",e=>{const b=e.target.closest(".min-go");if(!b)return;
   minimalSingle(S.model.groups[+b.dataset.g].ast,b.dataset.op,true);trKey="";renderTransforms()});
 $("tr-out").addEventListener("click",e=>{
@@ -2551,7 +2696,7 @@ function applyCustom(){
   syncSegs();buildSemantics();if(S.model)update();
 }));
 function syncSegs(){
-  const val={notation:S.notation,auto:S.auto?"1":"0",order:S.order,layout:S.layout,cols:S.cols,reveal:S.reveal?"1":"0",askKind:S.askKind?"1":"0",extraOps:S.extraOps?"1":"0",keys:S.keys?"1":"0"};
+  const val={notation:S.notation,auto:S.auto?"1":"0",order:S.order,layout:S.layout,cols:S.cols,reveal:S.reveal?"1":"0",askKind:S.askKind?"1":"0",extraOps:S.extraOps?"1":"0",keys:S.keys?"1":"0",omitAnd:S.omitAnd?"1":"0",negBar:S.negBar?"1":"0"};
   $("keys").hidden=!S.keys;
   document.querySelectorAll(".seg[data-set]").forEach(g=>{
     g.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.val===val[g.dataset.set])));
@@ -2576,6 +2721,7 @@ document.querySelectorAll(".seg[data-set]").forEach(g=>{
     if(key==="askKind")S.askKind=v==="1";
     if(key==="extraOps"){S.extraOps=v==="1";save(key,S[key]);applyLang();return}
     if(key==="keys"){S.keys=v==="1";save(key,S[key]);syncSegs();return}
+    if(key==="omitAnd"||key==="negBar"){S[key]=v==="1";save(key,S[key]);syncSegs();if(S.model){renderTable();update();trKey="";renderTransforms()}return}
     save(key,S[key]);syncSegs();
     if(key==="auto"||key==="cols"||key==="layout")renderTable();else update();
   });
