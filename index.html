@@ -1588,9 +1588,13 @@ $("hint").addEventListener("click",()=>{
   }
   // then a wrong cell, then an empty one
   let t=null;
+  // column by column (left to right), top to bottom inside a column
   for(const wrong of [true,false]){
-    for(let r=0;r<m.n&&!t;r++){if(!A.rows[r].complete)continue;
-      for(const x of A.sl){const v=store(x.s)[r][x.c],want=ev(x.node,A.rows[r].env);if(wrong?(v!=null&&v!==want):v==null){t={x,r,want};break}}}
+    for(const x of A.sl){
+      for(let r=0;r<m.n;r++){if(!A.rows[r].complete)continue;
+        const v=store(x.s)[r][x.c],want=ev(x.node,A.rows[r].env);if(wrong?(v!=null&&v!==want):v==null){t={x,r,want};break}}
+      if(t)break;
+    }
     if(t)break;
   }
   if(!t){showExplain(esc(lang.ex.nothing));return}
