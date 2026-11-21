@@ -647,6 +647,18 @@ ru:{
     ["Несовместные посылки","если нет строки, где все посылки истинны, из них следует любое заключение."]],
   semRel:"Отношения между формулами A и B",
   semRelNote:"Отношение определяется тем, какие пары значений (A, B) встречаются в общей таблице истинности. «+» — встречается, «—» — не встречается, «±» — может встречаться или нет.",
+  semDnf:"Сокращённая, куайновская и минимальная ДНФ",
+  semDnfDefs:[["Простая импликанта","элементарная конъюнкция, из которой следует формула, но не следует ни одна более короткая её часть."],
+    ["Сокращённая ДНФ","дизъюнкция всех простых импликант."],
+    ["ДНФ Куайна","дизъюнкция простых импликант, входящих хотя бы в одну минимальную ДНФ."],
+    ["Минимальная ДНФ","ДНФ с наименьшим числом букв; их может быть несколько."]],
+  semDnfEx:"Пример, где все три формы различаются: f = ¬p∧q∧r ∨ p∧r∧s ∨ p∧¬q∧¬s ∨ p∧q∧s.",
+  semDnfRows:[["Простые импликанты","¬pqr, prs, p¬q¬s, pqs, p¬qr, qrs"],
+    ["Сокращённая ДНФ (все 6)","¬pqr ∨ prs ∨ p¬q¬s ∨ pqs ∨ p¬qr ∨ qrs"],
+    ["Минимальные ДНФ (по 12 букв)","¬pqr ∨ prs ∨ p¬q¬s ∨ pqs  и  ¬pqr ∨ p¬qr ∨ p¬q¬s ∨ pqs"],
+    ["ДНФ Куайна (5 из 6)","¬pqr ∨ prs ∨ p¬qr ∨ p¬q¬s ∨ pqs"]],
+  semDnfNote:"Импликанта qrs простая, но не входит ни в одну минимальную ДНФ: всё, что она покрывает, покрывают ¬pqr и prs. Поэтому сокращённая ДНФ длиннее ДНФ Куайна. Минимальных ДНФ две, и каждая короче ДНФ Куайна: prs и p¬qr взаимозаменяемы.",
+  semDnfOpen:"Открыть пример",
   semAlgo:"Как определить отношение",
   semAlgoSteps:["Выпишите множество S — пары значений (A, B), которые встречаются в строках общей таблицы истинности. Всего пар четыре: 11, 10, 01, 00 (первая цифра — значение A, вторая — B).",
     "Первая ось — пары 10 и 01 (следование). Нет ни 10, ни 01 — эквивалентность. Нет 10, но есть 01 — A подчиняет B (A ⊨ B, но не B ⊨ A). Нет 01, но есть 10 — B подчиняет A. Есть обе пары — по этой оси отношения нет.",
@@ -836,6 +848,18 @@ en:{
     ["Inconsistent premises","if no row makes all premises true, they entail any conclusion."]],
   semRel:"Relations between formulas A and B",
   semRelNote:"A relation is determined by which pairs of values (A, B) occur in the common truth table. “+” occurs, “—” does not occur, “±” may or may not occur.",
+  semDnf:"Abbreviated, Quine and minimal DNF",
+  semDnfDefs:[["Prime implicant","an elementary conjunction that entails the formula, while no shorter part of it does."],
+    ["Abbreviated DNF","the disjunction of all prime implicants."],
+    ["Quine DNF","the disjunction of the prime implicants that occur in at least one minimal DNF."],
+    ["Minimal DNF","a DNF with the fewest literals; there may be several."]],
+  semDnfEx:"An example where all three forms differ: f = ¬p∧q∧r ∨ p∧r∧s ∨ p∧¬q∧¬s ∨ p∧q∧s.",
+  semDnfRows:[["Prime implicants","¬pqr, prs, p¬q¬s, pqs, p¬qr, qrs"],
+    ["Abbreviated DNF (all 6)","¬pqr ∨ prs ∨ p¬q¬s ∨ pqs ∨ p¬qr ∨ qrs"],
+    ["Minimal DNFs (12 literals each)","¬pqr ∨ prs ∨ p¬q¬s ∨ pqs  and  ¬pqr ∨ p¬qr ∨ p¬q¬s ∨ pqs"],
+    ["Quine DNF (5 of 6)","¬pqr ∨ prs ∨ p¬qr ∨ p¬q¬s ∨ pqs"]],
+  semDnfNote:"The implicant qrs is prime but occurs in no minimal DNF: everything it covers is covered by ¬pqr and prs. So the abbreviated DNF is longer than the Quine DNF. There are two minimal DNFs, each shorter than the Quine DNF: prs and p¬qr can replace each other.",
+  semDnfOpen:"Open the example",
   semAlgo:"How to find the relation",
   semAlgoSteps:["Write down the set S of pairs of values (A, B) that occur in the rows of the common truth table. There are four pairs: 11, 10, 01, 00 (the first digit is the value of A, the second of B).",
     "The first axis is the pairs 10 and 01 (entailment). Neither 10 nor 01 — equivalence. No 10 but 01 occurs — A is superaltern to B (A ⊨ B but not B ⊨ A). No 01 but 10 occurs — B is superaltern to A. Both occur — no relation on this axis.",
@@ -2784,7 +2808,11 @@ function buildSemantics(){
     const a=S_.map(x=>x[0]),b=S_.map(x=>x[1]),rs=relations(a.join(""),b.join(""));
     h+="<tr><td class=\"txt mono\">{"+S_.map(pair).join(", ")+"}</td><td class=\"txt\">"+esc(lang.semAlgoKind[kindOf(a)])+"</td><td class=\"txt\">"+esc(lang.semAlgoKind[kindOf(b)])+"</td><td class=\"txt\"><b>"+rs.map(r=>esc(name(r))).join(" + ")+"</b></td></tr>";
   });
-  $("sem").innerHTML=h+"</tbody></table></div><p>"+esc(lang.semAlgoNote)+"</p>";
+  h+="</tbody></table></div><p>"+esc(lang.semAlgoNote)+"</p>";
+  // abbreviated vs Quine vs minimal DNF on one example
+  const exF="¬p∧q∧r ∨ p∧r∧s ∨ p∧¬q∧¬s ∨ p∧q∧s";
+  h+="<h3>"+esc(lang.semDnf)+"</h3>"+dl(lang.semDnfDefs)+"<p>"+esc(lang.semDnfEx)+" <a href=\""+esc("?f="+encodeURIComponent(exF))+"\">"+esc(lang.semDnfOpen)+"</a></p>"+dl(lang.semDnfRows)+"<p>"+esc(lang.semDnfNote)+"</p>";
+  $("sem").innerHTML=h;
 }
 function applyLang(){
   const lang=L();
